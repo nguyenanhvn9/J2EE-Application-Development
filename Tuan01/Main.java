@@ -90,17 +90,22 @@ public class Main {
                 System.out.println("Loai san pham khong hop le!");
                 return;
         }
-        inventory.addProduct(product);
-        System.out.println("Da them san pham thanh cong!");
+        boolean added = inventory.addProduct(product);
+        if (added) {
+            System.out.println("Da them san pham thanh cong!");
+        }
     }
 
     private static void removeProductMenu() {
         System.out.print("Nhap ID san pham can xoa: ");
         String id = scanner.nextLine();
-        if (inventory.removeProductById(id)) {
-            System.out.println("Da xoa san pham thanh cong!");
-        } else {
-            System.out.println("Khong tim thay san pham!");
+        try {
+            inventory.getProductById(id); // kiểm tra tồn tại
+            if (inventory.removeProductById(id)) {
+                System.out.println("Da xoa san pham thanh cong!");
+            }
+        } catch (ProductNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -111,10 +116,13 @@ public class Main {
         double price = Double.parseDouble(scanner.nextLine());
         System.out.print("So luong moi: ");
         int quantity = Integer.parseInt(scanner.nextLine());
-        if (inventory.updateProduct(id, price, quantity)) {
-            System.out.println("Cap nhat thanh cong!");
-        } else {
-            System.out.println("Khong tim thay san pham!");
+        try {
+            inventory.getProductById(id); // kiểm tra tồn tại
+            if (inventory.updateProduct(id, price, quantity)) {
+                System.out.println("Cap nhat thanh cong!");
+            }
+        } catch (ProductNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -152,17 +160,17 @@ public class Main {
             System.out.print("Nhap ID san pham muon mua (hoac 0 de ket thuc): ");
             String id = scanner.nextLine();
             if (id.equals("0")) break;
-            Product product = inventory.getProductById(id);
-            if (product == null) {
-                System.out.println("Khong tim thay san pham!");
-                continue;
-            }
-            System.out.print("Nhap so luong muon mua: ");
-            int quantity = Integer.parseInt(scanner.nextLine());
             try {
-                order.addProduct(product, quantity);
-                System.out.println("Da them vao don hang!");
-            } catch (OutOfStockException e) {
+                Product product = inventory.getProductById(id);
+                System.out.print("Nhap so luong muon mua: ");
+                int quantity = Integer.parseInt(scanner.nextLine());
+                try {
+                    order.addProduct(product, quantity);
+                    System.out.println("Da them vao don hang!");
+                } catch (OutOfStockException e) {
+                    System.out.println(e.getMessage());
+                }
+            } catch (ProductNotFoundException e) {
                 System.out.println(e.getMessage());
             }
         }

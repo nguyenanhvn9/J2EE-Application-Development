@@ -15,8 +15,16 @@ public class InventoryManager {
         return instance;
     }
 
-    public void addProduct(Product product) {
+    // Them san pham, khong cho trung Id
+    public boolean addProduct(Product product) {
+        for (Product p : products) {
+            if (p.getId().equals(product.getId())) {
+                System.out.println("Khong the them, ID da ton tai!");
+                return false;
+            }
+        }
         products.add(product);
+        return true;
     }
 
     public boolean removeProductById(String id) {
@@ -64,13 +72,14 @@ public class InventoryManager {
         }
     }
 
-    public Product getProductById(String id) {
+    // Lay san pham theo Id, neu khong ton tai thi nem ProductNotFoundException
+    public Product getProductById(String id) throws ProductNotFoundException {
         for (Product p : products) {
             if (p.getId().equals(id)) {
                 return p;
             }
         }
-        return null;
+        throw new ProductNotFoundException("San pham voi ID " + id + " khong ton tai!");
     }
 
     public List<Product> getProducts() {
