@@ -15,7 +15,7 @@ public class Main {
             System.out.println("5. Tim kiem san pham theo khoang gia");
             System.out.println("6. Hien thi tat ca san pham");
             System.out.println("0. Thoat");
-            System.out.print("Chon chuc nang: ");
+            System.out.print("Ch: ");
             int choice = Integer.parseInt(scanner.nextLine());
             switch (choice) {
                 case 1: addProductMenu(); break;
@@ -24,7 +24,7 @@ public class Main {
                 case 4: searchByNameMenu(); break;
                 case 5: searchByPriceMenu(); break;
                 case 6: inventory.displayAllProducts(); break;
-                case 0: System.out.println("Tam biet!"); return;
+                case 0: System.out.println("Tam biet!!!"); return;
                 default: System.out.println("Lua chon khong hop le!");
             }
         }
