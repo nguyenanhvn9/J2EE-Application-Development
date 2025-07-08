@@ -86,5 +86,13 @@ public class InventoryManager {
             System.out.println();
         }
     }
+
+    public Product getProductById(String id) {
+        for (Product p : products) {
+            if (p.id.equalsIgnoreCase(id)) return p;
+        }
+        return null;
+    }
+
 }
 
