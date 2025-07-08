@@ -143,6 +143,7 @@ public class Main {
         }
     }
 
+    //nhập giá thấp nhất và giá tối đa
     static void filterByPriceRangeCLI(InventoryManager manager) {
         System.out.print("Enter min price: "); double min = getDoubleInput();
         if (min == -1.0) return;
