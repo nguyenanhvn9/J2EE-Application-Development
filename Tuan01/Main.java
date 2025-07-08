@@ -29,7 +29,6 @@ public class Main {
             }
         }
     }
-    // Menu chon san pham
     private static void addProductMenu() {
         System.out.println("Chon loai san pham:");
         System.out.println("1. Dien tu");
