@@ -101,7 +101,7 @@ public class InventoryManager {
             throw new OutOfStockException("Số lượng trong kho không đủ");
         }
 
-        order.addItem(product, quantity);1
+        order.addItem(product, quantity);
     }
 
 
