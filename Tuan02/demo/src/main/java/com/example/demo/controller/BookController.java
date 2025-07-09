@@ -18,9 +18,13 @@ public class BookController {
 
     // 1. Lấy danh sách tất cả sách
     @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks() {
-        bookService.fetchBooks(); // lazy loading
-        return ResponseEntity.ok(bookService.getAllBooks());
+    public List<Book> getBooks(
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+
+        bookService.fetchBooks(); // nạp dữ liệu 1 lần nếu rỗng
+        return bookService.getAllBooks(author, page, size);
     }
 
     // 2. Lấy thông tin sách theo ID

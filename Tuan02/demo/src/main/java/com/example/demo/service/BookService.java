@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Book;
 import com.example.demo.dto.*;
 import org.springframework.http.ResponseEntity;
@@ -7,25 +8,40 @@ import org.springframework.http.HttpMethod;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class BookService {
     private final List<Book> books = new ArrayList<>();
 
-    public List<Book> getAllBooks() {
-        return books;
+    public List<Book> getAllBooks(String author, Integer page, Integer size) {
+        Stream<Book> stream = books.stream();
+
+        // Lọc theo tên tác giả nếu có
+        if (author != null && !author.isEmpty()) {
+            stream = stream.filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()));
+        }
+
+        // Phân trang nếu có
+        if (page != null && size != null) {
+            int skip = page * size;
+            stream = stream.skip(skip).limit(size);
+        }
+
+        return stream.collect(Collectors.toList());
     }
 
     public Book getBookById(int id) {
         return books.stream()
                 .filter(book -> book.getId() == id)
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Book with ID " + id + " not found."));
     }
 
     public boolean addBook(Book book) {
@@ -66,8 +82,9 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable("books")
     public void fetchBooks() {
-        if (!books.isEmpty()) return; // tránh gọi nhiều lần
+        if (!books.isEmpty()) return;
 
         String url = "https://gutendex.com/books";
         RestTemplate restTemplate = new RestTemplate();
@@ -84,7 +101,6 @@ public class BookService {
             String authorNames = dto.getAuthors().stream()
                     .map(AuthorDTO::getName)
                     .collect(Collectors.joining(", "));
-
             books.add(new Book(dto.getId(), dto.getTitle(), authorNames));
         }
     }
