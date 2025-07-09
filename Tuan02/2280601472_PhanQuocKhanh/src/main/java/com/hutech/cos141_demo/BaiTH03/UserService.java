@@ -1,6 +1,6 @@
 package com.hutech.cos141_demo.BaiTH03;
 
-import com.hutech.cos141_demo.BaiTH03.dto.UserDTO;
+import com.hutech.cos141_demo.BaiTH03_04.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;

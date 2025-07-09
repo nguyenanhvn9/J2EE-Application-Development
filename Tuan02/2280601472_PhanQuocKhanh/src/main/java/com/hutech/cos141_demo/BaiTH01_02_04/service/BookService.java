@@ -1,9 +1,9 @@
-package com.hutech.cos141_demo.service;
+package com.hutech.cos141_demo.BaiTH01_02_04.service;
 
-import com.hutech.cos141_demo.model.AuthorDTO;
-import com.hutech.cos141_demo.model.Book;
-import com.hutech.cos141_demo.model.BookApiResponseDTO;
-import com.hutech.cos141_demo.model.BookDTO;
+import com.hutech.cos141_demo.BaiTH01_02_04.model.AuthorDTO;
+import com.hutech.cos141_demo.BaiTH01_02_04.model.Book;
+import com.hutech.cos141_demo.BaiTH01_02_04.model.BookApiResponseDTO;
+import com.hutech.cos141_demo.BaiTH01_02_04.model.BookDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.cache.annotation.Cacheable;
