@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         body.put("error", "Internal Server Error");
-        body.put("message", "Đã xảy ra lỗi không mong muốn: " + ex.getMessage());
+        body.put("message", "Đã xảy ra lỗi " + ex.getMessage());
         body.put("path", request.getDescription(false));
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
