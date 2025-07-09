@@ -14,8 +14,14 @@ public class BookController {
     private BookService bookService;
     // 1. Lấy danh sách tất cả sách
     @GetMapping
-    public List<Book> getAllBooks() {
-        return bookService.getAllBooks();
+    public List<Book> getAllBooks(@RequestParam(required = false) String author,
+                                  @RequestParam(required = false) Integer page,
+                                  @RequestParam(required = false) Integer size) {
+        if (author != null || page != null || size != null) {
+            return bookService.getAllBooks(author, page, size);
+        } else {
+            return bookService.getAllBooks();
+        }
     }
     // 2. Lấy thông tin sách theo ID
     @GetMapping("/{id}")

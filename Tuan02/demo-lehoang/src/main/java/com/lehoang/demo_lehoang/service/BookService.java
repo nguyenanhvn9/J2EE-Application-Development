@@ -11,12 +11,26 @@ import javax.annotation.PostConstruct;
 import com.lehoang.demo_lehoang.dto.GutendexResponse;
 import com.lehoang.demo_lehoang.dto.BookDto;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class BookService {
     private List<Book> books = new ArrayList<>();
     public List<Book> getAllBooks() {
         return books;
+    }
+    public List<Book> getAllBooks(String author, Integer page, Integer size) {
+        // Lọc theo author nếu có
+        Stream<Book> stream = books.stream();
+        if (author != null && !author.trim().isEmpty()) {
+            String lowerAuthor = author.toLowerCase();
+            stream = stream.filter(book -> book.getAuthor() != null && book.getAuthor().toLowerCase().contains(lowerAuthor));
+        }
+        // Phân trang
+        if (page != null && size != null && page >= 0 && size > 0) {
+            stream = stream.skip((long) page * size).limit(size);
+        }
+        return stream.toList();
     }
     public Book getBookById(int id) {
         return books.stream().filter(book -> book.getId() ==
