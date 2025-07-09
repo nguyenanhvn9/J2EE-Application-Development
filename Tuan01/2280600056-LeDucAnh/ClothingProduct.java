@@ -12,6 +12,7 @@ public class ClothingProduct extends Product {
 
     @Override
     public void display() {
-        System.out.println("[Quan ao] ID: " + id + ", Ten: " + name + ", Gia: " + price + ", SL: " + quantityInStock + ", Size: " + size + ", Chat lieu: " + material);
+        System.out.println("[Quan ao] ID: " + id + ", Ten: " + name + ", Gia: " + price + ", SL: " + quantityInStock
+                + ", Size: " + size + ", Chat lieu: " + material);
     }
-} 
+}
