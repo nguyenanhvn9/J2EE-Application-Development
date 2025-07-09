@@ -8,6 +8,9 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Arrays;
 import javax.annotation.PostConstruct;
+import com.lehoang.demo_lehoang.dto.GutendexResponse;
+import com.lehoang.demo_lehoang.dto.BookDto;
+import java.util.Optional;
 
 @Service
 public class BookService {
@@ -19,20 +22,37 @@ public class BookService {
         return books.stream().filter(book -> book.getId() ==
                 id).findFirst().orElse(null);
     }
-    public void addBook(Book book) {
+    public boolean addBook(Book book) {
+        if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("Book title cannot be null or empty.");
+        }
+        if (book.getAuthor() == null || book.getAuthor().trim().isEmpty()) {
+            throw new IllegalArgumentException("Book author cannot be null or empty.");
+        }
+        if (books.stream().anyMatch(b -> b.getId() == book.getId())) {
+            throw new IllegalArgumentException("Book with this ID already exists.");
+        }
         books.add(book);
+        return true;
     }
-    public void updateBook(int id, Book updatedBook) {
-        books.stream()
-                .filter(book -> book.getId() == id)
-                .findFirst()
-                .ifPresent(book -> {
-                    book.setTitle(updatedBook.getTitle());
-                    book.setAuthor(updatedBook.getAuthor());
-                });
+    public Optional<Book> updateBook(int id, Book updatedBook) {
+        if (updatedBook.getTitle() == null || updatedBook.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("Book title cannot be null or empty.");
+        }
+        if (updatedBook.getAuthor() == null || updatedBook.getAuthor().trim().isEmpty()) {
+            throw new IllegalArgumentException("Book author cannot be null or empty.");
+        }
+        for (Book book : books) {
+            if (book.getId() == id) {
+                book.setTitle(updatedBook.getTitle());
+                book.setAuthor(updatedBook.getAuthor());
+                return Optional.of(book);
+            }
+        }
+        return Optional.empty();
     }
-    public void deleteBook(int id) {
-        books.removeIf(book -> book.getId() == id);
+    public boolean deleteBook(int id) {
+        return books.removeIf(book -> book.getId() == id);
     }
 
     public void fetchBooksFromApi() {
@@ -52,24 +72,17 @@ public class BookService {
     public void init() {
         fetchBooksFromApi();
     }
-}
 
-// DTO classes for API response
-class GutendexResponse {
-    public int count;
-    public String next;
-    public String previous;
-    public BookDto[] results;
-}
-class BookDto {
-    public int id;
-    public String title;
-    public AuthorDto[] authors;
-}
-class AuthorDto {
-    public String name;
-    @JsonProperty("birth_year")
-    public Integer birthYear;
-    @JsonProperty("death_year")
-    public Integer deathYear;
+    public List<Book> searchBooks(String keyword) {
+        if (keyword == null) return List.of();
+        String lowerKeyword = keyword.toLowerCase();
+        List<Book> result = new ArrayList<>();
+        for (Book book : books) {
+            if ((book.getTitle() != null && book.getTitle().toLowerCase().contains(lowerKeyword)) ||
+                (book.getAuthor() != null && book.getAuthor().toLowerCase().contains(lowerKeyword))) {
+                result.add(book);
+            }
+        }
+        return result;
+    }
 }
