@@ -10,32 +10,60 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class BookService {
-    private List<Book> books = new ArrayList<>();
+    private final List<Book> books = new ArrayList<>();
+
     public List<Book> getAllBooks() {
         return books;
     }
+
     public Book getBookById(int id) {
-        return books.stream().filter(book -> book.getId() ==
-                id).findFirst().orElse(null);
-    }
-    public void addBook(Book book) {
-        books.add(book);
-    }
-    public void updateBook(int id, Book updatedBook) {
-        books.stream()
+        return books.stream()
                 .filter(book -> book.getId() == id)
                 .findFirst()
-                .ifPresent(book -> {
-                    book.setTitle(updatedBook.getTitle());
-                    book.setAuthor(updatedBook.getAuthor());
-                });
+                .orElse(null);
     }
-    public void deleteBook(int id) {
-        books.removeIf(book -> book.getId() == id);
+
+    public boolean addBook(Book book) {
+        validateBook(book);
+
+        boolean exists = books.stream().anyMatch(b -> b.getId() == book.getId());
+        if (exists) {
+            throw new IllegalArgumentException("Book with this ID already exists.");
+        }
+
+        books.add(book);
+        return true;
+    }
+
+    public Optional<Book> updateBook(int id, Book updatedBook) {
+        validateBook(updatedBook);
+
+        for (Book book : books) {
+            if (book.getId() == id) {
+                book.setTitle(updatedBook.getTitle());
+                book.setAuthor(updatedBook.getAuthor());
+                return Optional.of(book);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public boolean deleteBook(int id) {
+        return books.removeIf(book -> book.getId() == id);
+    }
+
+    public List<Book> searchBooks(String keyword) {
+        String lowerKeyword = keyword.toLowerCase();
+        return books.stream()
+                .filter(book ->
+                        book.getTitle().toLowerCase().contains(lowerKeyword) ||
+                                book.getAuthor().toLowerCase().contains(lowerKeyword))
+                .collect(Collectors.toList());
     }
 
     public void fetchBooks() {
@@ -58,6 +86,13 @@ public class BookService {
                     .collect(Collectors.joining(", "));
 
             books.add(new Book(dto.getId(), dto.getTitle(), authorNames));
+        }
+    }
+
+    private void validateBook(Book book) {
+        if (book.getTitle() == null || book.getTitle().trim().isEmpty() ||
+                book.getAuthor() == null || book.getAuthor().trim().isEmpty()) {
+            throw new IllegalArgumentException("Title and author must not be empty.");
         }
     }
 }
