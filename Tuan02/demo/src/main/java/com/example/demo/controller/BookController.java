@@ -14,6 +14,7 @@ public class BookController {
     // 1. Lấy danh sách tất cả sách
     @GetMapping
     public List<Book> getAllBooks() {
+        bookService.fetchBooks();
         return bookService.getAllBooks();
     }
     // 2. Lấy thông tin sách theo ID
