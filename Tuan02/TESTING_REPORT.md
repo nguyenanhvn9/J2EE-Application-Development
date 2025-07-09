@@ -1,5 +1,3 @@
-Dưới đây là bản dịch tiếng Việt cho **Báo cáo kiểm thử Ứng dụng Quản lý Sách Spring Boot**:
-
 ---
 
 # **Báo Cáo Kiểm Thử Ứng Dụng Quản Lý Sách Spring Boot**
