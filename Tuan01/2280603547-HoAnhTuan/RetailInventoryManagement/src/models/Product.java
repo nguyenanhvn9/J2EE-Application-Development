@@ -13,16 +13,12 @@ public abstract class Product {
         this.quantityInStock = quantityInStock;
     }
 
-    // Phương thức trừu tượng, các lớp con phải triển khai
     public abstract void display();
 
-    // Getters
     public String getId() { return id; }
-    public String getName() { return name; }
-    public double getPrice() { return price; }
-    public int getQuantityInStock() { return quantityInStock; }
-
-    // Setters (chỉ cung cấp cho các thuộc tính cần thay đổi)
     public void setPrice(double price) { this.price = price; }
-    public void setQuantityInStock(int quantityInStock) { this.quantityInStock = quantityInStock; }
+    public void setQuantityInStock(int quantity) { this.quantityInStock = quantity; }
+    public int getQuantityInStock() { return quantityInStock; }
+    public double getPrice() { return price; }
+    public String getName() { return name; }
 }
