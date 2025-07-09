@@ -3,7 +3,7 @@ package Tuan01;
 import java.util.*;
 import java.time.LocalDate;
 
-public class InventoryApp {
+public class Main {
     private static Scanner scanner = new Scanner(System.in);
     private static InventoryManager manager = InventoryManager.getInstance();
 

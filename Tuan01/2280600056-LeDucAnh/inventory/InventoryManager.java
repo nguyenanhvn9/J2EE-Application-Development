@@ -27,7 +27,8 @@ public class InventoryManager implements java.io.Serializable {
 
     public Product findById(String id) {
         for (Product p : products) {
-            if (p.getId().equals(id)) return p;
+            if (p.getId().equals(id))
+                return p;
         }
         return null;
     }
@@ -65,4 +66,4 @@ public class InventoryManager implements java.io.Serializable {
     public void setProducts(List<Product> products) {
         this.products = products;
     }
-} 
+}
