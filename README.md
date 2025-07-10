@@ -61,7 +61,7 @@ git checkout -b [MSSV]-[HoTen]
 
 1.  **Đảm bảo** bạn đang ở trên branch của mình bằng lệnh `git branch` (branch hiện tại sẽ có dấu `*`).
 
-2.  **Tạo project** Visual Studio vào đúng thư mục của tuần tương ứng (ví dụ: `Tuan02`), đặt tên cho Project theo định dạng **[MSSV]-[HoTen]**.
+2.  **Tạo project** vào đúng thư mục của tuần tương ứng (ví dụ: `Tuan02`), đặt tên cho Project theo định dạng **[MSSV]-[HoTen]**.
 
 3.  **Làm bài và commit thường xuyên.** 
 
