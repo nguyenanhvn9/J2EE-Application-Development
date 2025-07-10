@@ -174,7 +174,7 @@ class InventoryManager {
     }
     
     // Main class with CLI
-    public class Tuan01 {
+    public class TruongMinhMan_2280601910 {
         public static void main(String[] args) {
             InventoryManager inventoryManager = InventoryManager.getInstance();
             Scanner scanner = new Scanner(System.in);
