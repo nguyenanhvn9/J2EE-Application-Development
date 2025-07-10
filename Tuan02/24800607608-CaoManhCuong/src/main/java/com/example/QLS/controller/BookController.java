@@ -2,12 +2,13 @@ package com.example.QLS.controller;
 import com.example.QLS.model.Book;
 import com.example.QLS.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/books") // Base URL cho tất cả API trong controller
+@RequestMapping("/api/books")
 public class BookController {
     @Autowired
     private BookService bookService;
@@ -39,5 +40,12 @@ public class BookController {
     public String deleteBook(@PathVariable int id) {
         bookService.deleteBook(id);
         return "Book deleted successfully!";
+    }
+    //6. Lấy sách từ API
+
+    @GetMapping("/fetch")
+    public ResponseEntity<String> fetchBooks() {
+        bookService.fetchBooksFromApi();
+        return ResponseEntity.ok("Books fetched and added!");
     }
 }

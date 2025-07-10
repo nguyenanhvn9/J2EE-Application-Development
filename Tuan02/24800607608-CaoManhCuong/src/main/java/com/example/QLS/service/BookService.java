@@ -1,7 +1,11 @@
 package com.example.QLS.service;
+import com.example.QLS.dto.BookDTO;
+import com.example.QLS.dto.GutendexResponse;
 import com.example.QLS.model.Book;
 import java.util.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 
 @Service
 public class BookService {
@@ -28,4 +32,22 @@ public class BookService {
     public void deleteBook(int id) {
         books.removeIf(book -> book.getId() == id);
     }
+    public void fetchBooksFromApi() {
+        RestTemplate restTemplate = new RestTemplate();
+        String apiUrl = "https://gutendex.com/books";
+
+        GutendexResponse response = restTemplate.getForObject(apiUrl, GutendexResponse.class);
+
+        if (response != null && response.getResults() != null) {
+            for (BookDTO dto : response.getResults()) {
+                String authorName = (dto.getAuthors() != null && !dto.getAuthors().isEmpty())
+                        ? dto.getAuthors().get(0).getName()
+                        : "Unknown";
+
+                Book book = new Book(dto.getId(), dto.getTitle(), authorName);
+                books.add(book);
+            }
+        }
+    }
+
 }
