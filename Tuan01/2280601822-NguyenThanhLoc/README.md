@@ -75,4 +75,4 @@ java Main
 
 ---
 
-> **© 2024 - Hệ thống Quản lý kho hàng - J2EE** 
+> **© 2025 - Hệ thống Quản lý kho hàng - J2EE** 
