@@ -23,4 +23,10 @@
 hs_err_pid*
 replay_pid*
 .idea
+
 .gitignore
+.gitattributes
+HELP.md
+target/
+.mvn
+target/
