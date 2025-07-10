@@ -1,0 +1,8 @@
+retailinventorymanagement\model\Product.class
+retailinventorymanagement\service\InventoryManager.class
+retailinventorymanagement\model\FoodProduct.class
+retailinventorymanagement\service\Order.class
+retailinventorymanagement\exception\OutOfStockException.class
+retailinventorymanagement\model\ElectronicProduct.class
+retailinventorymanagement\main\Main.class
+retailinventorymanagement\model\ClothingProduct.class
