@@ -8,6 +8,7 @@ import lombok.*;
 public class Book {
     private int id;
     private String title;
+    @Getter
     private String author;
 
 }
