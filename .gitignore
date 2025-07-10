@@ -1,0 +1,17 @@
+# Bỏ qua thư mục build của Maven/Java
+target/
+*.class
+
+# Bỏ qua file ảnh, file tạm
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Bỏ qua file hệ thống
+.DS_Store
+Thumbs.db
+
+# Bỏ qua file ngoài thư mục project (nếu có)
+!Tuan01/
+!Tuan02/
