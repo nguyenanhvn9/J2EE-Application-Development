@@ -1,24 +1,17 @@
-# Compiled class file
+# Bỏ qua thư mục build của Maven/Java
+target/
 *.class
 
-# Log file
-*.log
+# Bỏ qua file ảnh, file tạm
+*.png
+*.jpg
+*.jpeg
+*.gif
 
-# BlueJ files
-*.ctxt
+# Bỏ qua file hệ thống
+.DS_Store
+Thumbs.db
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# Bỏ qua file ngoài thư mục project (nếu có)
+!Tuan01/
+!Tuan02/
