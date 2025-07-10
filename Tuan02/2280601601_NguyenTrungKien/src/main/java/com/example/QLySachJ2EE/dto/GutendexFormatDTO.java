@@ -3,7 +3,7 @@ package com.example.QLySachJ2EE.dto;
 import lombok.Data;
 
 @Data
-public class GutendexFormatDTO {
+public class  GutendexFormatDTO {
     private String text_plain;
     private String application_epub_zip;
     private String application_pdf;

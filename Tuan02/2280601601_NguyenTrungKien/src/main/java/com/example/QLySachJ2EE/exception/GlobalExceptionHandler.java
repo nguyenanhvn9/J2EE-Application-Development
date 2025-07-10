@@ -9,7 +9,7 @@ import org.springframework.web.context.request.WebRequest;
 import java.util.Date;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class  GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorDetails> handleResourceNotFoundException(

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class BookService {
+public class  BookService {
     private List<Book> books = new ArrayList<>();
     private boolean isDataLoaded = false;
     

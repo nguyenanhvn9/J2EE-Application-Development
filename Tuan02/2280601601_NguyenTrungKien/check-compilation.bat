@@ -1,4 +1,4 @@
-@echo off
+ @echo off
 echo Checking Java compilation...
 echo.
 

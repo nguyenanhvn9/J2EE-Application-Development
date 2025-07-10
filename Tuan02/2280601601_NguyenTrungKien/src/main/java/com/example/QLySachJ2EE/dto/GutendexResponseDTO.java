@@ -4,7 +4,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GutendexResponseDTO {
+public class  GutendexResponseDTO {
     private int count;
     private String next;
     private String previous;

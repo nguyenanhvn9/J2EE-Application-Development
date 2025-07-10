@@ -4,7 +4,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GutendexBookDTO {
+public class  GutendexBookDTO {
     private int id;
     private String title;
     private List<GutendexAuthorDTO> authors;

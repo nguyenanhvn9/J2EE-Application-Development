@@ -4,7 +4,7 @@ echo.
 
 REM Kiểm tra Java
 java -version >nul 2>&1
-if %errorlevel% neq 0 (
+if %errorlevel%  neq 0 (
     echo Error: Java is not installed or not in PATH
     pause
     exit /b 1

@@ -3,7 +3,7 @@ package com.example.QLySachJ2EE.dto;
 import lombok.Data;
 
 @Data
-public class JsonPlaceholderAddressDTO {
+public class  JsonPlaceholderAddressDTO {
     private String street;
     private String suite;
     private String city;

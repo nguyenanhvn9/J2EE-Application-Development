@@ -21,7 +21,7 @@ public class BookController {
             @RequestParam(required = false) String author,
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size) {
-        return bookService.getAllBooks(author, page, size);
+         return bookService.getAllBooks(author, page, size);
     }
 
     // 2. Lấy thông tin sách theo ID
