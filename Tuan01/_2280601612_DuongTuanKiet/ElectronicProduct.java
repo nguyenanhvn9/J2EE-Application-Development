@@ -1,3 +1,4 @@
+package _2280601612_DuongTuanKiet;
 public class ElectronicProduct extends Product {
     private int warrantyMonths;
     private int power;

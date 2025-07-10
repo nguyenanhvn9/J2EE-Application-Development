@@ -1,3 +1,4 @@
+package _2280601612_DuongTuanKiet;
 public class ClothingProduct extends Product {
     private String size;
     private String material;

@@ -1,3 +1,4 @@
+package _2280601612_DuongTuanKiet;
 import java.util.*;
 
 public class InventoryManager {

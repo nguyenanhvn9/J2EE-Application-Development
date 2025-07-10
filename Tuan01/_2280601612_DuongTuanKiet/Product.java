@@ -1,3 +1,4 @@
+package _2280601612_DuongTuanKiet;
 public abstract class Product {
     protected String id;
     protected String name;
