@@ -1,6 +1,6 @@
 package com.hutech.cos141_demo.BaiTH03;
 
-import com.hutech.cos141_demo.BaiTH03_04.dto.UserDTO;
+import com.hutech.cos141_demo.BaiTH03.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+// import java.util.stream.Collectors;
 
 @Service
 public class UserService {

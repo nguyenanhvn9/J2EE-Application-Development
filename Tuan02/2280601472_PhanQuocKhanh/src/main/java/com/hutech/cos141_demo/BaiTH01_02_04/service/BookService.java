@@ -7,7 +7,6 @@ import com.hutech.cos141_demo.BaiTH01_02_04.model.BookDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.cache.annotation.Cacheable;
-import com.hutech.cos141_demo.exception.ResourceNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;

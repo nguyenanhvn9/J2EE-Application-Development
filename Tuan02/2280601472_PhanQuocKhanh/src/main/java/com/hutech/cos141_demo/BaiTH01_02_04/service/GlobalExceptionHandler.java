@@ -1,4 +1,4 @@
-package com.hutech.cos141_demo.exception;
+package com.hutech.cos141_demo.BaiTH01_02_04.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

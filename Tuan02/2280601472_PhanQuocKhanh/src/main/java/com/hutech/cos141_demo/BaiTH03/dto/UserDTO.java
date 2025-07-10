@@ -1,4 +1,4 @@
-package com.hutech.cos141_demo.BaiTH03_04.dto;
+package com.hutech.cos141_demo.BaiTH03.dto;
 
 public class UserDTO {
     private int id;
