@@ -1,0 +1,19 @@
+package com.huttech.baitap.dto;
+
+import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class BookDTO {
+    private int id;
+    private String title;
+    private List<AuthorDTO> authors;
+
+}
