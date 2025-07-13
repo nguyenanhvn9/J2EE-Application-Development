@@ -1,0 +1,52 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+Tuan02/2280600648-TranThanhDat/Oracle_JDK-24.jdk/
+# Ignore macOS system files
+.DS_Store
+
+# Ignore NetBeans build files
+build/
+nbbuild/
+nbproject/private/
+*.class
+*.log
+
+# Ignore user-specific NetBeans project files
+private.xml
+private.properties
+genfiles.properties
+build-impl.xml
+
+# Ignore all compiled files
+*.class
