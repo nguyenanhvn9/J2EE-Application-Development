@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Todo List</title>
+    <meta charset="UTF-8">
+    <style>
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .todo-item form {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Todo List</h1>
+    
+    <!-- Form thêm công việc mới -->
+    <form th:action="@{/todos}" th:object="${newTodo}" method="post">
+        <input type="text" th:field="*{title}" placeholder="Nhập công việc mới" required>
+        <button type="submit">Thêm</button>
+    </form>
+
+    <!-- Danh sách công việc -->
+    <div th:if="${not #lists.isEmpty(todos)}">
+        <div class="todo-item" th:each="todo : ${todos}">
+            <!-- Form đánh dấu hoàn thành -->
+            <form th:action="@{/todos/{id}/toggle(id=${todo.id})}" method="post" style="display: inline;">
+                <input type="checkbox" th:checked="${todo.completed}" onchange="this.form.submit()">
+            </form>
+            
+            <!-- Tiêu đề công việc -->
+            <span th:text="${todo.title}" th:class="${todo.completed ? 'completed' : ''}"></span>
+            
+            <!-- Nút xóa -->
+            <form th:action="@{/todos/{id}/delete(id=${todo.id})}" method="get" style="display: inline;">
+                <button type="submit">Xóa</button>
+            </form>
+        </div>
+    </div>
+    <div th:if="${#lists.isEmpty(todos)}">
+        <p>Chưa có công việc nào.</p>
+    </div>
+</body>
+</html>
