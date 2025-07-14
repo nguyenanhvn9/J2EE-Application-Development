@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+    <title>Danh sách sách</title>
+</head>
+
+<body>
+<section layout:fragment="content">
+    <h2 class="mb-3">Danh Sách Sách</h2>
+    <a href="/books/add" class="btn btn-primary mb-3">Thêm Sách Mới</a>
+
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Tiêu đề</th>
+                <th>Tác giả</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="book : ${books}">
+                <td th:text="${book.id}"></td>
+                <td th:text="${book.title}"></td>
+                <td th:text="${book.author}"></td>
+                <td>
+                    <a th:href="@{/books/edit/{id}(id=${book.id})}" class="btn btn-warning btn-sm">Sửa</a>
+                    <a th:href="@{/books/delete/{id}(id=${book.id})}" class="btn btn-danger btn-sm">Xóa</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>
