@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh sách sách</title>
+    <script>
+        function searchBooks() {
+            var keyword = document.getElementById('searchInput').value;
+            fetch('/api/books/search?keyword=' + encodeURIComponent(keyword))
+                .then(response => response.json())
+                .then(data => {
+                    var tbody = document.getElementById('books-tbody');
+                    tbody.innerHTML = '';
+                    data.forEach(function(book) {
+                        var row = `<tr>
+                            <td>${book.id}</td>
+                            <td>${book.title}</td>
+                            <td>${book.author}</td>
+                            <td>
+                                <a href='/books/edit/${book.id}'>Sửa</a>
+                                <a href='/books/delete/${book.id}' onclick="return confirm('Bạn có chắc muốn xoá?')">Xoá</a>
+                            </td>
+                        </tr>`;
+                        tbody.innerHTML += row;
+                    });
+                });
+            return false;
+        }
+    </script>
+</head>
+<body>
+    <h1>Danh sách sách</h1>
+    <form onsubmit="return searchBooks();">
+        <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên hoặc tác giả..." />
+        <button type="submit">Tìm kiếm</button>
+    </form>
+    <a th:href="@{/books/add}">Thêm sách mới</a>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Tên sách</th>
+            <th>Tác giả</th>
+            <th>Hành động</th>
+        </tr>
+        <tbody id="books-tbody">
+        <tr th:each="book : ${books}">
+            <td th:text="${book.id}"></td>
+            <td th:text="${book.title}"></td>
+            <td th:text="${book.author}"></td>
+            <td>
+                <a th:href="@{'/books/edit/' + ${book.id}}">Sửa</a>
+                <a th:href="@{'/books/delete/' + ${book.id}}" onclick="return confirm('Bạn có chắc muốn xoá?')">Xoá</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</body>
+</html>
