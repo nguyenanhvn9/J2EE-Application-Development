@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quản lý Sách</title>
+
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body class="container my-4">
+    <h1 class="mb-4">Quản lý Sách</h1>
+    <div class="mb-4">
+      <a href="/" class="btn btn-secondary">Về trang chủ</a>
+    </div>
+    <!-- Thông báo -->
+    <div
+      th:if="${msg}"
+      class="alert alert-success text-center"
+      role="alert"
+      th:text="${msg}"
+    ></div>
+
+    <!-- Form thêm/sửa sách -->
+    <form
+      th:action="@{/books}"
+      method="post"
+      class="row g-3 align-items-end border p-4 mb-5 rounded shadow-sm bg-light"
+    >
+      <div class="col-md-2">
+        <label class="form-label">ID</label>
+        <input
+          type="text"
+          name="id"
+          th:value="${book.id}"
+          class="form-control"
+          placeholder="ID"
+          required
+        />
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Tiêu đề</label>
+        <input
+          type="text"
+          name="title"
+          th:value="${book.title}"
+          class="form-control"
+          required
+        />
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Tác giả</label>
+        <input
+          type="text"
+          name="authors"
+          th:value="${book.authorsStr}"
+          class="form-control"
+          required
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Chủ đề</label>
+        <input
+          type="text"
+          name="subjects"
+          th:value="${book.subjectsStr}"
+          class="form-control"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Kệ sách</label>
+        <input
+          type="text"
+          name="bookshelves"
+          th:value="${book.bookshelvesStr}"
+          class="form-control"
+        />
+      </div>
+
+      <div class="col-md-2">
+        <label class="form-label">Ngôn ngữ</label>
+        <input
+          type="text"
+          name="languages"
+          th:value="${book.languagesStr}"
+          class="form-control"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Url ảnh</label>
+        <input
+          type="text"
+          name="imageUrl"
+          th:value="${book.imageUrl}"
+          class="form-control"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">URL tải</label>
+        <input
+          type="text"
+          name="downloadUrl"
+          th:value="${book.downloadUrl}"
+          class="form-control"
+        />
+      </div>
+
+      <div class="col-md-12 text-end">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          th:text="${book.id} != null ? 'Cập nhật' : 'Thêm mới'"
+        ></button>
+      </div>
+    </form>
+
+    <!-- Bảng danh sách sách -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark text-center">
+          <tr>
+            <th>ID</th>
+            <th>Tiêu đề</th>
+            <th>Tác giả</th>
+            <th>Chủ đề</th>
+            <th>Kệ</th>
+            <th>Ngôn ngữ</th>
+            <th>Ảnh</th>
+            <th>URL</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="b : ${books}">
+            <td th:text="${b.id}"></td>
+            <td th:text="${b.title}"></td>
+            <td th:text="${b.authorsStr}"></td>
+            <td th:text="${b.subjectsStr}"></td>
+            <td th:text="${b.bookshelvesStr}"></td>
+            <td th:text="${b.languagesStr}"></td>
+            <td>
+              <img
+                th:src="${b.imageUrl}"
+                alt="Ảnh sách"
+                class="img-fluid"
+                style="max-width: 100px; max-height: 100px"
+              />
+            </td>
+            <td>
+              <!--Hiện tối đa 3 ký tự dài hơn hiện ...  -->
+              <a
+                th:href="${b.downloadUrl}"
+                th:text="${b.downloadUrl}"
+                class="text-primary text-decoration-underline"
+                target="_blank"
+              ></a>
+            </td>
+            <td class="text-nowrap">
+              <form
+                th:action="@{'/books/edit/' + ${b.id}}"
+                method="get"
+                class="d-inline"
+              >
+                <button class="btn btn-sm btn-warning">Sửa</button>
+              </form>
+              <form
+                th:action="@{'/books/delete/' + ${b.id}}"
+                method="post"
+                class="d-inline"
+              >
+                <button
+                  class="btn btn-sm btn-danger"
+                  type="submit"
+                  onclick="return confirm('Bạn có chắc muốn xoá?')"
+                >
+                  Xoá
+                </button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Phân trang -->
+    <nav th:if="${totalPages > 1}" class="mt-4">
+      <ul class="pagination justify-content-center">
+        <li
+          class="page-item"
+          th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+          th:classappend="${i == currentPage} ? 'active' : ''"
+        >
+          <a
+            class="page-link"
+            th:href="@{/books(page=${i}, size=${size})}"
+            th:text="${i + 1}"
+          ></a>
+        </li>
+      </ul>
+    </nav>
+  </body>
+</html>
