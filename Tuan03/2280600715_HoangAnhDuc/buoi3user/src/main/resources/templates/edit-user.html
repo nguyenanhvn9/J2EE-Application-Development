@@ -1,0 +1,27 @@
+<!-- templates/edit-user.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Sửa thông tin người dùng</title>
+</head>
+<body>
+  <h1>Sửa thông tin người dùng</h1>
+  <form th:action="@{/users/edit}" method="post" th:object="${user}">
+    <input type="hidden" th:field="*{id}" />
+
+    <label for="name">Họ tên:</label>
+    <input type="text" id="name" th:field="*{name}" required /><br/>
+
+    <label for="username">Username:</label>
+    <input type="text" id="username" th:field="*{username}" required /><br/>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" th:field="*{email}" required /><br/>
+
+    <label for="phone">Số điện thoại:</label>
+    <input type="text" id="phone" th:field="*{phone}" /><br/>
+
+    <button type="submit">Cập nhật</button>
+  </form>
+</body>
+</html>
