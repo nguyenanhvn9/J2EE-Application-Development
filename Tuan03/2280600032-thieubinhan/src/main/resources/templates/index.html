@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="/css/main.css"> </head>
+<body>
+<section class="todoapp">
+    <header class="header">
+        <h1>todos</h1>
+        <form th:action="@{/todos/add}" th:object="${newTodo}" method="post">
+            <input class="new-todo" placeholder="What needs to be done?" autofocus th:field="*{title}">
+        </form>
+    </header>
+    <section class="main">
+        <ul class="todo-list">
+            <li th:each="item : ${todoItems}" th:class="${item.completed ? 'completed' : ''}">
+                <div class="view">
+                    <form th:action="@{/todos/{id}/toggle(id=${item.id})}" method="post" class="toggle-form">
+                        <input class="toggle" type="checkbox" th:checked="${item.completed}" onchange="this.form.submit()">
+                        <label th:text="${item.title}"></label>
+                    </form>
+                    <form th:action="@{/todos/{id}/delete(id=${item.id})}" method="post" class="delete-form">
+                        <button class="destroy"></button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </section>
+    <footer class="footer">
+        <span class="todo-count">
+            <strong th:text="${activeItemCount}">0</strong> items left
+        </span>
+        <ul class="filters">
+            <li>
+                <a th:classappend="${currentFilter == 'all' ? 'selected' : ''}" href="/">All</a>
+            </li>
+            <li>
+                <a th:classappend="${currentFilter == 'active' ? 'selected' : ''}" href="/?filter=active">Active</a>
+            </li>
+            <li>
+                <a th:classappend="${currentFilter == 'completed' ? 'selected' : ''}" href="/?filter=completed">Completed</a>
+            </li>
+        </ul>
+        <form th:action="@{/todos/clear-completed}" method="post">
+            <button class="clear-completed">Clear completed</button>
+        </form>
+    </footer>
+</section>
+</body>
+</html>
