@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách Sách</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+        }
+
+        .navbar {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+        }
+
+        .navbar .nav-link {
+            color: white !important;
+            font-weight: 500;
+        }
+
+        .navbar .nav-link.active {
+            text-decoration: underline;
+        }
+
+        .btn-success {
+            background: linear-gradient(to right, #56ab2f, #a8e063);
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-warning {
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-danger {
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .table thead {
+            background: #0072ff;
+            color: white;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        img.cover-img {
+            height: 60px;
+            max-width: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        h2 {
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white fw-bold" href="#">BookManager</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/books">Quản lý Sách</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/users">Quản lý Người dùng</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>📖 Danh sách Sách</h2>
+            <a href="/books/add" class="btn btn-success">Thêm Sách</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle shadow-sm bg-white">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ảnh bìa</th>
+                        <th>Tên sách</th>
+                        <th>Tác giả</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="book : ${books}">
+                        <td th:text="${book.id}"></td>
+                        <td>
+                            <img th:if="${book.coverUrl != null}" th:src="${book.coverUrl}" alt="cover"
+                                class="cover-img" />
+                        </td>
+                        <td th:text="${book.title}"></td>
+                        <td th:text="${#lists.join(book.authors, ', ')}"></td>
+                        <td>
+                            <a th:href="@{'/books/edit/' + ${book.id}}" class="btn btn-warning btn-sm me-1">Sửa</a>
+                            <a th:href="@{'/books/delete/' + ${book.id}}" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(books)}">
+                        <td colspan="5" class="text-center text-muted">Không có dữ liệu sách nào</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
