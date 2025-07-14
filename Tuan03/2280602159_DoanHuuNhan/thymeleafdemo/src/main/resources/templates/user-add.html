@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Thêm Người Dùng</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <h2 class="mb-3">Thêm Người Dùng</h2>
+    <form th:action="@{/users/add}" th:object="${user}" method="post">
+        <div class="mb-3">
+            <label for="name" class="form-label">Họ tên</label>
+            <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="Nhập họ tên" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" th:field="*{email}" class="form-control" id="email" placeholder="Nhập email" required>
+        </div>
+        <div class="mb-3">
+            <label for="role" class="form-label">Vai trò</label>
+            <input type="text" th:field="*{role}" class="form-control" id="role" placeholder="Nhập vai trò" required>
+        </div>
+        <button type="submit" class="btn btn-success">Lưu</button>
+        <a href="/users" class="btn btn-secondary">Hủy</a>
+    </form>
+</main>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Thêm Sách Mới</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <h2 class="mb-3">Thêm Sách Mới</h2>
+    <form th:action="@{/books/add}" th:object="${book}" method="post">
+        <div class="mb-3">
+            <label for="title" class="form-label">Tiêu đề</label>
+            <input type="text" th:field="*{title}" class="form-control" id="title" placeholder="Nhập tiêu đề sách" required>
+        </div>
+        <div class="mb-3">
+            <label for="author" class="form-label">Tác giả</label>
+            <input type="text" th:field="*{author}" class="form-control" id="author" placeholder="Nhập tên tác giả" required>
+        </div>
+        <button type="submit" class="btn btn-success">Lưu</button>
+        <a href="/books" class="btn btn-secondary">Hủy</a>
+    </form>
+</main>
+</body>
+</html>
