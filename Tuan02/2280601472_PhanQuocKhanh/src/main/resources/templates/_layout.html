@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title layout:fragment="title">Trang quản lý</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+  <body>
+    <header>
+      <span class="logo">📚</span>
+      <h1>Quản lý hệ thống</h1>
+      <nav>
+        <a th:href="@{/books}">Sách</a> |
+        <a th:href="@{/users}">Người dùng</a>
+      </nav>
+    </header>
+    <hr />
+    <div class="container">
+      <div layout:fragment="content">
+        <!-- Nội dung trang con sẽ được chèn vào đây -->
+      </div>
+    </div>
+    <hr />
+    <footer>
+      <p>© 2024 - Hệ thống quản lý</p>
+    </footer>
+  </body>
+</html>
