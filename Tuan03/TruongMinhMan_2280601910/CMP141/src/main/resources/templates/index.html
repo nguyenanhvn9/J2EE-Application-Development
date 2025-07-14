@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>To-Do List</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1>To-Do List</h1>
+    <!-- Form thêm mới -->
+    <form th:action="@{/todos/add}" th:object="${newTodo}" method="post" class="mb-3">
+        <input type="text" th:field="*{title}" placeholder="Nhập công việc mới..." required />
+        <button type="submit">Thêm</button>
+    </form>
+    <!-- Danh sách công việc -->
+    <ul class="list-group mb-3">
+        <li class="list-group-item d-flex align-items-center" th:each="item : ${items}">
+            <form th:action="@{'/todos/' + ${item.id} + '/toggle'}" method="post" th:object="${item}" style="margin:0;">
+                <input type="checkbox" th:checked="${item.completed}" onchange="this.form.submit()" />
+            </form>
+            <span th:text="${item.title}" th:classappend="${item.completed} ? 'text-decoration-line-through ms-2' : 'ms-2'"></span>
+            <form th:action="@{'/todos/' + ${item.id} + '/delete'}" method="post" style="margin-left:auto;">
+                <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+            </form>
+        </li>
+    </ul>
+    <!-- Filter và clear completed -->
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <span th:text="${activeCount} + ' items left'"></span>
+        </div>
+        <div>
+            <a th:href="@{/?filter=all}" th:classappend="${filter} == 'all' ? 'fw-bold' : ''">All</a> |
+            <a th:href="@{/?filter=active}" th:classappend="${filter} == 'active' ? 'fw-bold' : ''">Active</a> |
+            <a th:href="@{/?filter=completed}" th:classappend="${filter} == 'completed' ? 'fw-bold' : ''">Completed</a>
+        </div>
+        <form th:action="@{/todos/clear-completed}" method="post" style="margin:0;">
+            <button type="submit" class="btn btn-warning btn-sm">Clear completed</button>
+        </form>
+    </div>
+</div>
+</body>
+</html> 
