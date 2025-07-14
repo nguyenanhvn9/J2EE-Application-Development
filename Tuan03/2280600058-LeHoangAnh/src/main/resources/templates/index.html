@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>To-Do Glass UI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #dbeafe, #ede9fe);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .todo-app {
+      width: 90%;
+      max-width: 700px;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      padding: 40px;
+    }
+
+    .todo-header {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #4f46e5;
+    }
+
+    .todo-form {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .todo-form input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 1rem;
+      background: #f9fafb;
+    }
+
+    .btn {
+      background-color: #6366f1;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #4f46e5;
+    }
+
+    .btn-clear {
+      background-color: #f87171;
+    }
+
+    .btn-clear:hover {
+      background-color: #dc2626;
+    }
+
+    .filters {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .filters a {
+      margin: 0 6px;
+      text-decoration: none;
+      font-weight: 600;
+      color: #4f46e5;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 2px;
+    }
+
+    .filters a.active {
+      border-color: #4f46e5;
+    }
+
+    .todo-list {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 20px;
+    }
+
+    .todo-list li {
+      background: #f1f5f9;
+      margin-bottom: 12px;
+      padding: 14px 20px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .todo-list input[type="checkbox"] {
+      margin-right: 14px;
+      transform: scale(1.2);
+    }
+
+    .todo-title {
+      flex: 1;
+      font-size: 1rem;
+    }
+
+    .todo-title.completed {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+
+    .todo-actions button {
+      margin-left: 8px;
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .footer {
+      text-align: right;
+      font-size: 0.95rem;
+      color: #475569;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="todo-app">
+    <div class="todo-header">Danh Sách Công Việc</div>
+
+    <form th:action="@{/todos/add}" th:object="${newTodo}" method="post" class="todo-form">
+      <input type="text" th:field="*{title}" placeholder="Nhập công việc mới..." required />
+      <button type="submit" class="btn">Thêm</button>
+    </form>
+
+    <form th:action="@{/todos/clear-completed}" method="post" style="text-align:right; margin-bottom:12px;">
+      <button type="submit" class="btn btn-clear">Xóa Đã Hoàn Thành</button>
+    </form>
+
+    <div class="filters">
+      <a th:href="@{/todos}" th:classappend="${filter}=='all' ? 'active'" class="">Tất cả</a>
+      <a th:href="@{/todos(filter='active')}" th:classappend="${filter}=='active' ? 'active'" class="">Chưa xong</a>
+      <a th:href="@{/todos(filter='completed')}" th:classappend="${filter}=='completed' ? 'active'" class="">Đã xong</a>
+    </div>
+
+    <ul class="todo-list">
+      <li th:each="todo : ${todos}">
+        <form th:action="@{'/todos/' + ${todo.id} + '/toggle'}" method="post" style="margin:0;">
+          <input type="hidden" name="filter" th:value="${filter}" />
+          <input type="checkbox" th:checked="${todo.completed}" onchange="this.form.submit()" />
+        </form>
+        <span th:text="${todo.title}"
+          th:classappend="${todo.completed} ? 'todo-title completed' : 'todo-title'"></span>
+        <form th:action="@{'/todos/' + ${todo.id} + '/delete'}" method="post" class="todo-actions">
+          <input type="hidden" name="filter" th:value="${filter}" />
+          <button type="submit" class="btn btn-clear">Xóa</button>
+        </form>
+      </li>
+      <li th:if="${#lists.isEmpty(todos)}" style="text-align:center; color:#9ca3af;">Không có công việc nào.</li>
+    </ul>
+
+    <div class="footer">
+      <span th:text="${activeCount} + ' công việc chưa hoàn thành'"></span>
+    </div>
+  </div>
+</body>
+
+</html>
