@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Danh sách sách</title>
+</head>
+
+<body>
+    <h1>Danh sách sách</h1>
+    <a href="/books/add">Thêm sách mới</a>
+
+    <form action="/books/search" method="get">
+        <input type="text" name="keyword" placeholder="Nhập từ khóa..." />
+        <button type="submit">Tìm kiếm</button>
+    </form>
+
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tiêu đề</th>
+                <th>Tác giả</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="book : ${books}">
+                <td th:text="${book.id}"></td>
+                <td th:text="${book.title}"></td>
+                <td th:text="${book.author}"></td>
+                <td>
+                    <a th:href="@{/books/edit/{id}(id=${book.id})}">Sửa</a>
+                    <a th:href="@{/books/delete/{id}(id=${book.id})}">Xóa</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>
