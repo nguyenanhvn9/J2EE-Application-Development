@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>To-Do List</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/todomvc-app-css@2.3.0/index.css">
+</head>
+<body>
+<section class="todoapp">
+  <header class="header">
+    <h1>todos</h1>
+    <form th:action="@{/todos/add}" method="post">
+      <input class="new-todo" name="title" th:field="*{newTodo.title}" placeholder="What needs to be done?" autofocus />
+    </form>
+  </header>
+
+  <section class="main" th:if="${todoList.size() > 0}">
+    <ul class="todo-list">
+      <li th:each="todo : ${todoList}" th:classappend="${todo.completed} ? 'completed'">
+        <div class="view">
+          <form th:action="@{/todos/{id}/toggle(id=${todo.id})}" method="post" style="display:inline;">
+            <input class="toggle" type="checkbox" th:checked="${todo.completed}" onclick="this.form.submit()" />
+          </form>
+          <label th:text="${todo.title}"></label>
+          <form th:action="@{/todos/{id}/delete(id=${todo.id})}" method="post" style="display:inline;">
+            <button class="destroy"></button>
+          </form>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="footer" th:if="${todoList.size() > 0}">
+    <span class="todo-count">
+      <strong th:text="${activeCount}">0</strong> items left
+    </span>
+
+    <ul class="filters">
+      <li><a th:href="@{/todos}" th:class="${currentFilter == 'all'} ? 'selected'">All</a></li>
+      <li><a th:href="@{/todos(filter='active')}" th:class="${currentFilter == 'active'} ? 'selected'">Active</a></li>
+      <li><a th:href="@{/todos(filter='completed')}" th:class="${currentFilter == 'completed'} ? 'selected'">Completed</a></li>
+    </ul>
+
+    <form th:action="@{/todos/clear-completed}" method="post" style="display:inline;">
+      <button class="clear-completed">Clear completed</button>
+    </form>
+  </footer>
+</section>
+</body>
+</html>
