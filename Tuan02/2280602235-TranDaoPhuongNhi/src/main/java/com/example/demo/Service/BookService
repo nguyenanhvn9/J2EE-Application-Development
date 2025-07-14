@@ -1,0 +1,3 @@
+import com.example.demo.dto.GutendexResponseDTO;
+import com.example.demo.dto.GutendexBookDTO;
+import com.example.demo.dto.GutendexAuthorDTO; 
