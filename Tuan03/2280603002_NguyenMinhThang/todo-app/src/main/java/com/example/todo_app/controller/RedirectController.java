@@ -1,0 +1,15 @@
+package com.example.todo_app.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/")
+public class RedirectController {
+
+    @GetMapping
+    public String redirectToTodos() {
+        return "redirect:/todos";
+    }
+}
