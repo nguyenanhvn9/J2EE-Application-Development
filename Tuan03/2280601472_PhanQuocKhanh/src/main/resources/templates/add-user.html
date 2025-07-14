@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="_layout.html"
+>
+  <head>
+    <title layout:fragment="title">Thêm người dùng mới</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h2>Thêm người dùng mới</h2>
+      <form th:action="@{/users/add}" method="post">
+        <label>Họ tên:</label>
+        <input type="text" name="name" required /><br />
+        <label>Tên đăng nhập:</label>
+        <input type="text" name="username" required /><br />
+        <label>Email:</label>
+        <input type="email" name="email" required /><br />
+        <label>Điện thoại:</label>
+        <input type="text" name="phone" required /><br />
+        <button type="submit">Lưu</button>
+      </form>
+      <a th:href="@{/users}">Quay lại danh sách</a>
+    </div>
+  </body>
+</html>

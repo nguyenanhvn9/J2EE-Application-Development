@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="_layout.html"
+>
+  <head>
+    <title layout:fragment="title">Danh sách người dùng</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h2>Danh sách người dùng</h2>
+      <a th:href="@{/users/add}">Thêm người dùng mới</a>
+      <table border="1">
+        <tr>
+          <th>ID</th>
+          <th>Họ tên</th>
+          <th>Tên đăng nhập</th>
+          <th>Email</th>
+          <th>Điện thoại</th>
+          <th>Hành động</th>
+        </tr>
+        <tr th:each="user : ${users}">
+          <td th:text="${user.id}"></td>
+          <td th:text="${user.name}"></td>
+          <td th:text="${user.username}"></td>
+          <td th:text="${user.email}"></td>
+          <td th:text="${user.phone}"></td>
+          <td>
+            <a th:href="@{'/users/edit/' + ${user.id}}">Sửa</a>
+            <a
+              th:href="@{'/users/delete/' + ${user.id}}"
+              onclick="return confirm('Bạn có chắc muốn xóa?');"
+              >Xóa</a
+            >
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>
