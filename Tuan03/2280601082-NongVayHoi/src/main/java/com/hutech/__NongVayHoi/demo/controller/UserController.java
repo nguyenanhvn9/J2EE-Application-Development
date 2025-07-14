@@ -3,56 +3,52 @@ package com.hutech.__NongVayHoi.demo.controller;
 import com.hutech.__NongVayHoi.demo.model.User;
 import com.hutech.__NongVayHoi.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
-@RestController
-@RequestMapping("/api/users")
+@Controller
+@RequestMapping("/users")
 public class UserController {
     @Autowired
     private UserService userService;
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public String listUsers(Model model) {
+        model.addAttribute("users", userService.getAllUsers());
+        return "users/list";
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable int id) {
-        return userService.getUserById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping("/add")
+    public String showAddForm(Model model) {
+        model.addAttribute("user", new User());
+        return "users/add";
     }
 
-    @PostMapping
-    public ResponseEntity<User> addUser(@RequestBody User user) {
-        boolean added = userService.addUser(user);
-        if (added) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(user);
-        } else {
-            return ResponseEntity.unprocessableEntity().build();
-        }
+    @PostMapping("/add")
+    public String addUser(@ModelAttribute User user) {
+        userService.addUser(user);
+        return "redirect:/users";
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable int id, @RequestBody User user) {
-        boolean updated = userService.updateUser(id, user);
-        if (updated) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable int id, Model model) {
+        User user = userService.getUserById(id).orElse(null);
+        if (user == null) return "redirect:/users";
+        model.addAttribute("user", user);
+        return "users/edit";
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
-        boolean deleted = userService.deleteUser(id);
-        if (deleted) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @PostMapping("/edit/{id}")
+    public String editUser(@PathVariable int id, @ModelAttribute User user) {
+        user.setId(id);
+        userService.updateUser(id, user);
+        return "redirect:/users";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable int id) {
+        userService.deleteUser(id);
+        return "redirect:/users";
     }
 } 

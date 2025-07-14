@@ -19,9 +19,7 @@ public class UserService {
     private RestTemplate restTemplate;
 
     public List<User> getAllUsers() {
-        if (users.isEmpty()) {
-            fetchUsersFromApi();
-        }
+        fetchUsersFromApi(); // Luôn fetch dữ liệu mới nhất từ API
         return users;
     }
 

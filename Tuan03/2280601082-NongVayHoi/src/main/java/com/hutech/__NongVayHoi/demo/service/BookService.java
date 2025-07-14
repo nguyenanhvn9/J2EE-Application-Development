@@ -50,6 +50,7 @@ public class BookService {
     }
 
     public List<Book> getBooks() {
+        fetch(); // Luôn fetch dữ liệu mới nhất từ API
         return books;
     }
 
