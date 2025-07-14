@@ -1,0 +1,25 @@
+<!-- templates/add-user.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Thêm người dùng</title>
+</head>
+<body>
+  <h1>Thêm người dùng mới</h1>
+  <form action="#" th:action="@{/users/add}" method="post" th:object="${user}">
+    <label for="name">Họ tên:</label>
+    <input type="text" id="name" th:field="*{name}" required /><br/>
+
+    <label for="username">Username:</label>
+    <input type="text" id="username" th:field="*{username}" required /><br/>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" th:field="*{email}" required /><br/>
+
+    <label for="phone">Số điện thoại:</label>
+    <input type="text" id="phone" th:field="*{phone}" /><br/>
+
+    <button type="submit">Thêm</button>
+  </form>
+</body>
+</html>
