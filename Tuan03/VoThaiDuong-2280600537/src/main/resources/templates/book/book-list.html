@@ -1,0 +1,9 @@
+<h2>Kết quả tìm kiếm</h2>
+<ul>
+    <li th:each="book : ${books}">
+        <span th:text="${book.title}"></span> -
+        <span th:text="${book.author}"></span>
+    </li>
+</ul>
+
+<a th:href="@{/books}">Trở về</a>

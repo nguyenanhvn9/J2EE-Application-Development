@@ -8,13 +8,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-// @RequestMapping("/")
+@RequestMapping("/todos")
 public class TodoController {
 
     @Autowired
     private TodoService todoService;
 
-    @GetMapping("/")
+    @GetMapping()
     public String index(@RequestParam(required = false, value = "filter", defaultValue = "all") String filter,
             Model model) {
 
@@ -31,36 +31,36 @@ public class TodoController {
         model.addAttribute("newTodo", new TodoItem());
         model.addAttribute("itemsLeft",
                 todoService.getAllItems().stream().filter(item -> item.isCompleted() == false).count());
-        return "index";
+        return "todos/index";
     }
 
-    @PostMapping("/todos/add")
+    @PostMapping("/add")
     public String addTodo(@ModelAttribute("newTodo") TodoItem newTodo) {
         todoService.addItem(newTodo.getTitle());
-        return "redirect:/";
+        return "redirect:/todos";
     }
 
-    @PostMapping("/todos")
+    @PostMapping()
     public String addTodo(@RequestParam String title) {
         todoService.addItem(title);
-        return "redirect:/";
+        return "redirect:/todos";
     }
 
-    @PostMapping("/todos/{id}/toggle")
+    @PostMapping("/{id}/toggle")
     public String toggleTodo(@PathVariable Long id) {
         todoService.toggleCompleted(id);
-        return "redirect:/";
+        return "redirect:/todos";
     }
 
-    @PostMapping("/todos/{id}/delete")
+    @PostMapping("/{id}/delete")
     public String deleteTodo(@PathVariable Long id) {
         todoService.deleteItem(id);
-        return "redirect:/";
+        return "redirect:/todos";
     }
 
-    @PostMapping("todos/clear-completed")
+    @PostMapping("clear-completed")
     public String clearCompleted() {
         todoService.clearCompleted();
-        return "redirect:/";
+        return "redirect:/todos";
     }
 }

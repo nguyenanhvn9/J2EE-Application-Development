@@ -1,256 +1,44 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo App</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Trang Quản Lý</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #4a6bff;
-            --secondary-color: #f5f7ff;
-            --danger-color: #ff4757;
-            --text-color: #333;
-            --light-text: #777;
-            --border-color: #e0e0e0;
-            --completed-color: #aaa;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: #f9f9f9;
-            padding: 20px;
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .container {
-            max-width: 600px;
-            margin: 30px auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-        }
-
-        h2 {
-            color: var(--primary-color);
+            max-width: 800px;
+            margin: 50px auto;
             text-align: center;
-            margin-bottom: 25px;
-            font-weight: 500;
         }
 
-        .add-todo-form {
-            display: flex;
-            margin-bottom: 25px;
-        }
-
-        .add-todo-form input[type="text"] {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid var(--border-color);
-            border-radius: 5px 0 0 5px;
-            font-size: 16px;
-            transition: border 0.3s;
-        }
-
-        .add-todo-form input[type="text"]:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .add-todo-form button {
-            padding: 12px 20px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 0 5px 5px 0;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-
-        .add-todo-form button:hover {
-            background-color: #3a56d4;
-        }
-
-        .todo-list {
-            list-style-type: none;
-            margin: 20px 0;
-        }
-
-        .todo-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            background-color: var(--secondary-color);
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-
-        .todo-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .todo-checkbox {
-            margin-right: 15px;
-            transform: scale(1.3);
-            cursor: pointer;
-        }
-
-        .todo-title {
-            flex: 1;
-            font-size: 16px;
-        }
-
-        .completed .todo-title {
-            text-decoration: line-through;
-            color: var(--completed-color);
-        }
-
-        .todo-actions {
-            display: flex;
-            margin-left: 10px;
-        }
-
-        .todo-actions button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            margin-left: 8px;
-            color: var(--light-text);
-            transition: color 0.3s;
-        }
-
-        .todo-actions button:hover {
-            color: var(--primary-color);
-        }
-
-        .todo-actions button.delete:hover {
-            color: var(--danger-color);
-        }
-
-        .todo-stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-top: 1px solid var(--border-color);
-            margin-top: 20px;
-            color: var(--light-text);
-            font-size: 14px;
-        }
-
-        .todo-filters {
-            display: flex;
-            gap: 15px;
-        }
-
-        .todo-filters a {
-            color: var(--light-text);
+        .app-link {
+            display: inline-block;
+            padding: 12px 30px;
+            margin: 10px;
+            border: solid 1px;
+            border-radius: 50px;
             text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .todo-filters a:hover,
-        .todo-filters a.active {
-            color: var(--primary-color);
             font-weight: 500;
-        }
-
-        .clear-completed {
-            background: none;
-            border: none;
-            color: var(--light-text);
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .clear-completed:hover {
-            color: var(--danger-color);
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-
-            .add-todo-form {
-                flex-direction: column;
-            }
-
-            .add-todo-form input[type="text"] {
-                border-radius: 5px;
-                margin-bottom: 10px;
-            }
-
-            .add-todo-form button {
-                border-radius: 5px;
-            }
-
-            .todo-stats {
-                flex-direction: column;
-                gap: 15px;
-                align-items: stretch;
-            }
-
-            .todo-filters {
-                justify-content: center;
-            }
+            transition: all 0.3s ease;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h2>📝 Quản lý Công việc</h2>
-
-        <form class="add-todo-form" th:action="@{/todos/add}" method="post" th:object="${newTodo}">
-            <input type="text" th:field="*{title}" placeholder="Nhập công việc mới..." required />
-            <button type="submit">Thêm</button>
-        </form>
-
-        <ul class="todo-list">
-            <li th:each="item : ${todoList}" class="todo-item" th:classappend="${item.completed} ? 'completed' : ''">
-                <form th:action="@{/todos/{id}/toggle(id=${item.id})}" method="post" style="display:inline;">
-                    <input type="checkbox" class="todo-checkbox" name="completed" th:checked="${item.completed}"
-                        onchange="this.form.submit()" />
-                </form>
-
-                <span class="todo-title" th:text="${item.title}"></span>
-
-                <div class="todo-actions">
-                    <form th:action="@{/todos/{id}/delete(id=${item.id})}" method="post" style="display:inline;">
-                        <button type="submit" class="delete" title="Xóa">🗑</button>
-                    </form>
-                </div>
-            </li>
-        </ul>
-
-        <div class="todo-stats">
-            <span th:text="${itemsLeft} + ' công việc chưa hoàn thành'"></span>
-
-            <div class="todo-filters">
-                <a th:href="@{?filter=all}" th:classappend="${filter == 'all'} ? 'active' : ''">All</a>
-                <a th:href="@{?filter=active}" th:classappend="${filter == 'active'} ? 'active' : ''">Active</a>
-                <a th:href="@{?filter=completed}"
-                    th:classappend="${filter == 'completed'} ? 'active' : ''">Completed</a>
-            </div>
-
-            <form th:action="@{/todos/clear-completed}" method="post" style="display:inline;">
-                <button type="submit" class="clear-completed">Clear completed</button>
-            </form>
-        </div>
+        <a th:href="@{/books}" class="app-link books-link">
+            <i class="fas fa-book"></i> Quản Lý Sách
+        </a>
+        <a th:href="@{/todos}" class="app-link todos-link">
+            <i class="fas fa-tasks"></i> Danh Sách Công Việc
+        </a>
     </div>
 </body>
 
