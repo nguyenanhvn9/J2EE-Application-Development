@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>todos</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 40px;
+            background: #f7f7f7;
+            color: #333;
+        }
+        h1 {
+            color: #af4c4c;
+            font-weight: 400;
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-family: 'Arial Black', Arial, sans-serif;
+        }
+        form.add-todo {
+            max-width: 400px;
+            margin: 0 auto 30px auto;
+            display: flex;
+        }
+        form.add-todo input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 12px;
+            font-size: 16px;
+            border: 1.5px solid #af4c4c;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+            font-style: italic;
+            color: #666;
+        }
+        form.add-todo input[type="text"]::placeholder {
+            color: #bfa9a9;
+            font-style: italic;
+        }
+        form.add-todo button {
+            background-color: #af4c4c;
+            border: none;
+            color: white;
+            padding: 0 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 0 4px 4px 0;
+            transition: background-color 0.3s ease;
+        }
+        form.add-todo button:hover {
+            background-color: #8a3b3b;
+        }
+        ul {
+            list-style: none;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 3px 8px rgb(0 0 0 / 0.05);
+        }
+        ul li {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 16px;
+            color: #333;
+        }
+        ul li:last-child {
+            border-bottom: none;
+        }
+        ul li form.toggle-completed {
+            margin: 0;
+        }
+        ul li input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin-right: 15px;
+            accent-color: #af4c4c;
+        }
+        ul li span {
+            flex-grow: 1;
+            user-select: none;
+        }
+        ul li span.completed {
+            text-decoration: line-through;
+            color: #b1afaf;
+        }
+        ul li form.delete-todo {
+            margin: 0;
+        }
+        ul li form.delete-todo button {
+            background: none;
+            border: none;
+            color: #af4c4c;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        ul li form.delete-todo button:hover {
+            color: #8a3b3b;
+        }
+        /* Footer */
+        .footer {
+            max-width: 400px;
+            margin: 15px auto 0 auto;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #777;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 3px 8px rgb(0 0 0 / 0.05);
+            user-select: none;
+        }
+        .footer .items-left {
+            flex: 1;
+            align-self: center;
+        }
+        .footer .filters {
+            flex: 2;
+            text-align: center;
+        }
+        .footer .filters form {
+            display: inline;
+            margin: 0 5px;
+        }
+        .footer .filters button {
+            border: 1px solid transparent;
+            background: none;
+            color: #777;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        .footer .filters button.active,
+        .footer .filters button:hover {
+            border-color: #af4c4c;
+            color: #af4c4c;
+        }
+        .footer form.clear-completed {
+            flex: 1;
+            text-align: right;
+        }
+        .footer form.clear-completed button {
+            background: none;
+            border: none;
+            color: #af4c4c;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 5px 10px;
+            transition: color 0.3s ease;
+        }
+        .footer form.clear-completed button:hover {
+            color: #8a3b3b;
+        }
+    </style>
+</head>
+<body>
+<h1>todos</h1>
+
+<!-- Form Thêm mới -->
+<form class="add-todo" th:action="@{/todos/add}" method="post" th:object="${newTodo}">
+    <input type="text" th:field="*{title}" placeholder="What needs to be done?" required />
+    <button type="submit">Thêm</button>
+</form>
+
+<ul>
+    <li th:each="item : ${todoItems}">
+        <!-- Checkbox Đánh dấu hoàn thành -->
+        <form class="toggle-completed" th:action="@{'/todos/' + ${item.id} + '/toggle'}" method="post" style="margin:0;">
+            <input type="checkbox" th:checked="${item.completed}" onclick="this.form.submit()" />
+        </form>
+        <span th:text="${item.title}" th:classappend="${item.completed} ? 'completed'"></span>
+        <!-- Nút Xóa -->
+        <form class="delete-todo" th:action="@{'/todos/' + ${item.id} + '/delete'}" method="post" style="margin:0;">
+            <button type="submit">Xóa</button>
+        </form>
+    </li>
+</ul>
+
+<!-- Footer: số lượng + bộ lọc + clear -->
+<div class="footer">
+    <div class="items-left">
+        <span th:text="${activeCount} + ' items left'"></span>
+    </div>
+    <div class="filters">
+        <form method="get" action="/" style="display:inline;">
+            <button type="submit" name="filter" value="all" th:classappend="${filter}=='all' ? 'active'">All</button>
+        </form>
+        <form method="get" action="/" style="display:inline;">
+            <button type="submit" name="filter" value="active" th:classappend="${filter}=='active' ? 'active'">Active</button>
+        </form>
+        <form method="get" action="/" style="display:inline;">
+            <button type="submit" name="filter" value="completed" th:classappend="${filter}=='completed' ? 'active'">Completed</button>
+        </form>
+    </div>
+    <form class="clear-completed" th:action="@{/todos/clear-completed}" method="post">
+        <button type="submit">Clear completed</button>
+    </form>
+</div>
+</body>
+</html>
