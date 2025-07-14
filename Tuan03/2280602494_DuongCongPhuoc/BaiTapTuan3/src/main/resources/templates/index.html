@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>todos</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; }
+        .container { max-width: 500px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #ddd; padding: 0 0 20px 0; }
+        h1 { text-align: center; color: #c0392b; font-size: 64px; margin: 30px 0 10px 0; font-weight: 400; letter-spacing: 2px; }
+        form.add-form { display: flex; border: 2px solid #c0392b; border-radius: 4px; margin: 0 20px 20px 20px; }
+        form.add-form input[type="text"] { flex: 1; border: none; font-size: 28px; padding: 16px; outline: none; font-style: italic; }
+        ul.todo-list { list-style: none; padding: 0; margin: 0 20px; }
+        li.todo-item { display: flex; align-items: center; font-size: 32px; border-bottom: 1px solid #eee; padding: 10px 0; }
+        li.todo-item:last-child { border-bottom: none; }
+        .checkbox-form { margin: 0; }
+        .todo-checkbox { width: 32px; height: 32px; margin-right: 16px; accent-color: #c0392b; }
+        .todo-title.completed { text-decoration: line-through; color: #888; }
+        .delete-form { margin-left: auto; }
+        .delete-btn { background: none; border: none; color: #c0392b; font-size: 22px; cursor: pointer; padding: 4px 12px; border-radius: 4px; transition: background 0.2s; }
+        .delete-btn:hover { background: #fbeeea; }
+        .footer { display: flex; align-items: center; justify-content: space-between; margin: 20px 20px 0 20px; font-size: 18px; color: #888; }
+        .filters { display: flex; gap: 8px; }
+        .filter-btn { border: 1px solid #c0392b; background: none; color: #c0392b; border-radius: 4px; padding: 2px 12px; font-size: 16px; cursor: pointer; }
+        .filter-btn.selected, .filter-btn:active { background: #c0392b; color: #fff; }
+        .clear-btn { background: none; border: none; color: #c0392b; font-size: 16px; cursor: pointer; margin-left: 12px; }
+        .clear-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>todos</h1>
+    <form th:action="@{/todos/add}" method="post" class="add-form">
+        <input type="text" th:field="*{newTodo.title}" placeholder="What needs to be done?" autocomplete="off" />
+    </form>
+    <ul class="todo-list">
+        <li th:each="item : ${todoItems}" class="todo-item">
+            <form th:action="@{'/todos/' + ${item.id} + '/toggle'}" method="post" class="checkbox-form">
+                <input type="hidden" name="filter" th:value="${filter}" />
+                <input type="checkbox" name="completed" class="todo-checkbox" th:checked="${item.completed}" onclick="this.form.submit()" />
+            </form>
+            <span th:text="${item.title}" th:classappend="${item.completed} ? 'todo-title completed' : 'todo-title'"></span>
+            <form th:action="@{'/todos/' + ${item.id} + '/delete'}" method="post" class="delete-form">
+                <input type="hidden" name="filter" th:value="${filter}" />
+                <button type="submit" class="delete-btn">×</button>
+            </form>
+        </li>
+    </ul>
+    <div class="footer">
+        <span th:text="${activeCount} + ' items left'"></span>
+        <div class="filters">
+            <a th:href="@{/?filter=all}" th:classappend="${filter} == 'all' ? 'filter-btn selected' : 'filter-btn'">All</a>
+            <a th:href="@{/?filter=active}" th:classappend="${filter} == 'active' ? 'filter-btn selected' : 'filter-btn'">Active</a>
+            <a th:href="@{/?filter=completed}" th:classappend="${filter} == 'completed' ? 'filter-btn selected' : 'filter-btn'">Completed</a>
+        </div>
+        <form th:action="@{/todos/clear-completed}" method="post" style="display:inline;">
+            <input type="hidden" name="filter" th:value="${filter}" />
+            <button type="submit" class="clear-btn">Clear completed</button>
+        </form>
+    </div>
+</div>
+</body>
+</html> 
