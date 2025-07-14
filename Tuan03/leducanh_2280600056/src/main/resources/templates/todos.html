@@ -13,6 +13,8 @@
     <div class="mb-4">
       <a href="/" class="btn btn-secondary">Về trang chủ</a>
     </div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
     <!-- Form thêm công việc -->
     <form th:action="@{/todos/add}" method="post" class="input-group mb-3">
       <input
@@ -79,7 +81,12 @@
           th:action="@{/todos/complete/{id}(id=${todo.id})}"
           method="post"
         >
-          <button class="btn btn-sm btn-success">Hoàn thành</button>
+          <button
+            class="btn btn-sm btn-success"
+            th:disabled="${completedCount >= maxCompleted}"
+          >
+            Hoàn thành
+          </button>
         </form>
       </li>
     </ul>

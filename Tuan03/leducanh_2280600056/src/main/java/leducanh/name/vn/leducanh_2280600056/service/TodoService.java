@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class TodoService {
 
     private final List<Todo> todos = new ArrayList<>();
+    private final int MAX_COMPLETED = 2;
     private final AtomicLong idCounter = new AtomicLong(1);
 
     public List<Todo> findAll() {
@@ -43,6 +44,27 @@ public class TodoService {
                 .ifPresent(t -> t.setCompleted(true));
     }
 
+    public boolean toggleCompleted(Long id) {
+        Optional<Todo> opt = todos.stream().filter(t -> t.getId().equals(id)).findFirst();
+        if (opt.isPresent()) {
+            Todo todo = opt.get();
+            if (!todo.isCompleted() && getCompletedCount() >= MAX_COMPLETED) {
+                return false; // Không cho tick thêm nếu đã đủ 2
+            }
+            todo.setCompleted(!todo.isCompleted());
+            return true;
+        }
+        return false;
+    }
+
+    public int getCompletedCount() {
+        return (int) todos.stream().filter(Todo::isCompleted).count();
+    }
+
+    public int getRemainingCount() {
+        return (int) todos.stream().filter(t -> !t.isCompleted()).count();
+    }
+
     public void clearCompleted() {
         todos.removeIf(Todo::isCompleted);
     }
@@ -51,4 +73,3 @@ public class TodoService {
         return todos.stream().filter(t -> !t.isCompleted()).count();
     }
 }
-
