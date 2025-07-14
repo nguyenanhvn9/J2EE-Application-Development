@@ -3,33 +3,71 @@
 <head>
     <title>Danh sách sách</title>
     <script>
-        function searchBooks() {
-            var keyword = document.getElementById('searchInput').value;
-            fetch('/api/books/search?keyword=' + encodeURIComponent(keyword))
+        let allSearchResults = [];
+        let currentPage = 1;
+        const pageSize = 5;
+
+        function renderBooks(books) {
+            var tbody = document.getElementById('books-tbody');
+            tbody.innerHTML = '';
+            books.forEach(function(book) {
+                var row = `<tr>
+                    <td>${book.id}</td>
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>
+                        <a href='/books/edit/${book.id}'>Sửa</a>
+                        <a href='/books/delete/${book.id}' onclick="return confirm('Bạn có chắc muốn xoá?')">Xoá</a>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function renderPagination(total, current) {
+            var container = document.getElementById('pagination');
+            container.innerHTML = '';
+            for (let i = 1; i <= total; i++) {
+                if (i === current) {
+                    container.innerHTML += `<strong>${i}</strong> `;
+                } else {
+                    container.innerHTML += `<a href="#" onclick="goToPage(${i});return false;">${i}</a> `;
+                }
+            }
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            const start = (page - 1) * pageSize;
+            const end = start + pageSize;
+            renderBooks(allSearchResults.slice(start, end));
+            renderPagination(Math.ceil(allSearchResults.length / pageSize), page);
+        }
+
+        function doSearch() {
+            const keyword = document.getElementById('searchInput').value;
+            fetch(`books/api/books/search?keyword=${encodeURIComponent(keyword)}`)
                 .then(response => response.json())
                 .then(data => {
-                    var tbody = document.getElementById('books-tbody');
-                    tbody.innerHTML = '';
-                    data.forEach(function(book) {
-                        var row = `<tr>
-                            <td>${book.id}</td>
-                            <td>${book.title}</td>
-                            <td>${book.author}</td>
-                            <td>
-                                <a href='/books/edit/${book.id}'>Sửa</a>
-                                <a href='/books/delete/${book.id}' onclick="return confirm('Bạn có chắc muốn xoá?')">Xoá</a>
-                            </td>
-                        </tr>`;
-                        tbody.innerHTML += row;
-                    });
+                    allSearchResults = data;
+                    goToPage(1);
                 });
             return false;
+        }
+
+        window.onload = function() {
+            fetch('books/api/books/search?keyword=')
+                .then(response => response.json())
+                .then(data => {
+                    allSearchResults = data;
+                    goToPage(1);
+                });
         }
     </script>
 </head>
 <body>
     <h1>Danh sách sách</h1>
-    <form onsubmit="return searchBooks();">
+    <form onsubmit="return doSearch();">
         <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên hoặc tác giả..." />
         <button type="submit">Tìm kiếm</button>
     </form>
@@ -42,16 +80,8 @@
             <th>Hành động</th>
         </tr>
         <tbody id="books-tbody">
-        <tr th:each="book : ${books}">
-            <td th:text="${book.id}"></td>
-            <td th:text="${book.title}"></td>
-            <td th:text="${book.author}"></td>
-            <td>
-                <a th:href="@{'/books/edit/' + ${book.id}}">Sửa</a>
-                <a th:href="@{'/books/delete/' + ${book.id}}" onclick="return confirm('Bạn có chắc muốn xoá?')">Xoá</a>
-            </td>
-        </tr>
         </tbody>
     </table>
+    <div id="pagination" style="margin-top:10px;"></div>
 </body>
 </html>

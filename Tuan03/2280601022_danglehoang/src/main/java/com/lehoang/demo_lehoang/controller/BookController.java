@@ -15,6 +15,8 @@ import com.lehoang.demo_lehoang.service.BookService;
 
 import org.springframework.ui.Model;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Controller
 @RequestMapping("/books")
@@ -63,7 +65,7 @@ public class BookController {
         return "redirect:/books";
     }
 
-    @GetMapping("/import-gutendex")
+    @GetMapping("/import")
     public String importGutendexBooks() {
         bookService.fetchAndAddBooksFromGutendex();
         return "redirect:/books";
@@ -73,5 +75,16 @@ public class BookController {
     @ResponseBody
     public List<Book> searchBooks(@RequestParam String keyword) {
         return bookService.searchBooks(keyword);
+    }
+
+    @GetMapping("/api/books/page")
+    @ResponseBody
+    public Map<String, Object> getBooksByPage(@RequestParam int number, @RequestParam int size) {
+        List<Book> pageBooks = bookService.getBooksByPage(number, size);
+        int totalPages = bookService.getTotalPages(size);
+        Map<String, Object> result = new HashMap<>();
+        result.put("books", pageBooks);
+        result.put("totalPages", totalPages);
+        return result;
     }
 }

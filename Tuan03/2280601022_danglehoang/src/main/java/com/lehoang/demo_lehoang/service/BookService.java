@@ -82,6 +82,17 @@ public class BookService {
         }
     }
 
+    public List<Book> getBooksByPage(int page, int size) {
+        int fromIndex = Math.max(0, (page - 1) * size);
+        int toIndex = Math.min(books.size(), fromIndex + size);
+        if (fromIndex > toIndex) return List.of();
+        return books.subList(fromIndex, toIndex);
+    }
+
+    public int getTotalPages(int size) {
+        return (int) Math.ceil((double) books.size() / size);
+    }
+
     // DTO cho response tổng thể của Gutendex
     public static class GutendexResponse {
         @JsonProperty("results")
