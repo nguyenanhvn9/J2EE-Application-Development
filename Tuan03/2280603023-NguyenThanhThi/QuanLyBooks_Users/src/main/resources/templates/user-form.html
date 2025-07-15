@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thêm/Sửa User</title>
+    <meta charset="UTF-8">
+    <style>
+        .form-card {
+            max-width: 420px;
+            margin: 40px auto 0 auto;
+            background: linear-gradient(135deg, #e3f2fd 0%, #fff 100%);
+            border-radius: 18px;
+            box-shadow: 0 6px 32px #1976d220;
+            padding: 36px 32px 28px 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .form-card .icon {
+            font-size: 2.8rem;
+            color: #1976d2;
+            position: absolute;
+            top: -24px;
+            right: 24px;
+            opacity: 0.12;
+        }
+        .form-card h1 {
+            text-align: center;
+            color: #1976d2;
+            margin-bottom: 18px;
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .form-card label {
+            display: block;
+            margin-top: 18px;
+            font-weight: 600;
+            color: #1976d2;
+        }
+        .form-card input[type='text'], .form-card input[type='email'], .form-card input[type='tel'] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border: 1.5px solid #90caf9;
+            border-radius: 8px;
+            font-size: 1.08rem;
+            background: #f7fafd;
+            transition: border 0.2s;
+        }
+        .form-card input:focus {
+            border: 1.5px solid #1976d2;
+            outline: none;
+            background: #e3f2fd;
+        }
+        .form-card .button {
+            width: 100%;
+            margin-top: 28px;
+            padding: 12px 0;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .form-card .back {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #1976d2;
+            text-decoration: underline;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        @media (max-width: 600px) {
+            .form-card { padding: 18px 6vw 18px 6vw; }
+        }
+    </style>
+</head>
+<body>
+<div class="form-card">
+    <span class="icon">👤</span>
+    <h1 th:text="${user.id == null ? 'Thêm User' : 'Sửa User'}"></h1>
+    <form th:action="@{${user.id == null} ? '/users/add' : '/users/edit/' + ${user.id}}" th:object="${user}" method="post">
+        <input type="hidden" th:field="*{id}" />
+        <label>Họ tên:</label>
+        <input type="text" th:field="*{name}" placeholder="Nhập họ tên..." required/>
+        <label>Username:</label>
+        <input type="text" th:field="*{username}" placeholder="Nhập username..." required/>
+        <label>Email:</label>
+        <input type="email" th:field="*{email}" placeholder="Nhập email..." required/>
+        <label>Số điện thoại:</label>
+        <input type="tel" th:field="*{phone}" placeholder="Nhập số điện thoại..." required/>
+        <button type="submit" class="button">Lưu</button>
+    </form>
+    <a th:href="@{/users}" class="back">← Quay lại danh sách</a>
+</div>
+</body>
+</html> 

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý Sách</title>
+    <meta charset="UTF-8">
+    
+    <style>
+        .list-card {
+            max-width: 900px;
+            margin: 40px auto 0 auto;
+            background: linear-gradient(135deg, #e3f2fd 0%, #fff 100%);
+            border-radius: 18px;
+            box-shadow: 0 6px 32px #1976d220;
+            padding: 36px 32px 28px 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .list-card .icon {
+            font-size: 2.8rem;
+            color: #1976d2;
+            position: absolute;
+            top: -24px;
+            right: 24px;
+            opacity: 0.10;
+        }
+        .list-card h1 {
+            color: #1976d2;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+            text-align: left;
+        }
+        .list-card .button {
+            margin-bottom: 18px;
+            font-size: 1.08rem;
+            padding: 10px 22px;
+            border-radius: 8px;
+        }
+        .list-card table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #fafbfc;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px #1976d210;
+        }
+        .list-card th, .list-card td {
+            padding: 14px 18px;
+            text-align: left;
+        }
+        .list-card th {
+            background: #e3f2fd;
+            font-weight: 700;
+            font-size: 1.08rem;
+        }
+        .list-card tr {
+            transition: background 0.18s;
+        }
+        .list-card tr:hover {
+            background: #f1f8ff;
+        }
+        .list-card td {
+            border-bottom: 1px solid #e3e3e3;
+            font-size: 1.04rem;
+        }
+        .list-card tr:last-child td { border-bottom: none; }
+        .list-card .actions { white-space: nowrap; }
+        @media (max-width: 900px) {
+            .list-card { padding: 18px 2vw 18px 2vw; }
+            .list-card th, .list-card td { font-size: 0.98rem; padding: 10px 6px; }
+        }
+    </style>
+</head>
+<body>
+<div class="list-card">
+    <span class="icon">📚</span>
+    <h1>Danh sách Sách</h1>
+    <a th:href="@{/books/add}" class="button">+ Thêm sách mới</a>
+    <table>
+        <tr>
+            <th>ID</th><th>Tiêu đề</th><th>Tác giả</th><th>Hành động</th>
+        </tr>
+        <tr th:each="book : ${books}">
+            <td th:text="${book.id}"></td>
+            <td th:text="${book.title}"></td>
+            <td th:text="${book.author}"></td>
+            <td class="actions">
+                <a th:href="@{/books/edit/{id}(id=${book.id})}" class="button">Sửa</a>
+                <a th:href="@{/books/delete/{id}(id=${book.id})}" class="button delete" onclick="return confirm('Xóa sách này?')">Xóa</a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html> 
