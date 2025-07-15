@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .success { color: green; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Debug Page</h1>
+        <p class="success">✅ Debug page is working!</p>
+        <p>Message: <strong th:text="${message}">Default message</strong></p>
+        <p class="info">Timestamp: <span th:text="${timestamp}">0</span></p>
+        
+        <h3>Test Links:</h3>
+        <a href="/debug">Debug API</a> |
+        <a href="/test-simple">Test Simple</a> |
+        <a href="/books">Books</a> |
+        <a href="/">Home</a>
+    </div>
+</body>
+</html> 
