@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .success { color: green; }
+        .error { color: red; }
+        .btn { padding: 10px 20px; margin: 5px; text-decoration: none; border-radius: 5px; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Page Works!</h1>
+        <p class="success">✅ Spring Boot application is running correctly!</p>
+        <p>Message: <strong th:text="${message}">Default message</strong></p>
+        
+        <h3>Test Links:</h3>
+        <a href="/" class="btn btn-primary">Home Page</a>
+        <a href="/books" class="btn btn-secondary">Books Page</a>
+        <a href="/test-simple" class="btn btn-primary">Test API</a>
+        <a href="/health" class="btn btn-secondary">Health Check</a>
+        
+        <h3>Debug Info:</h3>
+        <p>If you can see this page, Thymeleaf is working correctly.</p>
+    </div>
+</body>
+</html> 
