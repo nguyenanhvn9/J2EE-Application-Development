@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa người dùng</title>
+</head>
+<body>
+    <h1>Sửa người dùng</h1>
+    <form action="#" th:action="@{/users/edit/{id}(id=${user.id})}" th:object="${user}" method="post">
+        <label>Tên:</label>
+        <input type="text" th:field="*{name}" required><br>
+        <label>Email:</label>
+        <input type="email" th:field="*{email}" required><br>
+        <button type="submit">Cập nhật</button>
+    </form>
+</body>
+</html>

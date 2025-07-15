@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    <h1 th:text="${message}">Welcome!</h1>
+    <p>Tên của bạn là: <span th:text="${name}">User</span></p>
+
+    <hr>
+    <h2>Chức năng</h2>
+    <ul>
+        <li><a href="/books">Quản lý sách</a></li>
+        <li><a href="/users">Quản lý người dùng</a></li>
+    </ul>
+</body>
+</html>
