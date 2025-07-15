@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Service - Hệ thống Quản lý Sách</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+        }
+        
+        .feature-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .btn-custom {
+            border-radius: 25px;
+            padding: 10px 30px;
+            font-weight: 500;
+        }
+        
+        .stats-section {
+            background-color: #f8f9fa;
+            padding: 60px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-book me-2"></i>Book Service
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/books">Quản lý Sách</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/users">Quản lý Người dùng</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api/books/search">Tìm kiếm Sách</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-4">
+                <i class="fas fa-book-open me-3"></i>
+                Chào mừng đến với Book Service
+            </h1>
+            <p class="lead mb-5">
+                Hệ thống quản lý sách hiện đại, dễ sử dụng và đầy đủ tính năng
+            </p>
+            <div class="row justify-content-center">
+                <div class="col-auto me-3">
+                    <a href="/books" class="btn btn-light btn-lg btn-custom">
+                        <i class="fas fa-book me-2"></i>Xem Danh sách Sách
+                    </a>
+                </div>
+                <div class="col-auto">
+                    <a href="/users" class="btn btn-outline-light btn-lg btn-custom">
+                        <i class="fas fa-users me-2"></i>Quản lý Người dùng
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col">
+                    <h2 class="display-5 fw-bold">Tính năng nổi bật</h2>
+                    <p class="lead text-muted">Khám phá những tính năng mạnh mẽ của hệ thống</p>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon text-primary">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h5 class="card-title">Tìm kiếm Thông minh</h5>
+                            <p class="card-text">
+                                Tìm kiếm sách theo tiêu đề, tác giả, thể loại với thuật toán tìm kiếm thông minh
+                            </p>
+                            <a href="/api/books/search" class="btn btn-outline-primary btn-custom">
+                                Thử ngay
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon text-success">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <h5 class="card-title">Quản lý Dễ dàng</h5>
+                            <p class="card-text">
+                                Thêm, sửa, xóa sách và người dùng một cách dễ dàng với giao diện thân thiện
+                            </p>
+                            <a href="/books" class="btn btn-outline-success btn-custom">
+                                Quản lý Sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon text-info">
+                                <i class="fas fa-cloud"></i>
+                            </div>
+                            <h5 class="card-title">Tích hợp API</h5>
+                            <p class="card-text">
+                                Kết nối với Gutendex API để truy cập kho sách khổng lồ từ Project Gutenberg
+                            </p>
+                            <a href="/api/books/gutendex" class="btn btn-outline-info btn-custom">
+                                Khám phá
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-number" id="bookCount">0</div>
+                        <h5>Số lượng Sách</h5>
+                        <p class="text-muted">Trong hệ thống</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-number" id="userCount">0</div>
+                        <h5>Người dùng</h5>
+                        <p class="text-muted">Đã đăng ký</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-number">60,000+</div>
+                        <h5>Sách Gutenberg</h5>
+                        <p class="text-muted">Có thể truy cập</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row text-center mb-4">
+                <div class="col">
+                    <h3 class="fw-bold">Thao tác nhanh</h3>
+                    <p class="text-muted">Các hành động thường dùng</p>
+                </div>
+            </div>
+            
+            <div class="row g-3 justify-content-center">
+                <div class="col-md-3 col-sm-6">
+                    <a href="/books/new" class="btn btn-primary w-100 btn-lg">
+                        <i class="fas fa-plus me-2"></i>Thêm Sách Mới
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="/users/new" class="btn btn-success w-100 btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Thêm Người dùng
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="/api/books/search" class="btn btn-info w-100 btn-lg">
+                        <i class="fas fa-search me-2"></i>Tìm kiếm Sách
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a href="/h2-console" class="btn btn-warning w-100 btn-lg" target="_blank">
+                        <i class="fas fa-database me-2"></i>Database Console
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-book me-2"></i>Book Service</h5>
+                    <p>Hệ thống quản lý sách hiện đại cho J2EE Application Development</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h6>Liên kết hữu ích</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/api/books" class="text-light text-decoration-none">API Documentation</a></li>
+                        <li><a href="https://gutendex.com" class="text-light text-decoration-none" target="_blank">Gutendex API</a></li>
+                        <li><a href="/h2-console" class="text-light text-decoration-none" target="_blank">H2 Database Console</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col text-center">
+                    <p>&copy; 2024 Book Service - Nguyễn Văn Tú (2280603524). All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Animate numbers
+        function animateValue(element, start, end, duration) {
+            let current = start;
+            const range = end - start;
+            const increment = end > start ? 1 : -1;
+            const stepTime = Math.abs(Math.floor(duration / range));
+            
+            const timer = setInterval(() => {
+                current += increment;
+                element.textContent = current;
+                if (current === end) {
+                    clearInterval(timer);
+                }
+            }, stepTime);
+        }
+
+        // Load stats when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate book count
+            fetch('/api/books/count')
+                .then(response => response.json())
+                .then(data => {
+                    const bookCountElement = document.getElementById('bookCount');
+                    animateValue(bookCountElement, 0, data.count || 0, 2000);
+                })
+                .catch(() => {
+                    document.getElementById('bookCount').textContent = '0';
+                });
+
+            // Animate user count
+            fetch('/api/users/count')
+                .then(response => response.json())
+                .then(data => {
+                    const userCountElement = document.getElementById('userCount');
+                    animateValue(userCountElement, 0, data.count || 0, 2000);
+                })
+                .catch(() => {
+                    document.getElementById('userCount').textContent = '0';
+                });
+        });
+    </script>
+</body>
+</html>
