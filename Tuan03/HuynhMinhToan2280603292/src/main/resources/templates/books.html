@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh Sách Sách</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="display-5 fw-bold text-dark">
+                    <i class="fas fa-books me-3"></i>Danh Sách Sách
+                </h1>
+            </div>
+            <div class="col-auto">
+                <a href="/books/add" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Thêm Sách Mới
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col" class="text-center" style="width: 80px;">ID</th>
+                                <th scope="col">Tiêu đề</th>
+                                <th scope="col">Tác giả</th>
+                                <th scope="col" class="text-center" style="width: 200px;">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="book : ${books}" th:class="${bookStat.even} ? 'table-light' : 'table-white'">
+                                <td class="text-center fw-bold" th:text="${book.id}"></td>
+                                <td>
+                                    <div class="fw-semibold" th:text="${book.title}"></div>
+                                </td>
+                                <td>
+                                    <span class="text-muted" th:text="${book.author}"></span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/books/edit/{id}(id=${book.id})}" 
+                                           class="btn btn-warning btn-sm me-1" 
+                                           title="Sửa">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </a>
+                                        <a th:href="@{/books/delete/{id}(id=${book.id})}" 
+                                           class="btn btn-danger btn-sm" 
+                                           title="Xóa"
+                                           onclick="return confirm('Bạn có chắc chắn muốn xóa sách này?')">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(books)}">
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                                    <p class="mb-0">Chưa có sách nào trong danh sách</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col">
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Tổng số sách:</strong> <span th:text="${#lists.size(books)}">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+            <a href="/about" class="btn btn-info">About</a>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
