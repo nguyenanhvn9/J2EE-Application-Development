@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Sách & Người dùng</title>
+    <style>
+        table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 6px; }
+        th { background: #eee; }
+        form { margin-bottom: 20px; }
+        h2 { margin-top: 40px; }
+    </style>
+</head>
+<body>
+<h1>Quản lý Sách & Người dùng</h1>
+
+<!-- Quản lý Sách -->
+<h2>Danh sách Sách</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th><th>Tiêu đề</th><th>Tác giả</th><th>Lượt tải</th><th>Hành động</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.id}"></td>
+        <td th:text="${book.title}"></td>
+        <td th:text="${book.authorsString}"></td>
+        <td th:text="${book.downloadCount}"></td>
+        <td>
+            <form th:action="@{'/books/delete/' + ${book.id}}" method="post" style="display:inline">
+                <button type="submit">Xóa</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>Thêm Sách mới</h3>
+<form th:action="@{/books/add}" method="post">
+    <input type="number" name="id" placeholder="ID" required />
+    <input type="text" name="title" placeholder="Tiêu đề" required />
+    <input type="text" name="authors" placeholder="Tác giả (cách nhau bởi dấu phẩy)" required />
+    <input type="number" name="downloadCount" placeholder="Lượt tải" required />
+    <button type="submit">Thêm</button>
+</form>
+
+<!-- Quản lý Người dùng -->
+<h2>Danh sách Người dùng</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th><th>Tên</th><th>Username</th><th>Email</th><th>Phone</th><th>Hành động</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.username}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.phone}"></td>
+        <td>
+            <form th:action="@{'/users/delete/' + ${user.id}}" method="post" style="display:inline">
+                <button type="submit">Xóa</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>Thêm Người dùng mới</h3>
+<form th:action="@{/users/add}" method="post">
+    <input type="number" name="id" placeholder="ID" required />
+    <input type="text" name="name" placeholder="Tên" required />
+    <input type="text" name="username" placeholder="Username" required />
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="text" name="phone" placeholder="Phone" required />
+    <button type="submit">Thêm</button>
+</form>
+
+</body>
+</html> 
