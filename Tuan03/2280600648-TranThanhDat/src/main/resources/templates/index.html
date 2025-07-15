@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>todos</title>
+    <!-- Google fonts for nicer look -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Helvetica:wght@100;300;400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --border: #ededed;
+        --completed-colour: #d9d9d9;
+        --text-light: #d9d9d9;
+        --primary: #b83f45;
+        --grey: #777;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font: 14px/1.4 Helvetica, Arial, sans-serif;
+        background: #f5f5f5;
+        display: flex;
+        justify-content: center;
+        color: #4d4d4d;
+      }
+      h1 {
+        font-size: 10rem;
+        font-weight: 100;
+        color: var(--primary);
+        text-align: center;
+        margin: 2rem 0 1rem;
+      }
+      .todoapp {
+        background: #fff;
+        width: 550px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 25px 50px rgba(0, 0, 0, 0.1);
+      }
+      /* --- new todo input --- */
+      .header {
+        position: relative;
+      }
+      .toggle-all {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        width: 60px;
+        height: 34px;
+        transform: rotate(90deg);
+        border: none;
+        background: none;
+        font-size: 22px;
+        color: var(--border);
+        cursor: pointer;
+      }
+      .new-todo {
+        padding: 16px 60px 16px 60px;
+        width: 100%;
+        border: none;
+        font-size: 24px;
+        font-style: italic;
+        color: #4d4d4d;
+        border: 1px solid var(--border);
+        border-left: none;
+      }
+      .new-todo:focus {
+        outline: none;
+      }
+      /* --- list --- */
+      .todo-list {
+        list-style: none;
+      }
+      .todo-list li {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        padding: 15px 15px 15px 60px;
+        position: relative;
+        font-size: 24px;
+      }
+      .todo-list li .toggle {
+        appearance: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+      }
+      .todo-list li .toggle:checked {
+        border-color: var(--primary);
+      }
+      .todo-list li .toggle:checked::after {
+        content: "✔";
+        position: absolute;
+        left: 8px;
+        top: -2px;
+        font-size: 28px;
+        color: var(--primary);
+      }
+      .todo-list li.completed label {
+        text-decoration: line-through;
+        color: var(--grey);
+      }
+      .todo-list li button.destroy {
+        background: none;
+        border: none;
+        font-size: 26px;
+        color: var(--grey);
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+        cursor: pointer;
+      }
+      .todo-list li:hover button.destroy {
+        display: block;
+      }
+      /* --- footer --- */
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        font-size: 14px;
+        color: var(--grey);
+      }
+      .filters a {
+        padding: 3px 7px;
+        border: 1px solid transparent;
+        border-radius: 3px;
+        text-decoration: none;
+        color: inherit;
+      }
+      .filters a.selected {
+        border-color: rgba(175, 47, 47, 0.2);
+      }
+      .clear-completed {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="todoapp">
+      <h1>todos</h1>
+
+      <div class="header">
+        <!-- toggle all icon could be wired later -->
+        <button class="toggle-all">❯</button>
+        <form th:action="@{/todos/add}" method="post">
+          <input
+            class="new-todo"
+            th:field="${newTodo.title}"
+            placeholder="What needs to be done?"
+            autofocus
+          />
+        </form>
+      </div>
+
+      <!-- list -->
+      <ul class="todo-list">
+        <li
+          th:each="item : ${todoList}"
+          th:classappend="${item.completed}? 'completed'"
+        >
+          <form th:action="@{|/todos/${item.id}/toggle|}" method="post">
+            <input
+              class="toggle"
+              type="checkbox"
+              th:checked="${item.completed}"
+              onclick="this.form.submit()"
+            />
+          </form>
+          <label th:text="${item.title}"></label>
+          <form th:action="@{|/todos/${item.id}/delete|}" method="post">
+            <button class="destroy">×</button>
+          </form>
+        </li>
+      </ul>
+
+      <!-- footer -->
+      <div class="footer">
+        <span class="todo-count"
+          ><strong th:text="${activeCount}">0</strong> items left</span
+        >
+        <ul class="filters">
+          <li>
+            <a
+              th:href="@{/todos}"
+              th:class="${#strings.isEmpty(param.filter)}? 'selected'"
+              >All</a
+            >
+          </li>
+          <li>
+            <a
+              th:href="@{/todos(filter='active')}"
+              th:class="${param.filter == 'active'}? 'selected'"
+              >Active</a
+            >
+          </li>
+          <li>
+            <a
+              th:href="@{/todos(filter='completed')}"
+              th:class="${param.filter == 'completed'}? 'selected'"
+              >Completed</a
+            >
+          </li>
+        </ul>
+        <form th:action="@{/todos/clear-completed}" method="post">
+          <button class="clear-completed">Clear completed</button>
+        </form>
+      </div>
+    </section>
+  </body>
+</html>
