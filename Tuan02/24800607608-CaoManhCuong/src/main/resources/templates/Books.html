@@ -1,13 +1,31 @@
-<!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Danh sách sách</title>
 </head>
 <body>
-<p th:text = "Phát triển ứng dụng J2EE- Nguyễn Huy Cường" >
+<h1>Danh sách sách</h1>
+<a href="/books/add">Thêm sách mới</a>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Tiêu đề</th>
+        <th>Tác giả</th>
+        <th>Hành động</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.id}"></td>
+        <td th:text="${book.title}"></td>
+        <td th:text="${book.author}"></td>
+        <td>
+            <a th:href="@{/books/edit/{id}(id=${book.id})}">Sửa</a>
+            <a th:href="@{/books/delete/{id}(id=${book.id})}">Xóa</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>
