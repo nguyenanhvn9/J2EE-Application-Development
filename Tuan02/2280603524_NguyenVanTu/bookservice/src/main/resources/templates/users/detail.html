@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Chi tiết Người dùng: ' + ${user.name} + ' - Book Service'">Chi tiết Người dùng - Book Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-book me-2"></i>Book Service
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">Trang chủ</a>
+                <a class="nav-link" href="/books">Quản lý Sách</a>
+                <a class="nav-link active" href="/users">Quản lý Người dùng</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/users">Quản lý Người dùng</a></li>
+                <li class="breadcrumb-item active">Chi tiết</li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <h2>
+                    <i class="fas fa-user me-2"></i>
+                    Chi tiết Người dùng
+                </h2>
+            </div>
+            <div class="col-auto">
+                <div class="btn-group" role="group">
+                    <a href="/users" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                    </a>
+                    <a th:href="@{/users/{id}/edit(id=${user.id})}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Chỉnh sửa
+                    </a>
+                    <button type="button" class="btn btn-danger" 
+                            th:onclick="|confirmDelete('${user.id}', '${user.name}')|">
+                        <i class="fas fa-trash me-2"></i>Xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông báo -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Thông tin người dùng -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Thông tin chi tiết
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Avatar và tên -->
+                        <div class="row mb-4">
+                            <div class="col-auto">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 80px; height: 80px; font-size: 2rem; font-weight: bold;">
+                                    <span th:text="${#strings.substring(user.name, 0, 1).toUpperCase()}">U</span>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <h3 class="text-primary mb-1" th:text="${user.name}">User Name</h3>
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    <a th:href="'mailto:' + ${user.email}" th:text="${user.email}" class="text-decoration-none">
+                                        user@email.com
+                                    </a>
+                                </p>
+                                <span class="badge bg-success">
+                                    <i class="fas fa-user-check me-1"></i>Người dùng hoạt động
+                                </span>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Thông tin chi tiết -->
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <strong>ID:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="badge bg-primary" th:text="${user.id}">1</span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <strong>Tên đầy đủ:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span th:text="${user.name}" class="fw-bold">User Name</span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <strong>Email:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span th:text="${user.email}">user@email.com</span>
+                                <a th:href="'mailto:' + ${user.email}" class="btn btn-sm btn-outline-primary ms-2">
+                                    <i class="fas fa-envelope me-1"></i>Gửi email
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3" th:if="${user.createdAt != null}">
+                            <div class="col-sm-3">
+                                <strong>Ngày tạo:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm:ss')}">
+                                    01/01/2024 12:00:00
+                                </span>
+                                <small class="text-muted ms-2">
+                                    (<span th:text="${#temporals.formatDuration(user.createdAt, #temporals.createNow())}">vài giây trước</span>)
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row mb-0" th:if="${user.updatedAt != null}">
+                            <div class="col-sm-3">
+                                <strong>Cập nhật cuối:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span th:text="${#temporals.format(user.updatedAt, 'dd/MM/yyyy HH:mm:ss')}">
+                                    01/01/2024 12:00:00
+                                </span>
+                                <small class="text-muted ms-2">
+                                    (<span th:text="${#temporals.formatDuration(user.updatedAt, #temporals.createNow())}">vài giây trước</span>)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lịch sử hoạt động -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-history me-2"></i>
+                            Lịch sử hoạt động
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item" th:if="${user.createdAt != null}">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6 class="text-success mb-1">Tài khoản được tạo</h6>
+                                    <small class="text-muted" th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm:ss')}">
+                                        01/01/2024 12:00:00
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item" th:if="${user.updatedAt != null and user.updatedAt != user.createdAt}">
+                                <div class="timeline-marker bg-warning"></div>
+                                <div class="timeline-content">
+                                    <h6 class="text-warning mb-1">Thông tin được cập nhật</h6>
+                                    <small class="text-muted" th:text="${#temporals.format(user.updatedAt, 'dd/MM/yyyy HH:mm:ss')}">
+                                        01/01/2024 12:00:00
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${user.createdAt == null and user.updatedAt == null}" class="text-center py-3">
+                            <i class="fas fa-clock text-muted fa-2x mb-2"></i>
+                            <p class="text-muted">Chưa có hoạt động nào được ghi nhận</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-tools me-2"></i>
+                            Thao tác
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/users/{id}/edit(id=${user.id})}" class="btn btn-warning">
+                                <i class="fas fa-edit me-2"></i>Chỉnh sửa thông tin
+                            </a>
+                            
+                            <a th:href="'mailto:' + ${user.email}" class="btn btn-info">
+                                <i class="fas fa-envelope me-2"></i>Gửi email
+                            </a>
+                            
+                            <button type="button" class="btn btn-secondary" onclick="copyUserInfo()">
+                                <i class="fas fa-copy me-2"></i>Sao chép thông tin
+                            </button>
+                            
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" 
+                                        data-bs-toggle="dropdown">
+                                    <i class="fas fa-download me-2"></i>Xuất dữ liệu
+                                </button>
+                                <ul class="dropdown-menu w-100">
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="exportAsJSON()">
+                                            <i class="fas fa-file-code me-2"></i>Xuất JSON
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="exportAsVCard()">
+                                            <i class="fas fa-address-card me-2"></i>Xuất vCard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="printUserInfo()">
+                                            <i class="fas fa-print me-2"></i>In thông tin
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <hr>
+                            
+                            <button type="button" class="btn btn-danger" 
+                                    th:onclick="|confirmDelete('${user.id}', '${user.name}')|">
+                                <i class="fas fa-trash me-2"></i>Xóa người dùng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thống kê -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Thống kê nhanh
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="border-end">
+                                    <h4 class="text-primary mb-1" th:text="${#strings.length(user.name)}">0</h4>
+                                    <small class="text-muted">Ký tự tên</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <h4 class="text-success mb-1" th:text="${#strings.length(user.email)}">0</h4>
+                                <small class="text-muted">Ký tự email</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-compass me-2"></i>
+                            Điều hướng
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/users" class="btn btn-outline-primary">
+                                <i class="fas fa-list me-2"></i>Danh sách người dùng
+                            </a>
+                            <a href="/users/new" class="btn btn-outline-success">
+                                <i class="fas fa-plus me-2"></i>Thêm người dùng mới
+                            </a>
+                            <a href="/books" class="btn btn-outline-info">
+                                <i class="fas fa-book me-2"></i>Quản lý sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form xóa ẩn -->
+    <form id="deleteForm" method="post" style="display: none;">
+        <input type="hidden" name="_method" value="delete">
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        const user = /*[[${user}]]*/ {};
+
+        function confirmDelete(userId, userName) {
+            if (confirm(`Bạn có chắc chắn muốn xóa người dùng "${userName}"?`)) {
+                const form = document.getElementById('deleteForm');
+                form.action = `/users/${userId}/delete`;
+                form.submit();
+            }
+        }
+
+        function copyUserInfo() {
+            const info = `Tên: ${user.name}
+Email: ${user.email}
+ID: ${user.id}
+${user.createdAt ? 'Ngày tạo: ' + new Date(user.createdAt).toLocaleString('vi-VN') : ''}`;
+
+            navigator.clipboard.writeText(info).then(() => {
+                alert('Đã sao chép thông tin người dùng vào clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = info;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Đã sao chép thông tin người dùng vào clipboard!');
+            });
+        }
+
+        function exportAsJSON() {
+            const dataStr = JSON.stringify(user, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `user_${user.id}_${user.name.replace(/[^a-zA-Z0-9]/g, '_')}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportAsVCard() {
+            const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:${user.name}
+EMAIL:${user.email}
+NOTE:User ID: ${user.id}
+END:VCARD`;
+
+            const dataBlob = new Blob([vcard], {type: 'text/vcard'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${user.name.replace(/[^a-zA-Z0-9]/g, '_')}.vcf`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function printUserInfo() {
+            window.print();
+        }
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Timeline styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .timeline {
+                position: relative;
+                padding-left: 30px;
+            }
+            
+            .timeline::before {
+                content: '';
+                position: absolute;
+                left: 10px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: #dee2e6;
+            }
+            
+            .timeline-item {
+                position: relative;
+                margin-bottom: 20px;
+            }
+            
+            .timeline-marker {
+                position: absolute;
+                left: -25px;
+                top: 5px;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                border: 2px solid white;
+                box-shadow: 0 0 0 2px #dee2e6;
+            }
+            
+            .timeline-content {
+                margin-left: 10px;
+            }
+
+            @media print {
+                .navbar, .btn, .card-header .btn-group, .breadcrumb, .col-lg-4 { display: none !important; }
+                .card { border: none !important; box-shadow: none !important; }
+                .col-lg-8 { width: 100% !important; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
