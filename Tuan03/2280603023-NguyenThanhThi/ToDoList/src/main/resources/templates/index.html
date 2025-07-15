@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>ToDo List</title>
+    <style>
+        body { font-family: Arial; background: #f8f8f8; }
+        .todo-container { width: 400px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 10px; }
+        .todo-title { text-align: center; color: #b83f45; font-size: 48px; }
+        .todo-list { list-style: none; padding: 0; }
+        .todo-list li { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .todo-list li.completed span { text-decoration: line-through; color: #aaa; }
+        .filters { margin-top: 20px; text-align: center; }
+        .filters a, .filters button { margin: 0 5px; border: none; background: none; color: #b83f45; cursor: pointer; text-decoration: none; }
+        .filters .selected { border: 1px solid #b83f45; border-radius: 3px; padding: 2px 6px; }
+        .footer { margin-top: 20px; text-align: left; color: #888; }
+        input[type="text"] { border: 2px solid #b83f45; border-radius: 4px; padding: 10px; width: 100%; box-sizing: border-box; }
+        button { background: #b83f45; color: #fff; border: none; border-radius: 3px; padding: 5px 10px; cursor: pointer; }
+        button:hover { background: #a03238; }
+    </style>
+</head>
+<body>
+<div class="todo-container">
+    <div class="todo-title">todos</div>
+    <form th:action="@{/todos/add}" method="post">
+        <input type="text" th:field="${newTodo.title}" placeholder="What needs to be done?" autocomplete="off"/>
+    </form>
+    <ul class="todo-list">
+        <li th:each="item : ${todoItems}" th:classappend="${item.completed} ? 'completed'">
+            <form th:action="@{'/todos/' + ${item.id} + '/toggle'}" method="post" style="margin:0;">
+                <input type="checkbox" th:checked="${item.completed}" onclick="this.form.submit()"/>
+            </form>
+            <span th:text="${item.title}" style="flex:1; margin-left:10px;"></span>
+            <form th:action="@{'/todos/' + ${item.id} + '/delete'}" method="post" style="margin:0;">
+                <button type="submit">Xóa</button>
+            </form>
+        </li>
+    </ul>
+    <div class="footer">
+        <span th:text="${activeCount} + ' items left'"></span>
+        <div class="filters">
+            <a th:href="@{/?filter=all}" th:classappend="${filter == 'all'} ? 'selected'">All</a>
+            <a th:href="@{/?filter=active}" th:classappend="${filter == 'active'} ? 'selected'">Active</a>
+            <a th:href="@{/?filter=completed}" th:classappend="${filter == 'completed'} ? 'selected'">Completed</a>
+            <form th:action="@{/todos/clear-completed}" method="post" style="display:inline;">
+                <button type="submit">Clear completed</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html> 
