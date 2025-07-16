@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Giao diện thêm sinh viên vào lớp học</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .select-box { min-width: 250px; min-height: 250px; }
+        .center-btns { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h4 class="mb-4 fw-bold">Giao diện thêm sinh viên vào lớp học:</h4>
+    <h2 class="mb-4">Quản lý Đăng ký học của Sinh viên</h2>
+    <form th:action="@{/enrollments/add-by-student}" method="post" onsubmit="selectAll('registeredClasses')">
+        <div class="mb-3 row align-items-center">
+            <label class="col-sm-2 col-form-label fw-bold">Chọn sinh viên:</label>
+            <div class="col-sm-4">
+                <select class="form-select" name="studentId" id="studentSelect" th:field="*{studentId}" required onchange="this.form.submit()">
+                    <option value="">-- Vui lòng chọn --</option>
+                    <option th:each="student : ${students}" th:value="${student.id}" th:text="${student.firstName + ' ' + student.lastName}" th:selected="${student.id == selectedStudentId}"></option>
+                </select>
+            </div>
+        </div>
+        <hr>
+        <div class="mb-3 fw-bold">Đăng ký cho sinh viên:</div>
+        <div class="row">
+            <div class="col-md-5">
+                <label class="form-label">Các lớp học hiện có</label>
+                <select multiple class="form-select select-box" id="availableClasses">
+                    <option th:each="cls : ${availableClasses}" th:value="${cls.id}" th:text="${cls.name}"></option>
+                </select>
+            </div>
+            <div class="col-md-2 center-btns">
+                <button type="button" class="btn btn-secondary" onclick="moveSelected('availableClasses','registeredClasses')">&gt;</button>
+                <button type="button" class="btn btn-secondary" onclick="moveSelected('registeredClasses','availableClasses')">&lt;</button>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Các lớp lớp đã đăng ký</label>
+                <select multiple class="form-select select-box" id="registeredClasses" name="classIds">
+                    <option th:each="cls : ${registeredClasses}" th:value="${cls.id}" th:text="${cls.name}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+            <a th:href="@{/enrollments}" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </form>
+</div>
+<script>
+    function moveSelected(fromId, toId) {
+        var from = document.getElementById(fromId);
+        var to = document.getElementById(toId);
+        Array.from(from.selectedOptions).forEach(function(option) {
+            to.add(option);
+        });
+    }
+    function selectAll(selectId) {
+        var select = document.getElementById(selectId);
+        for (var i = 0; i < select.options.length; i++) {
+            select.options[i].selected = true;
+        }
+    }
+</script>
+</body>
+</html> 

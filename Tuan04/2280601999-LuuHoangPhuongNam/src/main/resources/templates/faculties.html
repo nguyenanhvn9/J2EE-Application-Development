@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Khoa</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">Quản lý Khoa</h2>
+    <a class="btn btn-success mb-3" th:href="@{/faculties/add}">Thêm khoa</a>
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Tên khoa</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="faculty : ${faculties}">
+                <td th:text="${faculty.id}"></td>
+                <td th:text="${faculty.name}"></td>
+                <td>
+                    <a th:href="@{'/faculties/edit/' + ${faculty.id}}" class="btn btn-primary btn-sm">Sửa</a>
+                    <a th:href="@{'/faculties/delete/' + ${faculty.id}}" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa?');">Xóa</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html> 

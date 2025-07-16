@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tree View - Cấu trúc trường học</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .tree ul { list-style-type: none; margin-left: 1.5rem; }
+        .tree li { margin: 0.5rem 0; }
+        .tree .node { font-weight: bold; }
+        .tree .icon { margin-right: 0.5rem; }
+        .tree .student { font-weight: normal; margin-left: 1.5rem; }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">Giao diện hiển thị cấu trúc trường học (Tree View)</h2>
+    <div class="tree">
+        <ul>
+            <li th:each="faculty : ${faculties}">
+                <span class="node"><span class="icon">🏢</span>Khoa: <span th:text="${faculty.name}"></span></span>
+                <ul>
+                    <li th:each="subject : ${faculty.subjects}">
+                        <span class="node"><span class="icon">📚</span>Môn học: <span th:text="${subject.name}"></span></span>
+                        <ul>
+                            <li th:each="cls : ${subject.studentClasses}">
+                                <span class="node"><span class="icon">🏫</span>Lớp: <span th:text="${cls.name}"></span> - <span class="icon">👥</span><span th:text="${#lists.size(cls.enrollments)}"></span></span>
+                                <ul>
+                                    <li th:if="${#lists.isEmpty(cls.enrollments)}">
+                                        <span class="student">Chưa có sinh viên nào đăng ký.</span>
+                                    </li>
+                                    <li th:each="enrollment : ${cls.enrollments}">
+                                        <span class="student"><span class="icon">👤</span><span th:text="${enrollment.student.firstName + ' ' + enrollment.student.lastName}"></span></span>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+</body>
+</html> 

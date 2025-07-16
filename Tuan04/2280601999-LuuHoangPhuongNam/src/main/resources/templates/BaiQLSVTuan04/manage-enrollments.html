@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý đăng ký học cho lớp học</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .select-box { min-width: 250px; min-height: 250px; }
+        .center-btns { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-3">Quản lý đăng ký học cho lớp: <span th:text="${studentClass.name}"></span></h2>
+    <div class="alert alert-info mb-4">
+        Chọn sinh viên từ danh sách bên trái để thêm vào lớp, hoặc xóa sinh viên khỏi lớp ở danh sách bên phải.
+    </div>
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+    <form th:action="@{/enrollments/add}" method="post">
+        <input type="hidden" name="classId" th:value="${studentClass.id}" />
+        <div class="row">
+            <div class="col-md-5">
+                <label class="form-label">Sinh viên chưa đăng ký</label>
+                <select multiple class="form-select select-box" name="studentIds" id="notRegistered">
+                    <option th:each="student : ${notRegistered}" th:value="${student.id}" th:text="${student.firstName + ' ' + student.lastName}"></option>
+                </select>
+            </div>
+            <div class="col-md-2 center-btns">
+                <button type="submit" class="btn btn-primary">&gt;&gt; Thêm</button>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Sinh viên đã đăng ký</label>
+                <ul class="list-group select-box">
+                    <li th:each="student : ${registered}" class="list-group-item d-flex justify-content-between align-items-center">
+                        <span th:text="${student.firstName + ' ' + student.lastName}"></span>
+                        <form th:action="@{/enrollments/remove}" method="post" style="display:inline;">
+                            <input type="hidden" name="classId" th:value="${studentClass.id}" />
+                            <input type="hidden" name="studentId" th:value="${student.id}" />
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa sinh viên này khỏi lớp không?');">Xóa</button>
+                        </form>
+                    </li>
+                    <li th:if="${#lists.isEmpty(registered)}" class="list-group-item text-muted">Chưa có sinh viên nào đăng ký.</li>
+                </ul>
+            </div>
+        </div>
+        <a th:href="@{/enrollments}" class="btn btn-secondary mt-3">Quay lại</a>
+    </form>
+</div>
+</body>
+</html> 

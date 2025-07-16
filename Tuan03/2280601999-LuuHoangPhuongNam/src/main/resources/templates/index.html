@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>To-Do List</title>
+    <style>
+        .completed { text-decoration: line-through; color: gray; }
+        .filter-btn { margin: 0 2px; }
+        .active-filter { font-weight: bold; }
+    </style>
+</head>
+<body>
+<h1>To-Do List</h1>
+
+<!-- Form thêm mới -->
+<form th:action="@{/todos/add}" th:object="${newTodo}" method="post">
+    <input type="text" th:field="*{title}" placeholder="Nhập công việc mới..." required />
+    <button type="submit">Thêm</button>
+</form>
+
+<!-- Danh sách công việc -->
+<ul>
+    <li th:each="todo : ${todos}">
+        <form th:action="@{'/todos/' + ${todo.id} + '/toggle'}" method="post" style="display:inline;">
+            <input type="checkbox" th:checked="${todo.completed}" onclick="this.form.submit()" />
+            <input type="hidden" name="filter" th:value="${filter}" />
+        </form>
+        <span th:text="${todo.title}" th:classappend="${todo.completed} ? 'completed' : ''"></span>
+        <form th:action="@{'/todos/' + ${todo.id} + '/delete'}" method="post" style="display:inline;">
+            <input type="hidden" name="filter" th:value="${filter}" />
+            <button type="submit">Xóa</button>
+        </form>
+    </li>
+</ul>
+
+<!-- Bộ lọc -->
+<div>
+    <form th:action="@{/todos}" method="get" style="display:inline;">
+        <button type="submit" name="filter" value="all" th:classappend="${filter} == 'all' ? 'active-filter' : ''">All</button>
+        <button type="submit" name="filter" value="active" th:classappend="${filter} == 'active' ? 'active-filter' : ''">Active</button>
+        <button type="submit" name="filter" value="completed" th:classappend="${filter} == 'completed' ? 'active-filter' : ''">Completed</button>
+    </form>
+</div>
+
+<!-- Nút clear completed -->
+<form th:action="@{/todos/clear-completed}" method="post" style="display:inline;">
+    <input type="hidden" name="filter" th:value="${filter}" />
+    <button type="submit">Clear Completed</button>
+</form>
+
+<!-- Số lượng công việc còn lại -->
+<div>
+    <span th:text="${activeCount} + ' items left'"></span>
+</div>
+</body>
+</html> 
