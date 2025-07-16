@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title layout:fragment="title">Danh sách Sinh viên</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="mb-0"><i class="bi bi-people text-primary"></i> Danh sách Sinh viên</h1>
+            <a th:href="@{/students/create}" class="btn btn-primary">
+                <i class="bi bi-person-plus"></i> Thêm Sinh viên
+            </a>
+        </div>
+
+        <table class="table table-bordered table-hover table-striped">
+            <thead class="table-light">
+            <tr>
+                <th>Họ và tên</th>
+                <th>Email</th>
+                <th style="width: 160px;">Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="student : ${students}">
+                <td th:text="${student.firstName + ' ' + student.lastName}"></td>
+                <td th:text="${student.email}"></td>
+                <td>
+                    <a th:href="@{/students/edit/{id}(id=${student.id})}" class="btn btn-sm btn-warning me-1">
+                        <i class="bi bi-pencil-square"></i> Sửa
+                    </a>
+                    <a th:href="@{/students/delete/{id}(id=${student.id})}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Bạn có chắc chắn muốn xoá sinh viên này?')">
+                        <i class="bi bi-trash"></i> Xoá
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(students)}">
+                <td colspan="3" class="text-center text-muted">Chưa có sinh viên nào.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

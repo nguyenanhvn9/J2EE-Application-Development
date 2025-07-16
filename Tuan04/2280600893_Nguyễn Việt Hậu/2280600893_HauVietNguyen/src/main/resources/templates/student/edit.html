@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title layout:fragment="title">Sửa Sinh viên</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container mt-4">
+        <h1 class="mb-4">
+            <i class="bi bi-pencil-square text-warning"></i> Sửa Sinh viên
+        </h1>
+
+        <form th:action="@{/students/save}" th:object="${student}" method="post" class="needs-validation" novalidate>
+            <!-- Hidden ID -->
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="mb-3">
+                <label for="firstName" class="form-label">Họ:</label>
+                <input type="text" id="firstName" th:field="*{firstName}" class="form-control" required />
+                <div class="invalid-feedback">Vui lòng nhập họ.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="lastName" class="form-label">Tên:</label>
+                <input type="text" id="lastName" th:field="*{lastName}" class="form-control" required />
+                <div class="invalid-feedback">Vui lòng nhập tên.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input type="email" id="email" th:field="*{email}" class="form-control" required />
+                <div class="invalid-feedback">Vui lòng nhập email hợp lệ.</div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-floppy"></i> Cập nhật
+                </button>
+                <a th:href="@{/students}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+</body>
+</html>

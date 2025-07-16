@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+  <title layout:fragment="title">Danh sách Môn học</title>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+<section layout:fragment="content">
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="mb-0">
+        <i class="bi bi-journal-text text-primary"></i> Danh sách Môn học
+      </h1>
+      <a th:href="@{/subjects/create}" class="btn btn-primary">
+        <i class="bi bi-journal-plus"></i> Thêm Môn học
+      </a>
+    </div>
+
+    <table class="table table-bordered table-hover table-striped">
+      <thead class="table-light">
+      <tr>
+        <th>Tên môn</th>
+        <th>Khoa</th>
+        <th style="width: 160px;">Thao tác</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="subject : ${subjects}">
+        <td th:text="${subject.name}"></td>
+        <td th:text="${subject.faculty.name}"></td>
+        <td>
+          <a th:href="@{/subjects/edit/{id}(id=${subject.id})}" class="btn btn-sm btn-warning me-1">
+            <i class="bi bi-pencil-square"></i> Sửa
+          </a>
+          <a th:href="@{/subjects/delete/{id}(id=${subject.id})}"
+             class="btn btn-sm btn-danger"
+             onclick="return confirm('Bạn có chắc chắn muốn xoá môn học này?')">
+            <i class="bi bi-trash"></i> Xoá
+          </a>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(subjects)}">
+        <td colspan="3" class="text-center text-muted">Chưa có môn học nào.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</body>
+</html>
