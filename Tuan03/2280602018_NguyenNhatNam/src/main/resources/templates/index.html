@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f5f5f5;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    .todo-container {
+      max-width: 600px;
+      margin: 80px auto;
+    }
+
+    .todo-box {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .todo-header {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding: 10px 20px;
+    }
+
+    .todo-header .arrow {
+      font-size: 22px;
+      margin-right: 15px;
+      color: #b83f45;
+    }
+
+    .todo-header input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 20px;
+      padding: 10px;
+      color: #333;
+    }
+
+    .todo-header input::placeholder {
+      font-style: italic;
+      color: #aaa;
+    }
+
+    .todo-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .todo-list li {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      border-top: 1px solid #eee;
+      font-size: 18px;
+      position: relative;
+    }
+
+    .todo-list li.completed span {
+      text-decoration: line-through;
+      color: #aaa;
+    }
+
+    .todo-list input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      margin-right: 15px;
+      border: 2px solid #ccc;
+      border-radius: 50%;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .todo-list input[type="checkbox"]:checked {
+      border-color: #28a745;
+      background-color: white;
+    }
+
+    .todo-list input[type="checkbox"]:checked::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 6px;
+      width: 6px;
+      height: 12px;
+      border: solid #28a745;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .delete-btn {
+      position: absolute;
+      right: 20px;
+      border: none;
+      background: none;
+      font-size: 18px;
+      color: #dc3545;
+      cursor: pointer;
+    }
+
+    .todo-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .filters a {
+      margin: 0 5px;
+      text-decoration: none;
+      color: #555;
+    }
+
+    .filters a.active {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div class="todo-container">
+  <h1 class="text-center text-danger mb-4" style="font-weight: 100; font-size: 64px;">ToDo List</h1>
+
+  <div class="todo-box">
+
+    <!-- Input -->
+    <form th:action="@{/todos/add}" method="post" class="todo-header">
+      <span class="arrow">&#x25BC;</span>
+      <input type="text" th:field="${newTodo.title}" placeholder="What needs to be done?" required />
+    </form>
+
+    <!-- Danh sách -->
+    <ul class="todo-list">
+      <li th:each="item : ${items}" th:classappend="${item.completed} ? 'completed'">
+        <form th:action="@{'/todos/' + ${item.id} + '/toggle'}" method="post" style="margin: 0;">
+          <input type="checkbox" th:checked="${item.completed}" onchange="this.form.submit()" />
+        </form>
+        <span th:text="${item.title}"></span>
+        <form th:action="@{'/todos/' + ${item.id} + '/delete'}" method="post">
+          <button type="submit" class="delete-btn">✖</button>
+        </form>
+      </li>
+    </ul>
+
+    <!-- Footer -->
+    <div class="todo-footer">
+      <span th:text="${itemsLeft} + ' items left'"></span>
+      <div class="filters">
+        <a th:href="@{/?filter=all}" th:class="${currentFilter == 'all'} ? 'active' : ''">All</a>
+        <a th:href="@{/?filter=active}" th:class="${currentFilter == 'active'} ? 'active' : ''">Active</a>
+        <a th:href="@{/?filter=completed}" th:class="${currentFilter == 'completed'} ? 'active' : ''">Completed</a>
+      </div>
+      <form th:action="@{/todos/clear}" method="post" style="margin: 0;">
+        <button type="submit" class="btn btn-sm btn-outline-warning">Clear completed</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
