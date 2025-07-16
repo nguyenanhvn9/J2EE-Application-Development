@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title layout:fragment="title">Chọn sinh viên</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container mt-4">
+        <h2 class="mb-4"><i class="bi bi-person-lines-fill text-primary"></i> Chọn Sinh viên để đăng ký lớp</h2>
+
+        <div class="list-group">
+            <a th:each="student : ${students}"
+               th:href="@{/enrollments/{id}(id=${student.id})}"
+               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span th:text="${student.firstName + ' ' + student.lastName}"></span>
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+
+        <div class="mt-3">
+            <a th:href="@{/}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Quay lại Trang chủ
+            </a>
+        </div>
+    </div>
+</section>
+</body>
+</html>

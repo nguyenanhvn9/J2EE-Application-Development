@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title layout:fragment="title">Danh sách Lớp học</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="mb-0"><i class="bi bi-building"></i> Danh sách Lớp học</h1>
+            <a th:href="@{/classes/create}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Thêm Lớp học
+            </a>
+        </div>
+
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-light">
+            <tr>
+                <th>Tên lớp</th>
+                <th>Môn học</th>
+                <th style="width: 150px;">Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="clazz : ${classes}">
+                <td th:text="${clazz.name}"></td>
+                <td th:text="${clazz.subject.name}"></td>
+                <td>
+                    <a th:href="@{/classes/edit/{id}(id=${clazz.id})}" class="btn btn-sm btn-warning me-1">
+                        <i class="bi bi-pencil-square"></i> Sửa
+                    </a>
+                    <a th:href="@{/classes/delete/{id}(id=${clazz.id})}"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('Bạn có chắc chắn muốn xoá lớp này?')">
+                        <i class="bi bi-trash"></i> Xoá
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(classes)}">
+                <td colspan="3" class="text-center text-muted">Chưa có lớp học nào.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

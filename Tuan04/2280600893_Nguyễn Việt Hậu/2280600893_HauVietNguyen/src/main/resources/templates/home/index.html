@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title layout:fragment="title">Cấu trúc Trường học</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <style>
+        ul {
+            list-style-type: none;
+            margin-left: 20px;
+            padding-left: 15px;
+            border-left: 1px solid #ccc;
+        }
+
+        .toggle-btn {
+            cursor: pointer;
+            margin-right: 6px;
+            color: #0d6efd;
+            user-select: none;
+        }
+
+        .collapsed > .toggle-content {
+            display: none;
+        }
+
+        .italic {
+            font-style: italic;
+            color: gray;
+        }
+
+        .item-line {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content" class="container mt-4">
+    <h1>📚 Cấu trúc Trường học</h1>
+
+    <ul>
+        <li th:each="faculty : ${faculties}" class="collapsible collapsed">
+            <div class="item-line">
+                <i class="bi bi-caret-right-fill toggle-btn"></i>
+                🏢 <strong th:text="${faculty.name}">Khoa</strong>
+            </div>
+            <ul class="toggle-content">
+                <li th:each="subject : ${faculty.subjects}" class="collapsible collapsed">
+                    <div class="item-line">
+                        <i class="bi bi-caret-right-fill toggle-btn"></i>
+                        📘 <strong>Môn học:</strong> <span th:text="${subject.name}"></span>
+                    </div>
+                    <ul class="toggle-content">
+                        <li th:each="clazz : ${subject.classes}" class="collapsible collapsed">
+                            <div class="item-line">
+                                <i class="bi bi-caret-right-fill toggle-btn"></i>
+                                🏫 <strong>Lớp:</strong> <span th:text="${clazz.name}"></span>
+                            </div>
+                            <ul class="toggle-content">
+                                <li>
+                                    👨‍🎓 <strong>Sĩ số:</strong>
+                                    <span th:text="${#lists.size(clazz.students)}"></span>
+                                </li>
+                                <li th:if="${#lists.isEmpty(clazz.students)}">
+                                    <span class="italic">Chưa có sinh viên nào đăng ký.</span>
+                                </li>
+                                <li th:each="student : ${clazz.students}">
+                                    👨‍🎓 <span th:text="${student.firstName + ' ' + student.lastName}"></span>
+                                    (<span th:text="${student.email}"></span>)
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
