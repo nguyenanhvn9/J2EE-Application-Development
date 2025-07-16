@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Todo List</h1>
+    <form th:action="@{/add}" th:object="${newTodo}" method="post" class="mb-4">
+        <div class="input-group">
+            <input type="text" th:field="*{title}" class="form-control" placeholder="Enter new todo"/>
+            <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+        <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+    </form>
+
+    <ul class="list-group mb-4">
+        <li th:each="todo : ${todos}" class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <form th:action="@{/{id}/toggle(id=${todo.id})}" method="post" style="display:inline;">
+                    <input type="checkbox" th:checked="${todo.completed}" onclick="this.form.submit()"/>
+                </form>
+                <span th:text="${todo.title}" th:class="${todo.completed} ? 'text-decoration-line-through' : ''"></span>
+            </div>
+            <form th:action="@{/{id}/delete(id=${todo.id})}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+        </li>
+    </ul>
+
+    <div class="d-flex justify-content-between">
+        <span th:text="${activeItemsCount} + ' items left'"></span>
+        <div>
+            <a th:href="@{/(filter='all')}" th:class="${filter == 'all'} ? 'btn btn-primary' : 'btn btn-outline-primary'">All</a>
+            <a th:href="@{/(filter='active')}" th:class="${filter == 'active'} ? 'btn btn-primary' : 'btn btn-outline-primary'">Active</a>
+            <a th:href="@{/(filter='completed')}" th:class="${filter == 'completed'} ? 'btn btn-primary' : 'btn btn-outline-primary'">Completed</a>
+        </div>
+        <form th:action="@{/clear-completed}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-warning">Clear Completed</button>
+        </form>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

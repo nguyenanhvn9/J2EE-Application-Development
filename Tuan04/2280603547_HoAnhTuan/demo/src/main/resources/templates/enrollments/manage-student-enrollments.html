@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Student Enrollments</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <h1>Manage Enrollments for <span th:text="${student.firstName + ' ' + student.lastName}"></span></h1>
+  <h3>Enrolled Classes</h3>
+  <table class="table table-bordered table-hover">
+    <thead class="table-dark">
+    <tr>
+      <th>ID</th>
+      <th>Class Name</th>
+      <th>Subject</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="studentClass : ${enrolledClasses}">
+      <td th:text="${studentClass.id}"></td>
+      <td th:text="${studentClass.name}"></td>
+      <td th:text="${studentClass.subject.name}"></td>
+      <td>
+        <form th:action="@{/enrollments/students/{studentId}/remove/{classId}(studentId=${student.id},classId=${studentClass.id})}" method="post" style="display:inline;">
+          <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <h3>Available Classes</h3>
+  <table class="table table-bordered table-hover">
+    <thead class="table-dark">
+    <tr>
+      <th>ID</th>
+      <th>Class Name</th>
+      <th>Subject</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="studentClass : ${availableClasses}">
+      <td th:text="${studentClass.id}"></td>
+      <td th:text="${studentClass.name}"></td>
+      <td th:text="${studentClass.subject.name}"></td>
+      <td>
+        <form th:action="@{/enrollments/students/{studentId}/add/{classId}(studentId=${student.id},classId=${studentClass.id})}" method="post" style="display:inline;">
+          <button type="submit" class="btn btn-sm btn-success">Add</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
