@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh Sách Khoa</title>
+</head>
+<body>
+<h1>Danh Sách Khoa</h1>
+<a href="/faculties/new">Thêm Khoa</a>
+<table>
+    <thead>
+    <tr>
+        <th>Tên Khoa</th>
+        <th>Hành động</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="faculty : ${faculties}">
+        <td th:text="${faculty.name}"></td>
+        <td>
+            <a th:href="@{/faculties/edit/{id}(id=${faculty.id})}">Sửa</a>
+            <a th:href="@{/faculties/delete/{id}(id=${faculty.id})}">Xóa</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
