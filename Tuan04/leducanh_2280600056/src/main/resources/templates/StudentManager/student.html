@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý Sinh viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body class="container py-4">
+
+<h2 th:text="${student.id != null} ? 'Chỉnh sửa Sinh viên' : 'Thêm Sinh viên mới'" class="mb-4"></h2>
+<div class="mb-4">
+    <a th:href="@{/student-manager}" class="btn btn-secondary">Trở lại</a>
+</div>
+<form th:action="${student.id != null} ? @{'/student-manager/students/edit/' + ${student.id}} : @{/student-manager/students/add}"
+      th:object="${student}" method="post" class="mb-5">
+    <input type="hidden" th:field="*{id}" />
+    <div class="mb-3">
+        <label class="form-label">Họ tên:</label>
+        <input type="text" th:field="*{name}" class="form-control" required/>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email:</label>
+        <input type="email" th:field="*{email}" class="form-control" required/>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Lớp:</label>
+        <select th:field="*{studentClass.id}" class="form-select">
+            <option th:each="cls : ${classes}" th:value="${cls.id}" th:text="${cls.name}"></option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a href="/student-manager/students" class="btn btn-secondary">Reset</a>
+</form>
+
+<h3>Danh sách Sinh viên</h3>
+<a href="/student-manager/students/add" class="btn btn-success mb-2">Thêm mới</a>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+    <tr>
+        <th>ID</th>
+        <th>Họ tên</th>
+        <th>Email</th>
+        <th>Lớp</th>
+        <th>Hành động</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="std : ${students}">
+        <td th:text="${std.id}"></td>
+        <td th:text="${std.name}"></td>
+        <td th:text="${std.email}"></td>
+        <td th:text="${std.studentClass.name}"></td>
+        <td>
+            <a th:href="@{'/student-manager/students/edit/' + ${std.id}}" class="btn btn-sm btn-warning">Sửa</a>
+            <a th:href="@{'/student-manager/students/delete/' + ${std.id}}" class="btn btn-sm btn-danger"
+               onclick="return confirm('Xác nhận xóa?')">Xóa</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
