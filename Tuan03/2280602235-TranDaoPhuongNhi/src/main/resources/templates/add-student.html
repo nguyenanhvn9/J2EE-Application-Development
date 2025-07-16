@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thêm Student</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Thêm Student</h1>
+    <form th:action="@{/students/add}" th:object="${student}" method="post">
+        <label>Name:</label>
+        <input type="text" th:field="*{name}" required><br>
+        <label>Email:</label>
+        <input type="email" th:field="*{email}" required><br>
+        <label>Major:</label>
+        <input type="text" th:field="*{major}" required><br>
+        <button type="submit">Thêm</button>
+    </form>
+    <a th:href="@{/students}">Quay lại danh sách</a>
+</body>
+</html> 
