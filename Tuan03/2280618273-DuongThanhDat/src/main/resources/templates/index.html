@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List Application</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+  <body>
+    <div class="todoapp">
+      <header class="header">
+        <h1>todos</h1>
+        <!-- Form để thêm công việc mới -->
+        <form th:action="@{/todos/add}" method="post" th:object="${newTodo}">
+          <input
+            class="new-todo"
+            placeholder="What needs to be done?"
+            th:field="*{title}"
+            autofocus
+            required
+          />
+        </form>
+      </header>
+
+      <!-- Main section with todo list -->
+      <section class="main" th:if="${!todos.isEmpty()}">
+        <ul class="todo-list">
+          <li th:each="todo : ${todos}" th:class="${todo.completed} ? 'completed' : ''">
+            <div class="view">
+              <!-- Checkbox để đánh dấu hoàn thành -->
+              <form
+                th:action="@{/todos/{id}/toggle(id=${todo.id})}"
+                method="post"
+                style="display: inline"
+              >
+                <input
+                  class="toggle"
+                  type="checkbox"
+                  th:checked="${todo.completed}"
+                  onchange="this.form.submit()"
+                />
+              </form>
+
+              <!-- Hiển thị nội dung công việc -->
+              <label th:text="${todo.title}"></label>
+
+              <!-- Form để xóa công việc -->
+              <form
+                th:action="@{/todos/{id}/delete(id=${todo.id})}"
+                method="post"
+                style="display: inline"
+              >
+                <button class="destroy" type="submit">×</button>
+              </form>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Footer with filters and actions -->
+      <footer class="footer" th:if="${!todos.isEmpty()}">
+        <span class="todo-count">
+          <strong th:text="${activeItemsCount}">0</strong>
+          <span th:text="${activeItemsCount == 1} ? ' item left' : ' items left'"></span>
+        </span>
+
+        <!-- Filter buttons -->
+        <ul class="filters">
+          <li>
+            <a th:href="@{/(filter=all)}" th:class="${currentFilter == 'all'} ? 'selected' : ''"
+              >All</a
+            >
+          </li>
+          <li>
+            <a
+              th:href="@{/(filter=active)}"
+              th:class="${currentFilter == 'active'} ? 'selected' : ''"
+              >Active</a
+            >
+          </li>
+          <li>
+            <a
+              th:href="@{/(filter=completed)}"
+              th:class="${currentFilter == 'completed'} ? 'selected' : ''"
+              >Completed</a
+            >
+          </li>
+        </ul>
+
+        <!-- Clear completed button -->
+        <form
+          th:action="@{/todos/clear-completed}"
+          method="post"
+          th:if="${hasCompletedItems}"
+          style="display: inline"
+        >
+          <button class="clear-completed" type="submit">Clear completed</button>
+        </form>
+      </footer>
+    </div>
+
+    <!-- Info section -->
+    <div class="info">
+      <p>Click to mark as completed</p>
+      <p>Double-click to edit a todo (feature not implemented yet)</p>
+      <p>Created by <a href="#">Duong Thanh Dat</a></p>
+      <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+    </div>
+  </body>
+</html>

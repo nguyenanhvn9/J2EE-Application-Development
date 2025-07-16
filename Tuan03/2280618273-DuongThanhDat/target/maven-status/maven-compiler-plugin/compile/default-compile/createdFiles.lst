@@ -1,0 +1,4 @@
+com/example/todolist/service/TodoService.class
+com/example/todolist/model/TodoItem.class
+com/example/todolist/controller/TodoController.class
+com/example/todolist/TodoListApplication.class
