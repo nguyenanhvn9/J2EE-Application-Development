@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thêm/Sửa Khoa</title>
+</head>
+<body>
+<h1 th:text="${faculty.id != null} ? 'Sửa Khoa' : 'Thêm Khoa'"></h1>
+<form th:action="@{/faculties}" th:object="${faculty}" method="post">
+    <label for="name">Tên Khoa:</label>
+    <input type="text" id="name" th:field="*{name}" required />
+    <button type="submit">Lưu</button>
+</form>
+<a href="/faculties">Quay lại</a>
+</body>
+</html>
