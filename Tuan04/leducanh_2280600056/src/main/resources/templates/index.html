@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Trang chủ</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="container py-5">
+    <h1 class="mb-4 text-center">Quản lý Ứng dụng</h1>
+    <h5 class="mb-4 text-center">Mời bạn chọn chức năng</h5>
+    <div class="list-group text-center">
+      <a th:href="@{/users}" class="list-group-item list-group-item-action"
+        >Quản lý Người dùng</a
+      >
+      <a th:href="@{/todos}" class="list-group-item list-group-item-action"
+        >Quản lý công việc (Todo)</a
+      >
+      <a th:href="@{/books}" class="list-group-item list-group-item-action"
+        >Quản lý sách</a
+      >
+      <a th:href="@{/student-manager}" class="list-group-item list-group-item-action"
+      >Quản lý đăng ký môn học</a
+      >
+    </div>
+  </body>
+</html>
