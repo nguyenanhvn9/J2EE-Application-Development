@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Sửa sinh viên</title></head>
+<body>
+<h1>Sửa sinh viên</h1>
+<form th:action="@{/students/edit}" method="post" th:object="${student}">
+    <input type="hidden" th:field="*{id}" />
+    <p>Họ tên: <input type="text" th:field="*{name}" required /></p>
+    <p>Email: <input type="email" th:field="*{email}" required /></p>
+    <button type="submit">Cập nhật</button>
+</form>
+</body>
+</html>
