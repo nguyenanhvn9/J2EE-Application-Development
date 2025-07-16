@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do List</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+    <h1>todos</h1>
+
+    <!-- Form Thêm mới -->
+    <form th:action="@{/todos/add}" method="post" th:object="${newTodo}">
+        <input type="text" th:field="*{title}" placeholder="What needs to be done?" required/>
+        <button type="submit">Thêm</button>
+    </form>
+
+    <!-- Hiển thị danh sách -->
+    <ul>
+        <li th:each="item : ${items}">
+            <form th:action="@{'/todos/' + ${item.id} + '/toggle'}" method="post" style="display:inline;">
+                <input type="checkbox" th:checked="${item.completed}" onchange="this.form.submit()" />
+            </form>
+            <span th:text="${item.title}" 
+                  th:style="${item.completed} ? 'text-decoration: line-through;' : ''">
+            </span>
+            <form th:action="@{'/todos/' + ${item.id} + '/delete'}" method="post" style="display:inline;">
+                <button type="submit">Xóa</button>
+            </form>
+        </li>
+    </ul>
+
+    <!-- Footer: bộ lọc và số lượng -->
+    <div>
+        <span th:text="${itemsLeft} + ' items left'"></span> |
+
+        <a th:href="@{/todos(filter='all')}" th:class="${currentFilter == 'all'} ? 'selected' : ''">All</a>
+        <a th:href="@{/todos(filter='active')}" th:class="${currentFilter == 'active'} ? 'selected' : ''">Active</a>
+        <a th:href="@{/todos(filter='completed')}" th:class="${currentFilter == 'completed'} ? 'selected' : ''">Completed</a>
+    </div>
+
+    <!-- Nút Clear Completed -->
+    <form th:action="@{/todos/clear-completed}" method="post" style="margin-top:10px;">
+        <button type="submit">Clear completed</button>
+    </form>
+</body>
+</html>
