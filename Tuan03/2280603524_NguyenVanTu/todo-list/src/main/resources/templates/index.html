@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>todos</title>
+    <!-- Sử dụng CDN thay cho webjars -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/todomvc-common@1.0.5/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/todomvc-app-css@2.0.6/index.css" />
+    <style>
+        /* Custom styles để giống hình */
+        .todo-list li .view {
+            display: flex;
+            align-items: center;
+            padding: 15px 15px 15px 60px;
+            position: relative;
+        }
+        
+        .todo-list li .toggle {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            margin: 0;
+        }
+        
+        .todo-list li .toggle:checked {
+            background-color: #5dc2af;
+            border-color: #5dc2af;
+        }
+        
+        .todo-list li .toggle:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .todo-list li.completed label {
+            color: #d9d9d9;
+            text-decoration: line-through;
+        }
+        
+        .todo-list li label {
+            color: #4d4d4d;
+            font-size: 24px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 300;
+            line-height: 1.2;
+            flex: 1;
+            margin-left: 15px;
+            cursor: pointer;
+        }
+        
+        .todo-list li .destroy {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .new-todo {
+            font-size: 24px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 300;
+        }
+        
+        h1 {
+            font-size: 100px;
+            font-weight: 100;
+            color: rgba(175, 47, 47, 0.15);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <section class="todoapp">
+        <header class="header">
+            <h1>todos</h1>
+            <form th:action="@{/todos/add}" method="post">
+                <input class="new-todo" name="newTodo" placeholder="What needs to be done?" autofocus autocomplete="off"/>
+                <input type="hidden" name="filter" th:value="${filter}"/>
+            </form>
+        </header>
+
+        <section class="main" th:if="${todos.size() > 0}">
+            <ul class="todo-list">
+                <li th:each="item : ${todos}" th:classappend="${item.completed} ? 'completed'">
+                    <div class="view">
+                        <form th:action="@{/todos/{id}/toggle(id=${item.id})}" method="post" style="display:inline;">
+                            <input class="toggle" type="checkbox" onchange="this.form.submit()" th:checked="${item.completed}"/>
+                            <input type="hidden" name="filter" th:value="${filter}"/>
+                        </form>
+                        <label th:text="${item.title}">Công việc</label>
+                        <form th:action="@{/todos/{id}/delete(id=${item.id})}" method="post" style="display:inline;">
+                            <button class="destroy"></button>
+                            <input type="hidden" name="filter" th:value="${filter}"/>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <footer class="footer" th:if="${todos.size() > 0}">
+            <span class="todo-count">
+                <strong th:text="${itemsLeft}">0</strong> 
+                <span th:text="${itemsLeft == 1} ? 'item' : 'items'">items</span> left
+            </span>
+            <ul class="filters">
+                <li><a th:href="@{/}" th:classappend="${filter == null} ? 'selected'">All</a></li>
+                <li><a th:href="@{/?filter=active}" th:classappend="${filter == 'active'} ? 'selected'">Active</a></li>
+                <li><a th:href="@{/?filter=completed}" th:classappend="${filter == 'completed'} ? 'selected'">Completed</a></li>
+            </ul>
+            <form th:action="@{/todos/clear-completed}" method="post" style="display:inline;">
+                <button class="clear-completed">Clear completed</button>
+                <input type="hidden" name="filter" th:value="${filter}"/>
+            </form>
+        </footer>
+    </section>
+</body>
+</html>

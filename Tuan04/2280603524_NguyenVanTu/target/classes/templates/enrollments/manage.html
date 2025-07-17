@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Đăng ký lớp học</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .student-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .student-card:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 5px rgba(0,123,255,0.2);
+        }
+        .student-card.selected {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        .available-list, .enrolled-list {
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        .available-list {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        .enrolled-list {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+        .transfer-buttons {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .btn-transfer {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+        }
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 50px 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-graduation-cap"></i> Quản lý Sinh viên
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">Trang chủ</a>
+                <a class="nav-link" href="/faculties">Khoa</a>
+                <a class="nav-link" href="/subjects">Môn học</a>
+                <a class="nav-link" href="/classes">Lớp học</a>
+                <a class="nav-link" href="/students">Sinh viên</a>
+                <a class="nav-link active" href="/enrollments">Đăng ký</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2><i class="fas fa-users"></i> Quản lý Đăng ký lớp học</h2>
+                        <p class="text-muted mb-0">
+                            Lớp: <strong th:text="${studentClass.name}">Tên lớp</strong> |
+                            Môn học: <strong th:text="${studentClass.subject.name}">Tên môn học</strong> |
+                            Khoa: <strong th:text="${studentClass.subject.faculty.name}">Tên khoa</strong>
+                        </p>
+                    </div>
+                    <a href="/enrollments" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flash messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row">
+            <!-- Available Students -->
+            <div class="col-md-5">
+                <h5 class="text-success mb-3">
+                    <i class="fas fa-user-plus"></i> Sinh viên chưa đăng ký
+                    <span class="badge bg-success ms-2" th:text="${#lists.size(availableStudents)}">0</span>
+                </h5>
+                <div class="available-list" id="availableList">
+                    <div th:if="${availableStudents.empty}" class="empty-state">
+                        <i class="fas fa-user-check fa-2x text-success mb-2"></i>
+                        <p>Tất cả sinh viên đã đăng ký lớp này</p>
+                    </div>
+                    
+                    <div th:each="student : ${availableStudents}" 
+                         class="student-card available-student" 
+                         th:data-student-id="${student.id}"
+                         onclick="selectStudent(this)">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-user-circle fa-2x text-success"></i>
+                            </div>
+                            <div>
+                                <strong th:text="${student.fullName}">Tên sinh viên</strong><br>
+                                <small class="text-muted" th:text="${student.email}">email@example.com</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transfer Buttons -->
+            <div class="col-md-2">
+                <div class="transfer-buttons">
+                    <button type="button" class="btn btn-primary btn-transfer" 
+                            onclick="enrollSelected()" title="Đăng ký sinh viên đã chọn">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="button" class="btn btn-warning btn-transfer" 
+                            onclick="unenrollSelected()" title="Hủy đăng ký sinh viên đã chọn">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Enrolled Students -->
+            <div class="col-md-5">
+                <h5 class="text-primary mb-3">
+                    <i class="fas fa-user-check"></i> Sinh viên đã đăng ký
+                    <span class="badge bg-primary ms-2" th:text="${#lists.size(enrolledStudents)}">0</span>
+                </h5>
+                <div class="enrolled-list" id="enrolledList">
+                    <div th:if="${enrolledStudents.empty}" class="empty-state">
+                        <i class="fas fa-user-times fa-2x text-primary mb-2"></i>
+                        <p>Chưa có sinh viên nào đăng ký lớp này</p>
+                    </div>
+                    
+                    <div th:each="student : ${enrolledStudents}" 
+                         class="student-card enrolled-student" 
+                         th:data-student-id="${student.id}"
+                         onclick="selectStudent(this)">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-user-circle fa-2x text-primary"></i>
+                            </div>
+                            <div>
+                                <strong th:text="${student.fullName}">Tên sinh viên</strong><br>
+                                <small class="text-muted" th:text="${student.email}">email@example.com</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedStudent = null;
+        const classId = /*[[${studentClass.id}]]*/ 0;
+
+        function selectStudent(element) {
+            // Remove previous selection
+            document.querySelectorAll('.student-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked element
+            element.classList.add('selected');
+            selectedStudent = element;
+        }
+
+        function enrollSelected() {
+            if (!selectedStudent || !selectedStudent.classList.contains('available-student')) {
+                alert('Vui lòng chọn một sinh viên từ danh sách chưa đăng ký');
+                return;
+            }
+
+            const studentId = selectedStudent.dataset.studentId;
+            
+            // Create form and submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/enrollments/enroll';
+            
+            const studentIdInput = document.createElement('input');
+            studentIdInput.type = 'hidden';
+            studentIdInput.name = 'studentId';
+            studentIdInput.value = studentId;
+            
+            const classIdInput = document.createElement('input');
+            classIdInput.type = 'hidden';
+            classIdInput.name = 'classId';
+            classIdInput.value = classId;
+            
+            form.appendChild(studentIdInput);
+            form.appendChild(classIdInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function unenrollSelected() {
+            if (!selectedStudent || !selectedStudent.classList.contains('enrolled-student')) {
+                alert('Vui lòng chọn một sinh viên từ danh sách đã đăng ký');
+                return;
+            }
+
+            const studentId = selectedStudent.dataset.studentId;
+            
+            if (!confirm('Bạn có chắc chắn muốn hủy đăng ký sinh viên này khỏi lớp?')) {
+                return;
+            }
+            
+            // Create form and submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/enrollments/unenroll';
+            
+            const studentIdInput = document.createElement('input');
+            studentIdInput.type = 'hidden';
+            studentIdInput.name = 'studentId';
+            studentIdInput.value = studentId;
+            
+            const classIdInput = document.createElement('input');
+            classIdInput.type = 'hidden';
+            classIdInput.name = 'classId';
+            classIdInput.value = classId;
+            
+            form.appendChild(studentIdInput);
+            form.appendChild(classIdInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+</body>
+</html>

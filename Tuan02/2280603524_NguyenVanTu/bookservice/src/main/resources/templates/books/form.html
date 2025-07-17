@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${book?.id != null ? 'Chỉnh sửa Sách' : 'Thêm Sách Mới'} + ' - Book Service'">Thêm Sách - Book Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-book me-2"></i>Book Service
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">Trang chủ</a>
+                <a class="nav-link active" href="/books">Quản lý Sách</a>
+                <a class="nav-link" href="/users">Quản lý Người dùng</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/books">Quản lý Sách</a></li>
+                <li class="breadcrumb-item active" th:text="${book?.id != null ? 'Chỉnh sửa' : 'Thêm mới'}">Thêm mới</li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <h2>
+                    <i class="fas fa-book me-2"></i>
+                    <span th:text="${book?.id != null ? 'Chỉnh sửa Sách' : 'Thêm Sách Mới'}">Thêm Sách Mới</span>
+                </h2>
+            </div>
+            <div class="col-auto">
+                <a href="/books" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                </a>
+            </div>
+        </div>
+
+        <!-- Thông báo lỗi -->
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Form -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>
+                    Thông tin Sách
+                </h5>
+            </div>
+            <div class="card-body">
+                <form th:action="${book?.id != null ? '/books/' + book.id + '/edit' : '/books/new'}" 
+                      method="post" th:object="${book}" novalidate>
+                    
+                    <input type="hidden" th:field="*{id}" th:if="${book?.id != null}">
+                    
+                    <div class="row">
+                        <!-- Tiêu đề -->
+                        <div class="col-md-6 mb-3">
+                            <label for="title" class="form-label">
+                                Tiêu đề <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="title" th:field="*{title}"
+                                   th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'" 
+                                   placeholder="Nhập tiêu đề sách..." required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" 
+                                 th:errors="*{title}"></div>
+                        </div>
+
+                        <!-- Gutenberg ID -->
+                        <div class="col-md-6 mb-3">
+                            <label for="gutenbergId" class="form-label">
+                                Gutenberg ID
+                            </label>
+                            <input type="number" class="form-control" id="gutenbergId" th:field="*{gutenbergId}"
+                                   th:classappend="${#fields.hasErrors('gutenbergId')} ? 'is-invalid'" 
+                                   placeholder="ID từ Project Gutenberg...">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('gutenbergId')}" 
+                                 th:errors="*{gutenbergId}"></div>
+                            <small class="form-text text-muted">ID từ Project Gutenberg (tùy chọn)</small>
+                        </div>
+                    </div>
+
+                    <!-- Tác giả -->
+                    <div class="mb-3">
+                        <label for="authorsInput" class="form-label">
+                            Tác giả <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="authorsInput" 
+                               th:value="${#strings.listJoin(book?.authors, ', ')}"
+                               th:classappend="${#fields.hasErrors('authors')} ? 'is-invalid'" 
+                               placeholder="Nhập tên tác giả, phân cách bằng dấu phẩy..." required>
+                        <input type="hidden" th:field="*{authors}">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('authors')}" 
+                             th:errors="*{authors}"></div>
+                        <small class="form-text text-muted">Phân cách nhiều tác giả bằng dấu phẩy</small>
+                    </div>
+
+                    <!-- Thể loại -->
+                    <div class="mb-3">
+                        <label for="subjectsInput" class="form-label">
+                            Thể loại/Chủ đề
+                        </label>
+                        <input type="text" class="form-control" id="subjectsInput" 
+                               th:value="${#strings.listJoin(book?.subjects, ', ')}"
+                               placeholder="Nhập thể loại, phân cách bằng dấu phẩy...">
+                        <input type="hidden" th:field="*{subjects}">
+                        <small class="form-text text-muted">Phân cách nhiều thể loại bằng dấu phẩy</small>
+                    </div>
+
+                    <div class="row">
+                        <!-- Ngôn ngữ -->
+                        <div class="col-md-6 mb-3">
+                            <label for="languagesInput" class="form-label">
+                                Ngôn ngữ <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="languagesInput" 
+                                   th:value="${#strings.listJoin(book?.languages, ', ')}"
+                                   th:classappend="${#fields.hasErrors('languages')} ? 'is-invalid'" 
+                                   placeholder="vi, en, fr..." required>
+                            <input type="hidden" th:field="*{languages}">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('languages')}" 
+                                 th:errors="*{languages}"></div>
+                            <small class="form-text text-muted">Mã ngôn ngữ (vi, en, fr...), phân cách bằng dấu phẩy</small>
+                        </div>
+
+                        <!-- Lượt tải -->
+                        <div class="col-md-6 mb-3">
+                            <label for="downloadCount" class="form-label">
+                                Lượt tải xuống
+                            </label>
+                            <input type="number" class="form-control" id="downloadCount" th:field="*{downloadCount}"
+                                   th:classappend="${#fields.hasErrors('downloadCount')} ? 'is-invalid'" 
+                                   placeholder="0" min="0">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('downloadCount')}" 
+                                 th:errors="*{downloadCount}"></div>
+                            <small class="form-text text-muted">Số lượt tải xuống (tùy chọn)</small>
+                        </div>
+                    </div>
+
+                    <!-- Media Type -->
+                    <div class="mb-3">
+                        <label for="mediaType" class="form-label">
+                            Loại media
+                        </label>
+                        <select class="form-select" id="mediaType" th:field="*{mediaType}">
+                            <option value="">Chọn loại media...</option>
+                            <option value="Text">Text</option>
+                            <option value="Audio">Audio</option>
+                            <option value="Image">Image</option>
+                            <option value="Video">Video</option>
+                            <option value="Application">Application</option>
+                        </select>
+                        <small class="form-text text-muted">Loại định dạng của sách (tùy chọn)</small>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="row mt-4">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${book?.id != null ? 'Cập nhật' : 'Thêm mới'}">Thêm mới</span>
+                            </button>
+                            <a href="/books" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Hủy bỏ
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Gợi ý từ Gutenberg API -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    Tải dữ liệu từ Project Gutenberg
+                </h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-3">Bạn có thể tải dữ liệu sách tự động từ Project Gutenberg API:</p>
+                <div class="row g-2">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" id="searchQuery" 
+                               placeholder="Tìm kiếm sách theo tiêu đề hoặc tác giả...">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-info w-100" onclick="searchGutenberg()">
+                            <i class="fas fa-search me-2"></i>Tìm kiếm
+                        </button>
+                    </div>
+                </div>
+                <div id="searchResults" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Xử lý chuyển đổi string thành array cho các trường list
+        document.addEventListener('DOMContentLoaded', function() {
+            // Authors
+            const authorsInput = document.getElementById('authorsInput');
+            const authorsHidden = document.querySelector('input[name="authors"]');
+            
+            authorsInput.addEventListener('input', function() {
+                const authors = this.value.split(',').map(s => s.trim()).filter(s => s);
+                authorsHidden.value = JSON.stringify(authors);
+            });
+
+            // Subjects
+            const subjectsInput = document.getElementById('subjectsInput');
+            const subjectsHidden = document.querySelector('input[name="subjects"]');
+            
+            subjectsInput.addEventListener('input', function() {
+                const subjects = this.value.split(',').map(s => s.trim()).filter(s => s);
+                subjectsHidden.value = JSON.stringify(subjects);
+            });
+
+            // Languages
+            const languagesInput = document.getElementById('languagesInput');
+            const languagesHidden = document.querySelector('input[name="languages"]');
+            
+            languagesInput.addEventListener('input', function() {
+                const languages = this.value.split(',').map(s => s.trim()).filter(s => s);
+                languagesHidden.value = JSON.stringify(languages);
+            });
+
+            // Trigger initial conversion
+            authorsInput.dispatchEvent(new Event('input'));
+            subjectsInput.dispatchEvent(new Event('input'));
+            languagesInput.dispatchEvent(new Event('input'));
+        });
+
+        // Tìm kiếm từ Gutenberg API
+        async function searchGutenberg() {
+            const query = document.getElementById('searchQuery').value.trim();
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!query) {
+                alert('Vui lòng nhập từ khóa tìm kiếm');
+                return;
+            }
+
+            resultsDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Đang tìm kiếm...</div>';
+
+            try {
+                const response = await fetch(`/api/books/search-gutenberg?query=${encodeURIComponent(query)}&limit=5`);
+                const books = await response.json();
+
+                if (books.length === 0) {
+                    resultsDiv.innerHTML = '<div class="alert alert-info">Không tìm thấy sách nào</div>';
+                    return;
+                }
+
+                let html = '<div class="table-responsive"><table class="table table-sm table-hover">';
+                html += '<thead><tr><th>Tiêu đề</th><th>Tác giả</th><th>Ngôn ngữ</th><th></th></tr></thead><tbody>';
+
+                books.forEach(book => {
+                    html += `<tr>
+                        <td>${book.title}</td>
+                        <td>${book.authors.join(', ')}</td>
+                        <td>${book.languages.join(', ')}</td>
+                        <td>
+                            <button class="btn btn-sm btn-success" onclick="fillForm(${JSON.stringify(book).replace(/"/g, '&quot;')})">
+                                <i class="fas fa-plus"></i> Chọn
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                resultsDiv.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error searching:', error);
+                resultsDiv.innerHTML = '<div class="alert alert-danger">Lỗi khi tìm kiếm. Vui lòng thử lại.</div>';
+            }
+        }
+
+        // Điền thông tin vào form
+        function fillForm(book) {
+            document.getElementById('title').value = book.title || '';
+            document.getElementById('gutenbergId').value = book.gutenbergId || '';
+            document.getElementById('authorsInput').value = book.authors.join(', ');
+            document.getElementById('subjectsInput').value = book.subjects.join(', ');
+            document.getElementById('languagesInput').value = book.languages.join(', ');
+            document.getElementById('downloadCount').value = book.downloadCount || '';
+            document.getElementById('mediaType').value = book.mediaType || '';
+
+            // Trigger input events to update hidden fields
+            document.getElementById('authorsInput').dispatchEvent(new Event('input'));
+            document.getElementById('subjectsInput').dispatchEvent(new Event('input'));
+            document.getElementById('languagesInput').dispatchEvent(new Event('input'));
+
+            // Scroll to form
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+
+            // Clear search results
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('searchQuery').value = '';
+        }
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Enter key search
+        document.getElementById('searchQuery').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchGutenberg();
+            }
+        });
+    </script>
+</body>
+</html>
