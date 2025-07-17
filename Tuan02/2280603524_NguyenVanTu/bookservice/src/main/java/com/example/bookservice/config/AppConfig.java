@@ -13,7 +13,13 @@ public class AppConfig {
 
     @Bean
     public RestTemplate restTemplate() {
-        return new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate();
+        // Set timeout để tránh hang
+        restTemplate.getInterceptors().add((request, body, execution) -> {
+            request.getHeaders().add("User-Agent", "BookService/1.0");
+            return execution.execute(request, body);
+        });
+        return restTemplate;
     }
 
     @Bean

@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,24 +58,39 @@ public class BookService {
 
     // Lấy sách với phân trang và lọc
     public List<BookDTO> getAllBooks(String author, int page, int size) {
-        List<Book> books;
-        
-        if (bookRepository.count() == 0) {
-            fetchBooksFromGutendxApi();
+        try {
+            List<Book> books;
+            
+            // Chỉ fetch từ API nếu thực sự cần thiết và chưa có dữ liệu
+            long count = bookRepository.count();
+            if (count == 0) {
+                System.out.println("No books in database, attempting to fetch from API...");
+                try {
+                    fetchBooksFromGutendxApi();
+                } catch (Exception e) {
+                    System.err.println("Failed to fetch from API: " + e.getMessage());
+                    // Continue với database rỗng thay vì crash
+                }
+            }
+            
+            if (author != null && !author.trim().isEmpty()) {
+                books = bookRepository.findByAuthorContainingIgnoreCase(author);
+            } else {
+                books = bookRepository.findAll();
+            }
+            
+            // Áp dụng phân trang thủ công
+            return books.stream()
+                    .skip((long) page * size)
+                    .limit(size)
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Error in getAllBooks: " + e.getMessage());
+            e.printStackTrace();
+            // Return empty list instead of crashing
+            return new ArrayList<>();
         }
-        
-        if (author != null && !author.trim().isEmpty()) {
-            books = bookRepository.findByAuthorContainingIgnoreCase(author);
-        } else {
-            books = bookRepository.findAll();
-        }
-        
-        // Áp dụng phân trang thủ công
-        return books.stream()
-                .skip((long) page * size)
-                .limit(size)
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
     }
 
     // Fetch dữ liệu từ Gutendx API

@@ -7,29 +7,39 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "books")
+@Table(name = "books", indexes = {
+    @Index(name = "idx_title", columnList = "title"),
+    @Index(name = "idx_download_count", columnList = "downloadCount"),
+    @Index(name = "idx_gutenberg_id", columnList = "gutenbergId")
+})
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "Title is required")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 500)
     private String title;
 
-    @ElementCollection
-    @CollectionTable(name = "book_authors", joinColumns = @JoinColumn(name = "book_id"))
-    @Column(name = "author")
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "book_authors", 
+                    joinColumns = @JoinColumn(name = "book_id"),
+                    indexes = @Index(name = "idx_author", columnList = "author"))
+    @Column(name = "author", length = 255)
     private List<String> authors;
 
-    @ElementCollection
-    @CollectionTable(name = "book_subjects", joinColumns = @JoinColumn(name = "book_id"))
-    @Column(name = "subject")
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "book_subjects", 
+                    joinColumns = @JoinColumn(name = "book_id"),
+                    indexes = @Index(name = "idx_subject", columnList = "subject"))
+    @Column(name = "subject", length = 500)
     private List<String> subjects;
 
-    @ElementCollection
-    @CollectionTable(name = "book_languages", joinColumns = @JoinColumn(name = "book_id"))
-    @Column(name = "language")
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "book_languages", 
+                    joinColumns = @JoinColumn(name = "book_id"),
+                    indexes = @Index(name = "idx_language", columnList = "language"))
+    @Column(name = "language", length = 10)
     private List<String> languages;
 
     @Positive(message = "Download count must be positive")

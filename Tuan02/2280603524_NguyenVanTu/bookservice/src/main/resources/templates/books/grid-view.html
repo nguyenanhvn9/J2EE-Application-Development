@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư Viện Sách - Card View</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .content-wrapper {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 20px 0;
+            padding: 30px;
+        }
+        .navbar {
+            background: rgba(52, 58, 64, 0.9) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        .book-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: 100%;
+        }
+        .book-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+        .book-cover {
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .book-cover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(1px);
+        }
+        .book-cover i {
+            font-size: 4rem;
+            z-index: 2;
+            position: relative;
+        }
+        .book-info {
+            padding: 20px;
+            position: relative;
+        }
+        .book-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .book-author {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .book-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .download-count {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .language-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        .language-tag {
+            background: #e9ecef;
+            color: #495057;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+        .book-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-action {
+            flex: 1;
+            padding: 8px;
+            border-radius: 15px;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+        .search-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .view-toggle {
+            background: white;
+            border-radius: 15px;
+            padding: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .view-toggle .btn {
+            border-radius: 10px;
+            border: none;
+            padding: 8px 15px;
+        }
+        .pagination .page-link {
+            border-radius: 50px;
+            margin: 0 5px;
+            border: none;
+            color: #667eea;
+        }
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-book me-2"></i>Book Service
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">Trang chủ</a>
+                <a class="nav-link active" href="/books">Quản lý Sách</a>
+                <a class="nav-link" href="/users">Quản lý Người dùng</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container content-wrapper" data-aos="fade-up">
+        <!-- Header -->
+        <div class="row mb-4 align-items-center" data-aos="fade-right">
+            <div class="col">
+                <h2 class="display-5 fw-bold mb-2">
+                    <i class="fas fa-book me-3"></i>Thư Viện Sách Điện Tử
+                </h2>
+                <p class="text-muted">Khám phá bộ sưu tập sách đa dạng</p>
+            </div>
+            <div class="col-auto">
+                <div class="d-flex gap-3 align-items-center">
+                    <!-- View Toggle -->
+                    <div class="view-toggle">
+                        <a href="/books" class="btn btn-outline-primary">
+                            <i class="fas fa-list"></i>
+                        </a>
+                        <a href="/books/grid" class="btn btn-primary">
+                            <i class="fas fa-th"></i>
+                        </a>
+                    </div>
+                    <a href="/books/new" class="btn btn-primary btn-lg" data-aos="zoom-in">
+                        <i class="fas fa-plus me-2"></i>Thêm Sách
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông báo -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert" data-aos="slide-down">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert" data-aos="slide-down">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Bộ lọc tìm kiếm -->
+        <div class="card search-card mb-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="fas fa-search me-2"></i>Tìm Kiếm & Bộ Lọc
+                </h5>
+                <form method="get" th:action="@{/books/grid}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label for="author" class="form-label fw-bold">
+                                <i class="fas fa-user-edit me-1"></i>Tìm theo tác giả:
+                            </label>
+                            <input type="text" class="form-control" id="author" name="author" 
+                                   th:value="${author}" placeholder="Nhập tên tác giả...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="size" class="form-label fw-bold">
+                                <i class="fas fa-list-ol me-1"></i>Số lượng/trang:
+                            </label>
+                            <select class="form-select" id="size" name="size">
+                                <option value="12" th:selected="${pageSize == 12}">12</option>
+                                <option value="24" th:selected="${pageSize == 24}">24</option>
+                                <option value="48" th:selected="${pageSize == 48}">48</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-search me-1"></i>Tìm kiếm
+                            </button>
+                            <a href="/books/grid" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                            </a>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <span class="badge bg-primary fs-6">
+                                <i class="fas fa-chart-bar me-1"></i>
+                                Tổng số: <strong th:text="${totalBooks}">0</strong> sách
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Danh sách sách dạng card -->
+        <div th:if="${#lists.isEmpty(books)}" class="text-center py-5" data-aos="zoom-in">
+            <div class="mb-4">
+                <i class="fas fa-book-open fa-5x text-muted"></i>
+            </div>
+            <h3 class="text-muted mb-3">Không có sách nào</h3>
+            <p class="text-muted mb-4">Hãy thêm sách mới hoặc thay đổi bộ lọc tìm kiếm</p>
+            <a href="/books/new" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus me-2"></i>Thêm Sách Đầu Tiên
+            </a>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(books)}" class="row g-4">
+            <div th:each="book, iterStat : ${books}" class="col-md-6 col-lg-4 col-xl-3" 
+                 data-aos="fade-up" th:data-aos-delay="${iterStat.index * 100}">
+                <div class="book-card">
+                    <!-- Book Cover -->
+                    <div class="book-cover">
+                        <i class="fas fa-book-open"></i>
+                        <div class="position-absolute top-0 end-0 p-3">
+                            <span class="badge bg-dark" th:text="${book.id}">1</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Book Info -->
+                    <div class="book-info">
+                        <h5 class="book-title" th:text="${book.title}">Book Title</h5>
+                        <p class="book-author" th:text="${#strings.listJoin(book.authors, ', ')}">Author Name</p>
+                        
+                        <!-- Book Stats -->
+                        <div class="book-stats">
+                            <span th:if="${book.downloadCount != null}" 
+                                  class="download-count">
+                                <i class="fas fa-download me-1"></i>
+                                <span th:text="${#numbers.formatInteger(book.downloadCount, 0, 'COMMA')}">0</span>
+                            </span>
+                            <span th:if="${book.downloadCount == null}" class="text-muted">
+                                <i class="fas fa-download me-1"></i>-
+                            </span>
+                        </div>
+                        
+                        <!-- Languages -->
+                        <div class="language-tags">
+                            <span th:each="language : ${book.languages}" 
+                                  class="language-tag" th:text="${language}">EN</span>
+                        </div>
+                        
+                        <!-- Subjects -->
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-tags me-1"></i>
+                                <span th:text="${#strings.abbreviate(#strings.listJoin(book.subjects, ', '), 60)}">Subjects</span>
+                            </small>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="book-actions">
+                            <a th:href="@{/books/{id}(id=${book.id})}" 
+                               class="btn btn-primary btn-action">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/books/{id}/edit(id=${book.id})}" 
+                               class="btn btn-warning btn-action">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-danger btn-action" 
+                                    th:onclick="|confirmDelete('${book.id}', '${book.title}')|">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phân trang -->
+        <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-5" data-aos="fade-up" data-aos-delay="300">
+            <nav>
+                <ul class="pagination pagination-lg">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/books/grid(page=${currentPage - 1}, size=${pageSize}, author=${author})}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    
+                    <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                        class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/books/grid(page=${i}, size=${pageSize}, author=${author})}" 
+                           th:text="${i + 1}">1</a>
+                    </li>
+                    
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/books/grid(page=${currentPage + 1}, size=${pageSize}, author=${author})}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Form xóa ẩn -->
+    <form id="deleteForm" method="post" style="display: none;">
+        <input type="hidden" name="_method" value="delete">
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        function confirmDelete(bookId, bookTitle) {
+            const modalHtml = `
+                <div class="modal fade" id="deleteModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0">
+                            <div class="modal-header border-0 bg-danger text-white">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Xác nhận xóa
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body text-center p-4">
+                                <div class="mb-3">
+                                    <i class="fas fa-trash-alt fa-4x text-danger"></i>
+                                </div>
+                                <h6 class="mb-3">Bạn có chắc chắn muốn xóa sách này?</h6>
+                                <div class="alert alert-light">
+                                    <strong>"${bookTitle}"</strong>
+                                </div>
+                                <small class="text-danger">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    Hành động này không thể hoàn tác!
+                                </small>
+                            </div>
+                            <div class="modal-footer border-0 justify-content-center">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-1"></i>Hủy
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="executeDelete('${bookId}')">
+                                    <i class="fas fa-trash me-1"></i>Xóa ngay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const existingModal = document.getElementById('deleteModal');
+            if (existingModal) existingModal.remove();
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+
+        function executeDelete(bookId) {
+            const form = document.getElementById('deleteForm');
+            form.action = `/books/${bookId}/delete`;
+            form.submit();
+        }
+
+        // Auto-hide alerts
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.transition = 'all 0.5s ease-out';
+                alert.style.transform = 'translateY(-100%)';
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 500);
+            });
+        }, 5000);
+    </script>
+
+    <!-- Scroll to top button -->
+    <button id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+            style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000; 
+                   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                   border: none; border-radius: 50%; width: 55px; height: 55px; 
+                   color: white; box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+                   transition: all 0.3s ease;">
+        <i class="fas fa-chevron-up fa-lg"></i>
+    </button>
+
+    <script>
+        // Show/hide scroll to top button
+        window.addEventListener('scroll', () => {
+            const scrollBtn = document.getElementById('scrollToTop');
+            if (window.pageYOffset > 300) {
+                scrollBtn.style.display = 'block';
+            } else {
+                scrollBtn.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
