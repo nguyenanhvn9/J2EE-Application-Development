@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sửa người dùng</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+    <h1>Sửa người dùng</h1>
+    <form th:action="@{/users/edit}" th:object="${user}" method="post">
+        <input type="hidden" th:field="*{id}" />
+        <label>Họ tên: <input type="text" th:field="*{name}" required /></label><br/>
+        <label>Username: <input type="text" th:field="*{username}" required /></label><br/>
+        <label>Email: <input type="email" th:field="*{email}" required /></label><br/>
+        <label>Phone: <input type="text" th:field="*{phone}" /></label><br/>
+        <button type="submit">Cập nhật</button>
+    </form>
+    <a th:href="@{/users}">Quay lại danh sách</a>
+</body>
+</html> 
