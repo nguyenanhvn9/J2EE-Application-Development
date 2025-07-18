@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .todo-title.completed {
+      text-decoration: line-through;
+      color: #adb5bd;
+    }
+
+    .todo-item:hover {
+      background: #f8f9fa;
+    }
+
+    .form-control:focus {
+      box-shadow: 0 0 0 0.2rem #0d6efd33;
+    }
+
+    .filter-btn.active {
+      background: #0d6efd;
+      color: #fff;
+      border-color: #0d6efd;
+    }
+
+    @media (max-width: 576px) {
+      .card {
+        margin: 0 0.5rem;
+      }
+
+      .input-group {
+        flex-direction: column;
+      }
+
+      .input-group>* {
+        width: 100% !important;
+        margin-bottom: 0.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8 col-12">
+        <div class="card shadow-lg border-0">
+          <div class="card-body p-4">
+            <h1 class="card-title text-center mb-4 fw-bold text-primary">
+              <i class="bi bi-list-check"></i> To-Do List
+            </h1>
+
+            <!-- Form thêm mới -->
+            <form th:action="@{/todos/add}" method="post" class="input-group mb-4">
+              <input type="text" th:field="*{newTodo.title}" placeholder="Nhập công việc mới..."
+                class="form-control form-control-lg" required autofocus />
+              <button type="submit" class="btn btn-primary btn-lg ms-2">
+                <i class="bi bi-plus-circle"></i> Thêm
+              </button>
+            </form>
+
+            <!-- Danh sách công việc -->
+            <ul class="list-group mb-4">
+              <li th:each="todo : ${todos}"
+                class="list-group-item d-flex align-items-center todo-item border-0 border-bottom px-0">
+                <!-- Toggle -->
+                <form th:action="@{/todos/{id}/toggle(id=${todo.id})}" method="post"
+                  class="d-flex align-items-center flex-grow-1">
+                  <input type="hidden" name="filter" th:value="${param.filter}" />
+                  <button type="submit" class="btn btn-link p-0 me-2" style="font-size:1.3rem;">
+                    <i th:classappend="${todo.completed} ? 'bi bi-check-circle-fill text-success' : 'bi bi-circle text-secondary'"
+                      class="bi"></i>
+                  </button>
+                  <span th:text="${todo.title}"
+                    th:classappend="${todo.completed} ? 'todo-title completed' : 'todo-title'"
+                    class="flex-grow-1 fs-5"></span>
+                </form>
+                <!-- Delete -->
+                <form th:action="@{/todos/{id}/delete(id=${todo.id})}" method="post" class="ms-2">
+                  <input type="hidden" name="filter" th:value="${param.filter}" />
+                  <button class="btn btn-outline-danger btn-sm" title="Xóa">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </li>
+              <li th:if="${#lists.isEmpty(todos)}" class="list-group-item text-center text-muted border-0">Chưa có công
+                việc nào.</li>
+            </ul>
+
+            <!-- Bộ lọc -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+              <span th:text="${itemsLeft} + ' công việc còn lại'" class="fw-semibold"></span>
+              <div class="btn-group" role="group">
+                <a th:href="@{/?filter=all}" class="btn btn-outline-secondary btn-sm filter-btn"
+                  th:classappend="${param.filter} == 'all' or ${param.filter} == null ? ' active' : ''">Tất cả</a>
+                <a th:href="@{/?filter=active}" class="btn btn-outline-secondary btn-sm filter-btn"
+                  th:classappend="${param.filter} == 'active' ? ' active' : ''">Chưa xong</a>
+                <a th:href="@{/?filter=completed}" class="btn btn-outline-secondary btn-sm filter-btn"
+                  th:classappend="${param.filter} == 'completed' ? ' active' : ''">Đã xong</a>
+              </div>
+            </div>
+
+            <!-- Nút xóa đã hoàn thành -->
+            <form th:action="@{/todos/clear}" method="post" class="text-end mt-2">
+              <input type="hidden" name="filter" th:value="${param.filter}" />
+              <button class="btn btn-warning btn-sm">
+                <i class="bi bi-broom"></i> Xóa tất cả đã hoàn thành
+              </button>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
