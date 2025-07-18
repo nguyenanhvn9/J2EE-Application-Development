@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý đăng ký lớp học</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <h1>
+                <i class="fas fa-user-check"></i>
+                Quản lý đăng ký
+            </h1>
+            <div class="breadcrumb">
+                <a th:href="@{/}">Trang chủ</a> / 
+                <span th:text="'Lớp: ' + ${studentClass.className}"></span>
+            </div>
+        </header>
+
+        <!-- Alert messages -->
+        <div th:if="${success}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${success}"></span>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Class Information -->
+        <div class="class-info">
+            <h2>
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span th:text="${studentClass.className}"></span>
+            </h2>
+            <p class="class-details">
+                <strong>Môn học:</strong> <span th:text="${studentClass.subject.subjectName}"></span><br>
+                <strong>Khoa:</strong> <span th:text="${studentClass.subject.faculty.facultyName}"></span><br>
+                <strong>Tín chỉ:</strong> <span th:text="${studentClass.subject.credits}"></span>
+            </p>
+        </div>
+
+        <div class="enrollment-container">
+            <!-- Enrolled Students Section -->
+            <div class="enrolled-section">
+                <h3>
+                    <i class="fas fa-users"></i>
+                    Sinh viên đã đăng ký 
+                    <span class="count" th:text="'(' + ${#lists.size(enrollments)} + ')'"></span>
+                </h3>
+                
+                <div th:if="${#lists.isEmpty(enrollments)}" class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <p>Chưa có sinh viên nào đăng ký lớp này</p>
+                </div>
+                
+                <div th:unless="${#lists.isEmpty(enrollments)}" class="students-grid">
+                    <div th:each="enrollment : ${enrollments}" class="student-card enrolled">
+                        <div class="student-info">
+                            <h4 th:text="${enrollment.student.studentName}"></h4>
+                            <p class="student-code" th:text="'MSSV: ' + ${enrollment.student.studentCode}"></p>
+                            <p class="enrollment-date" th:text="'Ngày ĐK: ' + ${#temporals.format(enrollment.enrollmentDate, 'dd/MM/yyyy')}"></p>
+                        </div>
+                        <div class="student-actions">
+                            <form th:action="@{/enrollments/{classId}/unenroll/{studentId}(classId=${studentClass.classId}, studentId=${enrollment.student.studentId})}" 
+                                  method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" 
+                                        onclick="return confirm('Bạn có chắc muốn hủy đăng ký sinh viên này?')">
+                                    <i class="fas fa-user-minus"></i>
+                                    Hủy ĐK
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Available Students Section -->
+            <div class="available-section">
+                <h3>
+                    <i class="fas fa-user-plus"></i>
+                    Sinh viên có thể đăng ký 
+                    <span class="count" th:text="'(' + ${#lists.size(availableStudents)} + ')'"></span>
+                </h3>
+                
+                <div th:if="${#lists.isEmpty(availableStudents)}" class="empty-state">
+                    <i class="fas fa-user-check"></i>
+                    <p>Tất cả sinh viên đều đã đăng ký lớp này</p>
+                </div>
+                
+                <div th:unless="${#lists.isEmpty(availableStudents)}">
+                    <!-- Bulk enrollment form -->
+                    <form th:action="@{/enrollments/{classId}/enroll-multiple(classId=${studentClass.classId})}" 
+                          method="post" class="bulk-actions">
+                        <div class="bulk-controls">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="selectAllStudents()">
+                                <i class="fas fa-check-square"></i>
+                                Chọn tất cả
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="deselectAllStudents()">
+                                <i class="fas fa-square"></i>
+                                Bỏ chọn
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-user-plus"></i>
+                                Đăng ký đã chọn
+                            </button>
+                        </div>
+                        
+                        <div class="students-grid">
+                            <div th:each="student : ${availableStudents}" class="student-card available">
+                                <div class="student-checkbox">
+                                    <input type="checkbox" th:value="${student.studentId}" 
+                                           name="studentIds" th:id="'student_' + ${student.studentId}">
+                                </div>
+                                <div class="student-info">
+                                    <label th:for="'student_' + ${student.studentId}">
+                                        <h4 th:text="${student.studentName}"></h4>
+                                        <p class="student-code" th:text="'MSSV: ' + ${student.studentCode}"></p>
+                                    </label>
+                                </div>
+                                <div class="student-actions">
+                                    <form th:action="@{/enrollments/{classId}/enroll/{studentId}(classId=${studentClass.classId}, studentId=${student.studentId})}" 
+                                          method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="fas fa-user-plus"></i>
+                                            Đăng ký
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a th:href="@{/}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Về trang chủ
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function selectAllStudents() {
+            const checkboxes = document.querySelectorAll('input[name="studentIds"]');
+            checkboxes.forEach(checkbox => checkbox.checked = true);
+        }
+        
+        function deselectAllStudents() {
+            const checkboxes = document.querySelectorAll('input[name="studentIds"]');
+            checkboxes.forEach(checkbox => checkbox.checked = false);
+        }
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

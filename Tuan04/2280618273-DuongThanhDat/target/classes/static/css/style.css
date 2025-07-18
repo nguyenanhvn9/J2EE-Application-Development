@@ -1,0 +1,750 @@
+/* Reset và Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header Styles */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 2.5rem;
+}
+
+.header h1 i {
+    margin-right: 10px;
+}
+
+.nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Button Styles */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.btn i {
+    margin-right: 5px;
+}
+
+/* Main Content */
+.main-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.main-content h2 {
+    color: #495057;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.main-content h2 i {
+    margin-right: 10px;
+    color: #007bff;
+}
+
+/* Tree View Styles */
+.tree-container {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.tree-node {
+    margin: 0.5rem 0;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.node-header {
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.node-header:hover {
+    background-color: #f8f9fa;
+}
+
+.node-header.collapsed::after {
+    content: "▶";
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+.node-header:not(.collapsed)::after {
+    content: "▼";
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+.node-title {
+    font-weight: 600;
+    flex-grow: 1;
+}
+
+.node-count {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-left: auto;
+    margin-right: 1rem;
+}
+
+.node-detail {
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+/* Faculty Node */
+.faculty-node {
+    border-left: 4px solid #28a745;
+}
+
+.faculty-header {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.faculty-header i {
+    color: white;
+    font-size: 1.2rem;
+}
+
+/* Subject Node */
+.subject-node {
+    border-left: 4px solid #007bff;
+    margin-left: 2rem;
+}
+
+.subject-header {
+    background: linear-gradient(135deg, #007bff, #6610f2);
+    color: white;
+}
+
+.subject-header i {
+    color: white;
+}
+
+/* Class Node */
+.class-node {
+    border-left: 4px solid #ffc107;
+    margin-left: 4rem;
+}
+
+.class-header {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: #212529;
+}
+
+.class-header i {
+    color: #212529;
+}
+
+/* Student Node */
+.student-node {
+    border-left: 4px solid #17a2b8;
+    margin-left: 6rem;
+}
+
+.student-header {
+    background: linear-gradient(135deg, #17a2b8, #20c997);
+    color: white;
+}
+
+.student-header i {
+    color: white;
+}
+
+/* Empty Node */
+.empty-node {
+    border-left: 4px solid #dc3545;
+    margin-left: 2rem;
+}
+
+.empty-header {
+    background: #f8d7da;
+    color: #721c24;
+    font-style: italic;
+}
+
+.empty-header i {
+    color: #dc3545;
+}
+
+/* Tree Children */
+.tree-children {
+    padding: 0.5rem 0;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin-bottom: 1rem;
+    color: #495057;
+}
+
+.empty-state p {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 1rem;
+    color: #6c757d;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Alert Styles */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert i {
+    font-size: 1.2rem;
+}
+
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.page-header h2 {
+    margin: 0;
+    color: #495057;
+}
+
+/* Table Styles */
+.table-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.data-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.data-table tbody tr:nth-child(even):hover {
+    background-color: #e9ecef;
+}
+
+.actions-column {
+    width: 200px;
+    text-align: center;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Form Styles */
+.form-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.form {
+    max-width: 600px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+.form-label i {
+    margin-right: 0.5rem;
+    color: #007bff;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-help {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Info Box */
+.info-box {
+    background: #e7f3ff;
+    border: 1px solid #b8daff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.info-box h3 {
+    margin: 0 0 1rem 0;
+    color: #004085;
+}
+
+.info-box h3 i {
+    margin-right: 0.5rem;
+}
+
+.info-box ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.info-box li {
+    margin-bottom: 0.5rem;
+    color: #004085;
+}
+
+/* Button Variants */
+.btn-success {
+    background-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    color: #212529;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* Enrollment Management Styles */
+.class-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.class-info h2 {
+    margin: 0 0 10px 0;
+    font-size: 1.8em;
+}
+
+.class-details {
+    margin: 0;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.enrollment-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.enrolled-section, .available-section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.enrolled-section h3, .available-section h3 {
+    margin: 0 0 20px 0;
+    color: #333;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+}
+
+.count {
+    color: #007bff;
+    font-weight: normal;
+}
+
+.students-grid {
+    display: grid;
+    gap: 15px;
+}
+
+.student-card {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.student-card.enrolled {
+    background: #f8f9fa;
+    border-color: #28a745;
+}
+
+.student-card.available {
+    background: #fff;
+    border-color: #007bff;
+}
+
+.student-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.student-checkbox {
+    margin-right: 15px;
+}
+
+.student-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.student-info {
+    flex: 1;
+}
+
+.student-info h4 {
+    margin: 0 0 5px 0;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.student-info label {
+    cursor: pointer;
+    display: block;
+}
+
+.student-code {
+    margin: 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.enrollment-date {
+    margin: 5px 0 0 0;
+    color: #28a745;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.student-actions {
+    margin-left: 15px;
+}
+
+.bulk-actions {
+    margin-bottom: 20px;
+}
+
+.bulk-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    align-items: center;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 3em;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 0;
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .nav {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .tree-node {
+        margin-left: 0 !important;
+    }
+    
+    .subject-node {
+        margin-left: 1rem !important;
+    }
+    
+    .class-node {
+        margin-left: 2rem !important;
+    }
+    
+    .student-node {
+        margin-left: 3rem !important;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .data-table {
+        min-width: 600px;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .actions {
+        flex-direction: column;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .enrollment-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .student-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .student-checkbox {
+        margin: 0;
+    }
+    
+    .student-actions {
+        margin: 0;
+    }
+    
+    .bulk-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .bulk-controls .btn {
+        margin-bottom: 10px;
+    }
+    
+    .bulk-controls .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tree-node {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Hover Effects */
+.tree-node:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Focus States */
+.btn:focus,
+.node-header:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}

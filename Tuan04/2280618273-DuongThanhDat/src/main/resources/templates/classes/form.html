@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${studentClass.id != null ? 'Chỉnh sửa lớp học' : 'Thêm lớp học mới'}">Form Lớp học</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Hệ thống Quản lý Sinh viên</span>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/}" class="nav-link">
+                <i class="fas fa-home"></i> Trang chủ
+            </a>
+            <a th:href="@{/faculties}" class="nav-link">
+                <i class="fas fa-building"></i> Khoa
+            </a>
+            <a th:href="@{/subjects}" class="nav-link">
+                <i class="fas fa-book"></i> Môn học
+            </a>
+            <a th:href="@{/classes}" class="nav-link active">
+                <i class="fas fa-users"></i> Lớp học
+            </a>
+            <a th:href="@{/students}" class="nav-link">
+                <i class="fas fa-user-graduate"></i> Sinh viên
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-users"></i>
+                <span th:text="${studentClass.id != null ? 'Chỉnh sửa lớp học' : 'Thêm lớp học mới'}"></span>
+            </h1>
+            <a th:href="@{/classes}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="form-container">
+            <form th:action="@{/classes}" th:object="${studentClass}" method="post" class="form">
+                <input type="hidden" th:field="*{id}">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">
+                            <i class="fas fa-tag"></i>
+                            Tên lớp học <span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               th:field="*{name}" 
+                               id="name" 
+                               class="form-control" 
+                               placeholder="Nhập tên lớp học (VD: Lớp Java Cơ bản K65)"
+                               required>
+                        <div th:if="${#fields.hasErrors('name')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{name}"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">
+                            <i class="fas fa-book"></i>
+                            Môn học <span class="required">*</span>
+                        </label>
+                        <select th:field="*{subject}" id="subject" class="form-control" required>
+                            <option value="">-- Chọn môn học --</option>
+                            <optgroup th:each="faculty : ${faculties}" th:label="${faculty.name}">
+                                <option th:each="subject : ${faculty.subjects}" 
+                                        th:value="${subject.id}" 
+                                        th:text="${subject.name + ' (' + subject.code + ')'}"></option>
+                            </optgroup>
+                        </select>
+                        <div th:if="${#fields.hasErrors('subject')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{subject}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="maxStudents">
+                            <i class="fas fa-users"></i>
+                            Sức chứa tối đa
+                        </label>
+                        <input type="number" 
+                               th:field="*{maxStudents}" 
+                               id="maxStudents" 
+                               class="form-control" 
+                               placeholder="Nhập số sinh viên tối đa (để trống = không giới hạn)"
+                               min="1"
+                               max="200">
+                        <small class="form-text">Để trống nếu không giới hạn số lượng sinh viên</small>
+                        <div th:if="${#fields.hasErrors('maxStudents')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{maxStudents}"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="room">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Phòng học
+                        </label>
+                        <input type="text" 
+                               th:field="*{room}" 
+                               id="room" 
+                               class="form-control" 
+                               placeholder="Nhập tên phòng học (VD: A101, B205)">
+                        <div th:if="${#fields.hasErrors('room')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{room}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="schedule">
+                            <i class="fas fa-clock"></i>
+                            Lịch học
+                        </label>
+                        <input type="text" 
+                               th:field="*{schedule}" 
+                               id="schedule" 
+                               class="form-control" 
+                               placeholder="Nhập lịch học (VD: Thứ 2, 4, 6 - 7:30-9:30)">
+                        <div th:if="${#fields.hasErrors('schedule')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{schedule}"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="instructor">
+                            <i class="fas fa-user-tie"></i>
+                            Giảng viên
+                        </label>
+                        <input type="text" 
+                               th:field="*{instructor}" 
+                               id="instructor" 
+                               class="form-control" 
+                               placeholder="Nhập tên giảng viên">
+                        <div th:if="${#fields.hasErrors('instructor')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{instructor}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">
+                        <i class="fas fa-align-left"></i>
+                        Mô tả
+                    </label>
+                    <textarea th:field="*{description}" 
+                              id="description" 
+                              class="form-control" 
+                              rows="4"
+                              placeholder="Nhập mô tả chi tiết về lớp học..."></textarea>
+                    <div th:if="${#fields.hasErrors('description')}" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span th:errors="*{description}"></span>
+                    </div>
+                </div>
+
+                <!-- Current Students List (for edit mode) -->
+                <div th:if="${studentClass.id != null}" class="form-group">
+                    <label>
+                        <i class="fas fa-user-graduate"></i>
+                        Danh sách sinh viên hiện tại
+                    </label>
+                    <div class="students-list">
+                        <div th:each="student : ${studentClass.students}" class="student-item">
+                            <div class="student-info">
+                                <span class="student-code" th:text="${student.studentCode}"></span>
+                                <span class="student-name" th:text="${student.fullName}"></span>
+                                <span class="student-email" th:text="${student.email}"></span>
+                            </div>
+                            <a th:href="@{/students/{id}(id=${student.id})}" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                        <div th:if="${#lists.isEmpty(studentClass.students)}" class="text-muted text-center">
+                            <i class="fas fa-user-slash"></i>
+                            <span>Chưa có sinh viên nào trong lớp này</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        <span th:text="${studentClass.id != null ? 'Cập nhật' : 'Thêm mới'}"></span>
+                    </button>
+                    <a th:href="@{/classes}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Hủy bỏ
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .students-list {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .student-item:last-child {
+            border-bottom: none;
+        }
+
+        .student-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .student-code {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .student-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .student-email {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .form-text {
+            color: #6c757d;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .student-info {
+                flex: 1;
+            }
+            
+            .student-item {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+
+    <script>
+        // Validate form before submit
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const name = document.getElementById('name').value;
+            const subject = document.getElementById('subject').value;
+            
+            if (!name || !subject) {
+                e.preventDefault();
+                alert('Vui lòng điền đầy đủ các trường bắt buộc!');
+                return false;
+            }
+            
+            const maxStudents = document.getElementById('maxStudents').value;
+            if (maxStudents && (parseInt(maxStudents) < 1 || parseInt(maxStudents) > 200)) {
+                e.preventDefault();
+                alert('Sức chứa tối đa phải từ 1 đến 200 sinh viên!');
+                return false;
+            }
+        });
+
+        // Dynamic subject selection with faculty grouping
+        document.getElementById('subject').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                console.log('Selected subject:', selectedOption.text);
+            }
+        });
+    </script>
+</body>
+</html>

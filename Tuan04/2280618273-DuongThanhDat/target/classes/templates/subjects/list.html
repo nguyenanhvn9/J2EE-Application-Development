@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Môn học</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Hệ thống Quản lý Sinh viên</span>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/}" class="nav-link">
+                <i class="fas fa-home"></i> Trang chủ
+            </a>
+            <a th:href="@{/faculties}" class="nav-link">
+                <i class="fas fa-building"></i> Khoa
+            </a>
+            <a th:href="@{/subjects}" class="nav-link active">
+                <i class="fas fa-book"></i> Môn học
+            </a>
+            <a th:href="@{/classes}" class="nav-link">
+                <i class="fas fa-users"></i> Lớp học
+            </a>
+            <a th:href="@{/students}" class="nav-link">
+                <i class="fas fa-user-graduate"></i> Sinh viên
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-book"></i> Danh sách Môn học</h1>
+            <a th:href="@{/subjects/new}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Thêm môn học mới
+            </a>
+        </div>
+
+        <div th:if="${message}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${message}"></span>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="search-section">
+            <form th:action="@{/subjects}" method="get" class="search-form">
+                <div class="search-row">
+                    <div class="search-input-group">
+                        <input type="text" name="search" th:value="${searchTerm}" placeholder="Tìm kiếm theo tên hoặc mã môn học..." class="form-control">
+                        <button type="submit" class="btn btn-search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <select name="facultyId" class="form-control">
+                        <option value="">-- Tất cả khoa --</option>
+                        <option th:each="faculty : ${faculties}" 
+                                th:value="${faculty.id}" 
+                                th:text="${faculty.name}"
+                                th:selected="${faculty.id == selectedFacultyId}"></option>
+                    </select>
+                    <select name="credits" class="form-control">
+                        <option value="">-- Tất cả tín chỉ --</option>
+                        <option value="1" th:selected="${'1' == selectedCredits}">1 tín chỉ</option>
+                        <option value="2" th:selected="${'2' == selectedCredits}">2 tín chỉ</option>
+                        <option value="3" th:selected="${'3' == selectedCredits}">3 tín chỉ</option>
+                        <option value="4" th:selected="${'4' == selectedCredits}">4 tín chỉ</option>
+                        <option value="5" th:selected="${'5' == selectedCredits}">5+ tín chỉ</option>
+                    </select>
+                </div>
+                <a th:if="${searchTerm or selectedFacultyId or selectedCredits}" th:href="@{/subjects}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Xóa bộ lọc
+                </a>
+            </form>
+        </div>
+
+        <!-- Subjects Grid -->
+        <div class="subjects-grid">
+            <div th:each="subject : ${subjects}" class="subject-card">
+                <div class="subject-header">
+                    <div class="subject-title">
+                        <h3 th:text="${subject.name}"></h3>
+                        <span class="subject-code" th:text="${subject.code}"></span>
+                    </div>
+                    <div class="subject-actions">
+                        <a th:href="@{/subjects/{id}(id=${subject.id})}" class="btn btn-sm btn-info" title="Xem chi tiết">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a th:href="@{/subjects/edit/{id}(id=${subject.id})}" class="btn btn-sm btn-warning" title="Chỉnh sửa">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a th:href="@{/subjects/delete/{id}(id=${subject.id})}" 
+                           class="btn btn-sm btn-danger" 
+                           title="Xóa"
+                           onclick="return confirm('Bạn có chắc chắn muốn xóa môn học này?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="subject-body">
+                    <div class="subject-info">
+                        <div class="info-item">
+                            <i class="fas fa-building"></i>
+                            <span>Khoa: <strong th:text="${subject.faculty.name}"></strong></span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-star"></i>
+                            <span>Tín chỉ: <strong th:text="${subject.credits}"></strong></span>
+                        </div>
+                        <div class="info-item" th:if="${subject.prerequisiteSubjects and !#lists.isEmpty(subject.prerequisiteSubjects)}">
+                            <i class="fas fa-link"></i>
+                            <span>Môn tiên quyết: 
+                                <strong th:each="prereq, iterStat : ${subject.prerequisiteSubjects}">
+                                    <span th:text="${prereq.name}"></span>
+                                    <span th:if="${!iterStat.last}">, </span>
+                                </strong>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <span class="stat-number" th:text="${#lists.size(subject.studentClasses)}">0</span>
+                            <span class="stat-label">Lớp học</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-user-graduate"></i>
+                            <span class="stat-number" th:text="${subject.totalStudents ?: 0}">0</span>
+                            <span class="stat-label">Sinh viên</span>
+                        </div>
+                    </div>
+
+                    <div th:if="${subject.description}" class="subject-description">
+                        <p th:text="${subject.description}"></p>
+                    </div>
+                </div>
+
+                <div class="subject-footer">
+                    <div class="subject-classes" th:if="${!#lists.isEmpty(subject.studentClasses)}">
+                        <small class="text-muted">
+                            <i class="fas fa-users"></i>
+                            Lớp học: 
+                            <span th:each="clazz, iterStat : ${subject.studentClasses}">
+                                <span th:text="${clazz.name}"></span>
+                                <span th:if="${!iterStat.last}">, </span>
+                            </span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(subjects)}" class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>Không có môn học nào</h3>
+                <p th:if="${searchTerm or selectedFacultyId or selectedCredits}">
+                    Không tìm thấy môn học phù hợp với bộ lọc hiện tại
+                </p>
+                <p th:unless="${searchTerm or selectedFacultyId or selectedCredits}">
+                    Chưa có môn học nào được tạo. Bắt đầu bằng cách thêm môn học đầu tiên!
+                </p>
+                <a th:href="@{/subjects/new}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Thêm môn học đầu tiên
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics Summary -->
+        <div th:unless="${#lists.isEmpty(subjects)}" class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 th:text="${#lists.size(subjects)}">0</h3>
+                    <p>Tổng số môn học</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 th:text="${#lists.size(faculties)}">0</h3>
+                    <p>Khoa đang có môn học</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 th:text="${totalCredits ?: 0}">0</h3>
+                    <p>Tổng tín chỉ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .subject-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .subject-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .subject-title h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+        }
+
+        .subject-code {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .subject-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .subject-body {
+            padding: 1.5rem;
+        }
+
+        .subject-info {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .info-item i {
+            width: 16px;
+            color: #28a745;
+            margin-top: 0.1rem;
+        }
+
+        .subject-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-item i {
+            font-size: 1.5rem;
+            color: #28a745;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .subject-description {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .subject-description p {
+            margin: 0;
+            color: #666;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .subject-footer {
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .subject-classes {
+            font-size: 0.85rem;
+        }
+
+        .subject-classes i {
+            color: #28a745;
+            margin-right: 0.5rem;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-row select {
+            min-width: 150px;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .empty-state p {
+            margin-bottom: 2rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media (max-width: 768px) {
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-row {
+                flex-direction: column;
+            }
+            
+            .search-row select {
+                min-width: 100%;
+            }
+            
+            .subject-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .subject-actions {
+                align-self: flex-end;
+            }
+        }
+    </style>
+
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

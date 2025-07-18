@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Khoa</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-building"></i> Quản lý Khoa</h1>
+            <nav class="nav">
+                <a href="/" class="btn btn-secondary"><i class="fas fa-home"></i> Trang chủ</a>
+                <a href="/subjects" class="btn btn-primary"><i class="fas fa-book"></i> Môn học</a>
+                <a href="/classes" class="btn btn-primary"><i class="fas fa-chalkboard"></i> Lớp học</a>
+                <a href="/students" class="btn btn-primary"><i class="fas fa-users"></i> Sinh viên</a>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <!-- Thông báo -->
+            <div th:if="${success}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}"></span>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- Header và nút thêm -->
+            <div class="page-header">
+                <h2><i class="fas fa-list"></i> Danh sách Khoa</h2>
+                <a href="/faculties/new" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Thêm Khoa mới
+                </a>
+            </div>
+
+            <!-- Bảng danh sách khoa -->
+            <div th:if="${!faculties.isEmpty()}" class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên Khoa</th>
+                            <th>Số Môn học</th>
+                            <th class="actions-column">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="faculty : ${faculties}">
+                            <td th:text="${faculty.id}">1</td>
+                            <td th:text="${faculty.name}">Tên Khoa</td>
+                            <td th:text="${faculty.subjects != null ? faculty.subjects.size() : 0}">0</td>
+                            <td class="actions">
+                                <a th:href="@{/faculties/{id}/edit(id=${faculty.id})}" 
+                                   class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <form th:action="@{/faculties/{id}/delete(id=${faculty.id})}" 
+                                      method="post" 
+                                      style="display: inline;"
+                                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa khoa này?')">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Thông báo nếu không có dữ liệu -->
+            <div th:if="${faculties.isEmpty()}" class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>Chưa có khoa nào</h3>
+                <p>Hệ thống chưa có khoa nào. Hãy thêm khoa đầu tiên để bắt đầu.</p>
+                <a href="/faculties/new" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Thêm Khoa đầu tiên
+                </a>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 Hệ thống Quản lý Sinh viên - Dương Thành Đạt (2280618273)</p>
+        </footer>
+    </div>
+</body>
+</html>

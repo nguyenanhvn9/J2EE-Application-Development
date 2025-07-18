@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Sinh viên</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-graduation-cap"></i> Hệ thống Quản lý Sinh viên</h1>
+            <nav class="nav">
+                <a href="/faculties" class="btn btn-primary"><i class="fas fa-building"></i> Quản lý Khoa</a>
+                <a href="/subjects" class="btn btn-primary"><i class="fas fa-book"></i> Quản lý Môn học</a>
+                <a href="/classes" class="btn btn-primary"><i class="fas fa-chalkboard"></i> Quản lý Lớp học</a>
+                <a href="/students" class="btn btn-primary"><i class="fas fa-users"></i> Quản lý Sinh viên</a>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <div class="tree-view">
+                <h2><i class="fas fa-sitemap"></i> Cấu trúc Tổ chức</h2>
+                
+                <div class="tree-container">
+                    <!-- Khoa (Faculties) -->
+                    <div th:each="faculty : ${faculties}" class="tree-node faculty-node">
+                        <div class="node-header faculty-header">
+                            <i class="fas fa-building"></i>
+                            <span class="node-title" th:text="${faculty.name}">Tên Khoa</span>
+                            <span class="node-count" th:text="'(' + ${#lists.size(faculty.subjects)} + ' môn học)'"></span>
+                        </div>
+                        
+                        <!-- Môn học (Subjects) -->
+                        <div th:if="${not #lists.isEmpty(faculty.subjects)}" class="tree-children">
+                            <div th:each="subject : ${faculty.subjects}" class="tree-node subject-node">
+                                <div class="node-header subject-header">
+                                    <i class="fas fa-book"></i>
+                                    <span class="node-title" th:text="${subject.name}">Tên Môn học</span>
+                                    <span class="node-count" th:text="'(' + ${#lists.size(subject.studentClasses)} + ' lớp học)'"></span>
+                                </div>
+                                
+                                <!-- Lớp học (Classes) -->
+                                <div th:if="${not #lists.isEmpty(subject.studentClasses)}" class="tree-children">
+                                    <div th:each="studentClass : ${subject.studentClasses}" class="tree-node class-node">
+                                        <div class="node-header class-header">
+                                            <i class="fas fa-chalkboard"></i>
+                                            <span class="node-title" th:text="${studentClass.name}">Tên Lớp học</span>
+                                            <span class="node-count" th:text="'(' + ${#lists.size(studentClass.enrollments)} + ' sinh viên)'"></span>
+                                            <a th:href="@{/enrollments/{classId}(classId=${studentClass.id})}" 
+                                               class="btn btn-sm btn-secondary">
+                                                <i class="fas fa-user-plus"></i> Quản lý ĐK
+                                            </a>
+                                        </div>
+                                        
+                                        <!-- Sinh viên (Students) -->
+                                        <div th:if="${not #lists.isEmpty(studentClass.enrollments)}" class="tree-children">
+                                            <div th:each="enrollment : ${studentClass.enrollments}" class="tree-node student-node">
+                                                <div class="node-header student-header">
+                                                    <i class="fas fa-user"></i>
+                                                    <span class="node-title" th:text="${enrollment.student.fullName}">Tên Sinh viên</span>
+                                                    <span class="node-detail" th:text="${enrollment.student.email}">Email</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Thông báo nếu lớp chưa có sinh viên -->
+                                        <div th:if="${#lists.isEmpty(studentClass.students)}" class="tree-children">
+                                            <div class="tree-node empty-node">
+                                                <div class="node-header empty-header">
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                    <span class="node-title">Chưa có sinh viên đăng ký</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Thông báo nếu môn học chưa có lớp -->
+                                <div th:if="${#lists.isEmpty(subject.studentClasses)}" class="tree-children">
+                                    <div class="tree-node empty-node">
+                                        <div class="node-header empty-header">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            <span class="node-title">Chưa có lớp học nào</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Thông báo nếu khoa chưa có môn học -->
+                        <div th:if="${#lists.isEmpty(faculty.subjects)}" class="tree-children">
+                            <div class="tree-node empty-node">
+                                <div class="node-header empty-header">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span class="node-title">Chưa có môn học nào</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Thông báo nếu chưa có khoa nào -->
+                <div th:if="${#lists.isEmpty(faculties)}" class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>Chưa có dữ liệu</h3>
+                    <p>Hệ thống chưa có khoa nào. Vui lòng thêm khoa để bắt đầu.</p>
+                    <a href="/faculties/new" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Thêm Khoa đầu tiên
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 Hệ thống Quản lý Sinh viên - Dương Thành Đạt (2280618273)</p>
+        </footer>
+    </div>
+
+    <script>
+        // Add some interactive features
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click to expand/collapse functionality
+            const nodeHeaders = document.querySelectorAll('.node-header');
+            nodeHeaders.forEach(header => {
+                header.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('btn')) return; // Don't toggle if button clicked
+                    
+                    const node = this.closest('.tree-node');
+                    const children = node.querySelector('.tree-children');
+                    if (children) {
+                        children.style.display = children.style.display === 'none' ? 'block' : 'none';
+                        this.classList.toggle('collapsed');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

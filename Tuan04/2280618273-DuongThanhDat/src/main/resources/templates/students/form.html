@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${student.id != null ? 'Chỉnh sửa sinh viên' : 'Thêm sinh viên mới'}">Form Sinh viên</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Hệ thống Quản lý Sinh viên</span>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/}" class="nav-link">
+                <i class="fas fa-home"></i> Trang chủ
+            </a>
+            <a th:href="@{/faculties}" class="nav-link">
+                <i class="fas fa-building"></i> Khoa
+            </a>
+            <a th:href="@{/subjects}" class="nav-link">
+                <i class="fas fa-book"></i> Môn học
+            </a>
+            <a th:href="@{/classes}" class="nav-link">
+                <i class="fas fa-users"></i> Lớp học
+            </a>
+            <a th:href="@{/students}" class="nav-link active">
+                <i class="fas fa-user-graduate"></i> Sinh viên
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-user-graduate"></i>
+                <span th:text="${student.id != null ? 'Chỉnh sửa sinh viên' : 'Thêm sinh viên mới'}"></span>
+            </h1>
+            <a th:href="@{/students}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="form-container">
+            <form th:action="@{/students}" th:object="${student}" method="post" class="form">
+                <input type="hidden" th:field="*{id}">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="studentCode">
+                            <i class="fas fa-id-card"></i>
+                            Mã sinh viên <span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               th:field="*{studentCode}" 
+                               id="studentCode" 
+                               class="form-control" 
+                               placeholder="Nhập mã sinh viên (VD: SV001)"
+                               required>
+                        <div th:if="${#fields.hasErrors('studentCode')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{studentCode}"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fullName">
+                            <i class="fas fa-user"></i>
+                            Họ và tên <span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               th:field="*{fullName}" 
+                               id="fullName" 
+                               class="form-control" 
+                               placeholder="Nhập họ và tên đầy đủ"
+                               required>
+                        <div th:if="${#fields.hasErrors('fullName')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{fullName}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i>
+                            Email <span class="required">*</span>
+                        </label>
+                        <input type="email" 
+                               th:field="*{email}" 
+                               id="email" 
+                               class="form-control" 
+                               placeholder="example@email.com"
+                               required>
+                        <div th:if="${#fields.hasErrors('email')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{email}"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dateOfBirth">
+                            <i class="fas fa-calendar-alt"></i>
+                            Ngày sinh <span class="required">*</span>
+                        </label>
+                        <input type="date" 
+                               th:field="*{dateOfBirth}" 
+                               id="dateOfBirth" 
+                               class="form-control" 
+                               required>
+                        <div th:if="${#fields.hasErrors('dateOfBirth')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{dateOfBirth}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="studentClass">
+                            <i class="fas fa-users"></i>
+                            Lớp học
+                        </label>
+                        <select th:field="*{studentClass}" id="studentClass" class="form-control">
+                            <option value="">-- Chọn lớp học --</option>
+                            <option th:each="clazz : ${studentClasses}" 
+                                    th:value="${clazz.id}" 
+                                    th:text="${clazz.name + ' (' + clazz.subject.name + ')'}"></option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('studentClass')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{studentClass}"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Địa chỉ
+                        </label>
+                        <input type="text" 
+                               th:field="*{address}" 
+                               id="address" 
+                               class="form-control" 
+                               placeholder="Nhập địa chỉ">
+                        <div th:if="${#fields.hasErrors('address')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{address}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phoneNumber">
+                            <i class="fas fa-phone"></i>
+                            Số điện thoại
+                        </label>
+                        <input type="tel" 
+                               th:field="*{phoneNumber}" 
+                               id="phoneNumber" 
+                               class="form-control" 
+                               placeholder="0123456789">
+                        <div th:if="${#fields.hasErrors('phoneNumber')}" class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span th:errors="*{phoneNumber}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subject Selection for Enrollment -->
+                <div th:if="${student.id != null}" class="form-group">
+                    <label>
+                        <i class="fas fa-book"></i>
+                        Môn học đã đăng ký
+                    </label>
+                    <div class="enrolled-subjects">
+                        <div th:each="enrollment : ${student.enrollments}" class="subject-tag">
+                            <span th:text="${enrollment.subject.name}"></span>
+                            <small th:text="'(' + ${enrollment.subject.code} + ')'"></small>
+                        </div>
+                        <div th:if="${#lists.isEmpty(student.enrollments)}" class="text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            Sinh viên chưa đăng ký môn học nào
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        <span th:text="${student.id != null ? 'Cập nhật' : 'Thêm mới'}"></span>
+                    </button>
+                    <a th:href="@{/students}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Hủy bỏ
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Set max date for date of birth (18 years ago)
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+        document.getElementById('dateOfBirth').max = maxDate.toISOString().split('T')[0];
+        
+        // Validate form before submit
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const studentCode = document.getElementById('studentCode').value;
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            
+            if (!studentCode || !fullName || !email) {
+                e.preventDefault();
+                alert('Vui lòng điền đầy đủ các trường bắt buộc!');
+                return false;
+            }
+            
+            // Validate student code format
+            const codePattern = /^[A-Z]{2}\d{3,6}$/;
+            if (!codePattern.test(studentCode)) {
+                e.preventDefault();
+                alert('Mã sinh viên phải có định dạng: 2 chữ cái + 3-6 chữ số (VD: SV001)');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Sinh viên</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Hệ thống Quản lý Sinh viên</span>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/}" class="nav-link">
+                <i class="fas fa-home"></i> Trang chủ
+            </a>
+            <a th:href="@{/faculties}" class="nav-link">
+                <i class="fas fa-building"></i> Khoa
+            </a>
+            <a th:href="@{/subjects}" class="nav-link">
+                <i class="fas fa-book"></i> Môn học
+            </a>
+            <a th:href="@{/classes}" class="nav-link">
+                <i class="fas fa-users"></i> Lớp học
+            </a>
+            <a th:href="@{/students}" class="nav-link active">
+                <i class="fas fa-user-graduate"></i> Sinh viên
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-user-graduate"></i>
+                Chi tiết Sinh viên
+            </h1>
+            <div class="btn-group">
+                <a th:href="@{/students/edit/{id}(id=${student.id})}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Chỉnh sửa
+                </a>
+                <a th:href="@{/students}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </div>
+
+        <div class="detail-container">
+            <!-- Student Information Card -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-user"></i> Thông tin cá nhân</h3>
+                </div>
+                <div class="card-body">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label><i class="fas fa-id-card"></i> Mã sinh viên:</label>
+                            <span th:text="${student.studentCode}" class="value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label><i class="fas fa-user"></i> Họ và tên:</label>
+                            <span th:text="${student.fullName}" class="value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label><i class="fas fa-envelope"></i> Email:</label>
+                            <span th:text="${student.email}" class="value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label><i class="fas fa-calendar-alt"></i> Ngày sinh:</label>
+                            <span th:text="${#temporals.format(student.dateOfBirth, 'dd/MM/yyyy')}" class="value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label><i class="fas fa-phone"></i> Số điện thoại:</label>
+                            <span th:text="${student.phoneNumber ?: 'Chưa cập nhật'}" class="value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <label><i class="fas fa-map-marker-alt"></i> Địa chỉ:</label>
+                            <span th:text="${student.address ?: 'Chưa cập nhật'}" class="value"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Class Information Card -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-users"></i> Thông tin lớp học</h3>
+                </div>
+                <div class="card-body">
+                    <div th:if="${student.studentClass}">
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <label><i class="fas fa-tag"></i> Tên lớp:</label>
+                                <span th:text="${student.studentClass.name}" class="value"></span>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fas fa-book"></i> Môn học:</label>
+                                <span th:text="${student.studentClass.subject.name}" class="value"></span>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fas fa-code"></i> Mã môn học:</label>
+                                <span th:text="${student.studentClass.subject.code}" class="value"></span>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fas fa-building"></i> Khoa:</label>
+                                <span th:text="${student.studentClass.subject.faculty.name}" class="value"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:unless="${student.studentClass}" class="text-muted text-center">
+                        <i class="fas fa-info-circle"></i>
+                        Sinh viên chưa được phân vào lớp học nào
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enrolled Subjects Card -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-book-open"></i> Môn học đã đăng ký</h3>
+                    <span class="badge badge-primary" th:text="${#lists.size(student.enrollments)}"></span>
+                </div>
+                <div class="card-body">
+                    <div th:if="${!#lists.isEmpty(student.enrollments)}">
+                        <div class="subjects-grid">
+                            <div th:each="enrollment : ${student.enrollments}" class="subject-card">
+                                <div class="subject-info">
+                                    <h4 th:text="${enrollment.subject.name}"></h4>
+                                    <p class="subject-code" th:text="${enrollment.subject.code}"></p>
+                                    <p class="subject-credits">
+                                        <i class="fas fa-star"></i>
+                                        <span th:text="${enrollment.subject.credits}"></span> tín chỉ
+                                    </p>
+                                    <p class="subject-faculty">
+                                        <i class="fas fa-building"></i>
+                                        <span th:text="${enrollment.subject.faculty.name}"></span>
+                                    </p>
+                                </div>
+                                <div class="enrollment-date">
+                                    <small class="text-muted">
+                                        Đăng ký: <span th:text="${#temporals.format(enrollment.enrollmentDate, 'dd/MM/yyyy')}"></span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(student.enrollments)}" class="text-muted text-center">
+                        <i class="fas fa-book-open"></i>
+                        <p>Sinh viên chưa đăng ký môn học nào</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Card -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Thống kê</h3>
+                </div>
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4 th:text="${#lists.size(student.enrollments)}">0</h4>
+                                <p>Môn học đã đăng ký</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4 th:text="${totalCredits ?: 0}">0</h4>
+                                <p>Tổng số tín chỉ</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h4 th:text="${#temporals.format(student.createdAt ?: #temporals.createNow(), 'dd/MM/yyyy')}">--</h4>
+                                <p>Ngày tham gia</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .detail-container {
+            display: grid;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .detail-item label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .detail-item .value {
+            font-size: 1.1rem;
+            color: #333;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .subject-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid #28a745;
+            transition: transform 0.2s;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .subject-info h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .subject-code {
+            color: #666;
+            font-weight: 600;
+            margin: 0.25rem 0;
+        }
+
+        .subject-credits, .subject-faculty {
+            margin: 0.5rem 0;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .enrollment-date {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .stat-content h4 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .stat-content p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>

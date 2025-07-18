@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${faculty.id != null ? 'Sửa Khoa' : 'Thêm Khoa mới'}">Thêm/Sửa Khoa</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-building"></i> 
+                <span th:text="${faculty.id != null ? 'Sửa Khoa' : 'Thêm Khoa mới'}">Thêm/Sửa Khoa</span>
+            </h1>
+            <nav class="nav">
+                <a href="/" class="btn btn-secondary"><i class="fas fa-home"></i> Trang chủ</a>
+                <a href="/faculties" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại</a>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <!-- Thông báo lỗi -->
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- Form -->
+            <div class="form-container">
+                <form th:action="${faculty.id != null ? '/faculties/' + faculty.id : '/faculties'}" 
+                      method="post" 
+                      th:object="${faculty}" 
+                      class="form">
+                    
+                    <div class="form-group">
+                        <label for="name" class="form-label">
+                            <i class="fas fa-building"></i> Tên Khoa:
+                        </label>
+                        <input type="text" 
+                               id="name" 
+                               th:field="*{name}" 
+                               class="form-input" 
+                               placeholder="Nhập tên khoa (VD: Công nghệ Thông tin)"
+                               required>
+                        <div class="form-help">
+                            Tên khoa phải rõ ràng và dễ hiểu. VD: "Công nghệ Thông tin", "Quản trị Kinh doanh"
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> 
+                            <span th:text="${faculty.id != null ? 'Cập nhật' : 'Thêm mới'}">Lưu</span>
+                        </button>
+                        <a href="/faculties" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Hủy
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Thông tin hướng dẫn -->
+            <div class="info-box">
+                <h3><i class="fas fa-info-circle"></i> Hướng dẫn</h3>
+                <ul>
+                    <li>Tên khoa là thông tin bắt buộc</li>
+                    <li>Tên khoa nên rõ ràng và mô tả đúng lĩnh vực</li>
+                    <li>Sau khi tạo khoa, bạn có thể thêm các môn học thuộc khoa này</li>
+                    <li th:if="${faculty.id != null}">
+                        Lưu ý: Việc sửa tên khoa có thể ảnh hưởng đến các môn học và lớp học liên quan
+                    </li>
+                </ul>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 Hệ thống Quản lý Sinh viên - Dương Thành Đạt (2280618273)</p>
+        </footer>
+    </div>
+</body>
+</html>
