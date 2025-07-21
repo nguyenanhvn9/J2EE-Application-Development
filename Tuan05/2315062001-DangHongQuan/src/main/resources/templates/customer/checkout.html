@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Checkout</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container mt-4">
+    <h2>Checkout</h2>
+
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/checkout/process}" th:object="${checkoutRequest}" method="post">
+        <div class="mb-3">
+            <label>Customer Name</label>
+            <input type="text" class="form-control" th:field="*{customerName}" required>
+        </div>
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" class="form-control" th:field="*{customerEmail}" required>
+        </div>
+        <div class="mb-3">
+            <label>Phone</label>
+            <input type="text" class="form-control" th:field="*{customerPhone}" required>
+        </div>
+        <div class="mb-3">
+            <label>Shipping Address</label>
+            <textarea class="form-control" th:field="*{shippingAddress}" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label>Shipping Method</label>
+            <select class="form-select" th:field="*{shippingMethod}" required>
+                <option value="standard">Standard (30.000đ)</option>
+                <option value="express">Express (50.000đ)</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <p>Subtotal: <strong th:text="${#numbers.formatDecimal(subtotal, 0, 'COMMA', 0, 'POINT')} + ' đ'"></strong></p>
+        </div>
+
+        <button type="submit" class="btn btn-success">Place Order</button>
+    </form>
+</div>
+</body>
+</html>
