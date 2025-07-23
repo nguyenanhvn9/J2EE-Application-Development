@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Thanh toán</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f5f5f7;
+        }
+
+        .apple-card {
+            border: none;
+            border-radius: 24px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+            background: #fff;
+            padding: 32px 24px 24px 24px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .apple-btn {
+            border-radius: 20px;
+            font-size: 1em;
+            padding: 8px 28px;
+            background: #0071e3;
+            color: #fff;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .apple-btn:hover {
+            background: #005bb5;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">TechShop</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/cart">Giỏ hàng</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/order-history">Lịch sử đặt hàng</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/products">Quản trị</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="apple-card">
+            <h2 class="mb-4 text-center">Thanh toán đơn hàng</h2>
+            <form th:action="@{'/checkout'}" method="post" class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Họ và tên:</label>
+                    <input type="text" name="customerName" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Số điện thoại:</label>
+                    <input type="text" name="phone" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email:</label>
+                    <input type="email" name="email" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Địa chỉ giao hàng:</label>
+                    <input type="text" name="address" class="form-control" required />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Phương thức giao hàng:</label><br />
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="shippingMethod" value="Tiêu chuẩn" checked />
+                        <label class="form-check-label">Giao hàng Tiêu chuẩn - 30,000đ</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="shippingMethod" value="Hỏa tốc" />
+                        <label class="form-check-label">Giao hàng Hỏa tốc - 50,000đ</label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <h4>Tóm tắt đơn hàng</h4>
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tên sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item : ${cart}">
+                                <td th:text="${item.name}"></td>
+                                <td th:text="${item.quantity}"></td>
+                                <td th:text="${#numbers.formatInteger(item.total, 0, 'COMMA')}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><b>Tạm tính:</b> <span th:text="${#numbers.formatInteger(total, 0, 'COMMA')}"></span> đ</p>
+                </div>
+                <div class="col-12 d-flex justify-content-between">
+                    <a th:href="@{'/cart'}" class="btn btn-outline-secondary">Quay lại giỏ hàng</a>
+                    <button type="submit" class="apple-btn">Xác nhận đơn hàng</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
