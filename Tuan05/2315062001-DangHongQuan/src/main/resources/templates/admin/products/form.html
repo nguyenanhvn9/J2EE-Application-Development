@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle}">Form Sản phẩm</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        form { background: white; padding: 20px; border-radius: 5px; max-width: 500px; margin: auto; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; }
+        .error { color: red; font-size: 0.9em; }
+        .buttons { margin-top: 20px; }
+        .buttons button, .buttons a { padding: 10px 15px; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<h2 th:text="${product.id != null} ? 'Cập nhật Sản phẩm' : 'Thêm Sản phẩm mới'" style="text-align:center;"></h2>
+
+<form th:action="@{${product.id} != null ? '/admin/products/edit/' + ${product.id} : '/admin/products/add'}"
+      th:object="${product}" method="post">
+
+    <label for="name">Tên sản phẩm:</label>
+    <input type="text" th:field="*{name}" required>
+    <div class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+
+    <label for="price">Giá:</label>
+    <input type="number" step="0.01" th:field="*{price}" required>
+    <div class="error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+
+    <label for="stockQuantity">Số lượng tồn:</label>
+    <input type="number" th:field="*{stockQuantity}" required>
+    <div class="error" th:if="${#fields.hasErrors('stockQuantity')}" th:errors="*{stockQuantity}"></div>
+
+    <label for="category">Danh mục:</label>
+    <select th:field="*{category.id}" required>
+        <option value="" disabled selected>-- Chọn danh mục --</option>
+        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+    </select>
+
+    <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <div class="buttons">
+        <button type="submit" th:text="${product.id != null} ? 'Cập nhật' : 'Thêm mới'"></button>
+        <a th:href="@{/admin/products}">← Trở về danh sách</a>
+    </div>
+</form>
+
+</body>
+</html>

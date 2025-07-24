@@ -1,0 +1,104 @@
+<!-- customer/product-detail.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- CSRF token (for AJAX requests) -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+</head>
+<body>
+<div th:replace="fragments/navbar :: body"></div>
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-6">
+            <img th:src="@{${product.imageUrl}}" class="img-fluid" alt="Product image">
+        </div>
+        <div class="col-md-6">
+            <h2 th:text="${product.name}"></h2>
+            <h4 th:text="${product.price} + ' $'"></h4>
+            <p th:text="${product.description}"></p>
+            <button class="btn btn-success"
+                    th:attr="data-id=${product.id}"
+                    onclick="addToCart(this)">
+                Add to Cart
+            </button>
+        </div>
+    </div>
+
+    <h3 class="mt-5">Related Products</h3>
+    <div class="row" th:each="prod : ${relatedProducts}">
+        <div class="col-md-3 mb-3">
+            <div class="card h-100">
+                <img th:src="@{${prod.imageUrl}}" class="card-img-top" alt="Product image">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${prod.name}"></h5>
+                    <p class="card-text" th:text="${prod.price} + ' $'"></p>
+                    <a th:href="@{'/product-detail?id=' + ${prod.id}}" class="btn btn-outline-secondary">View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3>Đánh Giá Sản Phẩm</h3>
+    <ul class="list-group">
+        <li class="list-group-item" th:each="review : ${reviews}">
+            <div>
+                <strong th:text="${review.rating}"></strong> sao -
+                <span th:text="${review.comment}"></span>
+                <br>
+                <small class="review-date" th:data-date="${review.createdAt}"></small>
+            </div>
+        </li>
+    </ul>
+
+
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Lấy tất cả các phần tử nhỏ có class review-date
+        const reviewDates = document.querySelectorAll('.review-date');
+
+        reviewDates.forEach(dateElement => {
+            // Lấy giá trị ngày từ thuộc tính data-date
+            const dateValue = dateElement.getAttribute('data-date');
+
+            // Chuyển đổi thành đối tượng Date
+            const date = new Date(dateValue);
+
+            // Định dạng ngày theo dd/MM/yyyy
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            const formattedDate = date.toLocaleDateString('vi-VN', options);
+
+            // Gán giá trị đã định dạng vào phần tử
+            dateElement.textContent = formattedDate;
+        });
+    });
+</script>
+
+<script>
+    function addToCart(button) {
+        const productId = button.getAttribute('data-id');
+        const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                [header]: token
+            },
+            body: `productId=${productId}&quantity=1`
+        })
+            .then(response => response.text())
+            .then(data => {
+                const [status, message] = data.split(':');
+                alert(message);
+            })
+            .catch(error => alert('Error: ' + error));
+    }
+</script>
+</body>
+</html>

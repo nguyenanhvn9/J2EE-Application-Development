@@ -1,0 +1,9 @@
+<h2>My Reviews</h2>
+<div th:each="review : ${reviews}">
+    <p>
+        <strong th:text="${review.product.name}">Product</strong>:
+        <span th:text="${review.rating} + '★'"></span><br>
+        <em th:text="${review.comment}"></em>
+        <small th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy')}"></small>
+    </p>
+</div>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Student CRUD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+
+<div class="container">
+    <h2 class="mb-4">Quản lý Sinh viên</h2>
+
+    <form th:action="@{/students/add}" method="post" class="row g-2 mb-4">
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="mssv" placeholder="Mã số sinh viên" required>
+        </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="ten" placeholder="Tên sinh viên" required>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Thêm</button>
+        </div>
+    </form>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>MSSV</th>
+            <th>Tên sinh viên</th>
+            <th style="width: 180px">Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="sv : ${students}">
+            <form th:action="@{/students/update}" method="post">
+                <td><input type="hidden" name="id" th:value="${sv.id}" /> <span th:text="${sv.id}"></span></td>
+                <td><input type="text" name="mssv" class="form-control" th:value="${sv.mssv}" /></td>
+                <td><input type="text" name="ten" class="form-control" th:value="${sv.ten}" /></td>
+                <td>
+                    <button class="btn btn-sm btn-warning" type="submit">Cập nhật</button>
+                    <a th:href="@{'/students/delete/' + ${sv.id}}" class="btn btn-sm btn-danger ms-1">Xoá</a>
+                </td>
+            </form>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

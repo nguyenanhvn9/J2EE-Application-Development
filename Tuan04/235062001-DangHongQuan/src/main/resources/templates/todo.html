@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>TodoMVC Spring + Bootstrap</title>
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tastejs/todomvc-app-css@gh-pages/index.css" />
+</head>
+<style>
+    .completed label {
+        text-decoration: line-through;
+        color: #888;
+    }
+</style>
+<body class="bg-light py-5">
+<div class="container">
+    <section class="todoapp mx-auto" style="max-width: 600px;">
+        <header class="header">
+            <h1 class="text-primary">todos</h1>
+            <form th:action="@{/todos/add}" method="post">
+                <input class="new-todo form-control" name="title" placeholder="What needs to be done?" autofocus />
+            </form>
+        </header>
+
+        <section class="main mt-3" th:if="${todos.size() > 0}">
+
+
+            <ul class="todo-list list-unstyled mt-3">
+                <li th:each="todo : ${todos}" th:classappend="${todo.completed} ? 'completed'">
+                    <form th:action="@{'/todos/toggle/' + ${todo.id}}" method="post" class="d-flex align-items-center">
+                        <input class="toggle me-2" type="checkbox" th:checked="${todo.completed}" onchange="this.form.submit()" />
+                        <label th:text="${todo.title}" class="flex-grow-1"></label>
+                        <a th:href="@{'/todos/delete/' + ${todo.id}(filter=${filter})}" class="destroy btn-close ms-2"></a>
+                    </form>
+                </li>
+            </ul>
+        </section>
+
+        <footer class="footer mt-4" th:if="${todos.size() > 0}">
+            <div class="d-flex justify-content-between align-items-center">
+      <span class="todo-count">
+        <strong th:text="${remaining}">0</strong> items left
+      </span>
+                <ul class="filters list-inline mb-0">
+                    <li class="list-inline-item">
+                        <a th:classappend="${filter == 'all'} ? 'selected'" href="/todos">All</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a th:classappend="${filter == 'active'} ? 'selected'" href="/todos?filter=active">Active</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a th:classappend="${filter == 'completed'} ? 'selected'" href="/todos?filter=completed">Completed</a>
+                    </li>
+                </ul>
+                <form th:action="@{/todos/clear-completed}" method="post">
+                    <button class="btn btn-outline-danger btn-sm clear-completed" type="submit">Clear completed</button>
+                </form>
+            </div>
+        </footer>
+    </section>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const checkboxes = document.querySelectorAll('.toggle');
+
+        function updateCheckboxState() {
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            checkboxes.forEach(cb => {
+                if (!cb.checked) {
+                    cb.disabled = checkedCount >= 2;
+                } else {
+                    cb.disabled = false;
+                }
+            });
+        }
+
+
+
+
+        updateCheckboxState();
+    });
+</script>
+
+</body>
+
+</html>
