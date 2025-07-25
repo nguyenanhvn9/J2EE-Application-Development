@@ -6,6 +6,9 @@ import com.techshop.repository.OrderItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class ProductService {
@@ -41,5 +44,27 @@ public class ProductService {
 
     public List<Product> searchByName(String name) {
         return productRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    public List<Map<String, Object>> getTop5BestSellersThisMonth() {
+        LocalDate firstDay = LocalDate.now().withDayOfMonth(1);
+        Map<Long, Integer> productSales = new HashMap<>();
+        orderItemRepository.findAll().forEach(item -> {
+            if (item.getOrder().getCreatedAt().toLocalDate().isAfter(firstDay.minusDays(1))) {
+                productSales.put(item.getProduct().getId(),
+                        productSales.getOrDefault(item.getProduct().getId(), 0) + item.getQuantity());
+            }
+        });
+        return productSales.entrySet().stream()
+                .sorted((a, b) -> b.getValue() - a.getValue())
+                .limit(5)
+                .map(e -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("productId", e.getKey());
+                    map.put("quantity", e.getValue());
+                    map.put("productName", productRepository.findById(e.getKey()).map(p -> p.getName()).orElse(""));
+                    return map;
+                })
+                .toList();
     }
 }

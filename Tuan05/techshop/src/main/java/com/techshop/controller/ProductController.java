@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import org.springframework.security.core.Authentication;
 import com.techshop.util.ControllerUtils;
+import com.techshop.service.UserService;
 
 @Controller
 @RequestMapping("/products")
@@ -33,6 +34,9 @@ public class ProductController {
     @Autowired
     private ReviewService reviewService;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping("/product/{id}")
     public String productDetail(@PathVariable Long id, Model model, Authentication authentication,
             @RequestParam(value = "error", required = false) String error,
@@ -42,19 +46,22 @@ public class ProductController {
         if (product == null)
             return "redirect:/";
         model.addAttribute("product", product);
-        // Lấy danh sách đánh giá
         List<Review> reviews = reviewService.getReviewsByProduct(id);
         if (reviews == null)
             reviews = java.util.Collections.emptyList();
+        System.out.println("Reviews for product " + id + ": " + reviews.size());
         model.addAttribute("reviews", reviews);
-        // Tính điểm trung bình
-        double averageRating = reviews.isEmpty() ? 0 : reviews.stream().mapToInt(Review::getRating).average().orElse(0);
-        model.addAttribute("averageRating", String.format("%.1f", averageRating));
-        // Kiểm tra quyền gửi đánh giá
+        double averageRating = 0;
+        if (!reviews.isEmpty()) {
+            averageRating = reviews.stream().mapToInt(Review::getRating).average().orElse(0);
+        }
+        model.addAttribute("averageRating", averageRating);
         Long userId = null;
+        String username = null;
         if (authentication != null && authentication.isAuthenticated()) {
             com.techshop.model.User user = (com.techshop.model.User) authentication.getPrincipal();
             userId = user.getId();
+            username = user.getUsername();
         }
         boolean canReview = false;
         if (userId != null && orderService.hasUserPurchasedProduct(userId, id)
@@ -62,10 +69,38 @@ public class ProductController {
             canReview = true;
         }
         model.addAttribute("canReview", canReview);
+        model.addAttribute("username", username);
         if (error != null)
             model.addAttribute("error", error);
         if (success != null)
             model.addAttribute("success", success);
         return "product_detail";
+    }
+
+    @GetMapping("/review-form")
+    public String reviewForm(@RequestParam Long productId, Model model, Authentication authentication) {
+        Product product = productService.getProduct(productId);
+        boolean canReview = false;
+        String username = null;
+        if (authentication != null && authentication.isAuthenticated()) {
+            String usernameSpring = authentication.getName();
+            com.techshop.model.User user = userService.findByUsername(usernameSpring);
+            if (user != null) {
+                username = user.getUsername();
+                Long userId = user.getId();
+                if (userId != null && product != null
+                        && orderService.hasUserPurchasedProduct(userId, productId)
+                        && !reviewService.hasUserReviewed(productId, userId)) {
+                    canReview = true;
+                }
+            }
+        }
+        model.addAttribute("product", product);
+        model.addAttribute("canReview", canReview);
+        model.addAttribute("username", username);
+        if (product == null) {
+            model.addAttribute("error", "Sản phẩm không tồn tại hoặc đã bị xóa!");
+        }
+        return "review_form";
     }
 }

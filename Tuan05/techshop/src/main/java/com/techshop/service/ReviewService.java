@@ -12,7 +12,7 @@ public class ReviewService {
     private ReviewRepository reviewRepository;
 
     public List<Review> getReviewsByProduct(Long productId) {
-        return reviewRepository.findByProductId(productId);
+        return reviewRepository.findByProduct_Id(productId);
     }
 
     public boolean hasUserReviewed(Long productId, Long userId) {

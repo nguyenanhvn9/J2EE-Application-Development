@@ -98,6 +98,34 @@
                         </tr>
                     </tbody>
                 </table>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <!-- Voucher form removed -->
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 offset-md-6">
+                        <div class="card p-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Tạm tính:</span>
+                                <span id="cartTotal" th:text="${#numbers.formatInteger(total, 0, 'COMMA')}"></span> đ
+                            </div>
+                            <div class="d-flex justify-content-between" id="voucherDiscountRow" style="display:none;">
+                                <span>Giảm giá:</span>
+                                <span id="voucherDiscount"></span>
+                            </div>
+                            <hr />
+                            <div class="d-flex justify-content-between fw-bold">
+                                <span>Tổng cộng:</span>
+                                <span id="cartTotalFinal" th:text="${#numbers.formatInteger(total, 0, 'COMMA')}"></span>
+                                đ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    // Voucher script removed
+                </script>
                 <div class="d-flex justify-content-between align-items-center">
                     <a th:href="@{'/'}" class="btn btn-outline-secondary">Tiếp tục mua sắm</a>
                     <div>

@@ -19,6 +19,8 @@ public class Order {
     private String shippingMethod;
     private BigDecimal shippingFee;
     private BigDecimal totalAmount;
+    private String voucherCode;
+    private double voucherDiscount;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
@@ -136,4 +138,9 @@ public class Order {
     public void setItems(List<OrderItem> items) {
         this.items = items;
     }
+
+    public String getVoucherCode() { return voucherCode; }
+    public void setVoucherCode(String voucherCode) { this.voucherCode = voucherCode; }
+    public double getVoucherDiscount() { return voucherDiscount; }
+    public void setVoucherDiscount(double voucherDiscount) { this.voucherDiscount = voucherDiscount; }
 }

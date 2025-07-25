@@ -24,12 +24,14 @@ public class SecurityConfig {
                 http
                                 .userDetailsService(userDetailsService)
                                 .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/cart/apply-voucher").permitAll()
                                                 .requestMatchers("/admin/users/**").hasRole("ADMIN")
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                                 .requestMatchers("/profile/**", "/order-history", "/orders/**",
                                                                 "/cart/**")
                                                 .hasRole("USER")
                                                 .anyRequest().permitAll())
+                                .csrf(csrf -> csrf.ignoringRequestMatchers("/cart/apply-voucher"))
                                 .formLogin(form -> form
                                                 .loginPage("/login")
                                                 .defaultSuccessUrl("/")

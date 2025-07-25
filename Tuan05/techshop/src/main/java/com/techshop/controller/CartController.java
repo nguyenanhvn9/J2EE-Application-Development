@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.techshop.repository.UserRepository;
+import com.techshop.service.VoucherService;
+import com.techshop.model.Voucher;
+import com.techshop.service.EmailService;
 
 @Controller
 public class CartController {
@@ -30,6 +33,10 @@ public class CartController {
     private OrderService orderService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private VoucherService voucherService;
+    @Autowired
+    private EmailService emailService;
 
     private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
@@ -90,6 +97,35 @@ public class CartController {
         return "redirect:/cart";
     }
 
+    @PostMapping("/cart/add-ajax")
+    @ResponseBody
+    public Map<String, Object> addToCartAjax(@RequestParam Long productId, @RequestParam int quantity,
+            HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        List<CartItem> cart = getCartFromSession(session);
+        boolean found = false;
+        for (CartItem item : cart) {
+            if (item.getProductId().equals(productId)) {
+                item.setQuantity(item.getQuantity() + quantity);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            Product product = productService.getProduct(productId);
+            if (product != null) {
+                CartItem newItem = new CartItem(productId, product.getName(), product.getImageUrl(), product.getPrice(),
+                        quantity);
+                cart.add(newItem);
+            }
+        }
+        session.setAttribute("cart", cart);
+        int cartCount = cart.stream().mapToInt(CartItem::getQuantity).sum();
+        result.put("success", true);
+        result.put("cartCount", cartCount);
+        return result;
+    }
+
     @GetMapping("/cart")
     public String viewCart(HttpSession session, Model model) {
         ControllerUtils.addUsername(model);
@@ -148,10 +184,39 @@ public class CartController {
             return "redirect:/cart";
         BigDecimal shippingFee = "Hỏa tốc".equals(shippingMethod) ? new BigDecimal("50000") : new BigDecimal("30000");
         BigDecimal total = cart.stream().map(CartItem::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Lấy mã giảm giá từ session
+        String voucherCode = (String) session.getAttribute("voucherCode");
+        BigDecimal voucherDiscount = BigDecimal.ZERO;
+        if (voucherCode != null) {
+            Voucher voucher = voucherService.findByCode(voucherCode);
+            if (voucherService.isValid(voucher)) {
+                double discount = voucher.getDiscount();
+                voucherDiscount = BigDecimal.valueOf(discount < 1 ? total.doubleValue() * discount : discount);
+                // Cập nhật lượt sử dụng
+                voucher.setUsedCount(voucher.getUsedCount() + 1);
+                voucherService.save(voucher);
+            } else {
+                voucherCode = null;
+                voucherDiscount = BigDecimal.ZERO;
+            }
+        }
+        BigDecimal finalAmount = total.add(shippingFee).subtract(voucherDiscount);
+        if (finalAmount.compareTo(BigDecimal.ZERO) < 0)
+            finalAmount = BigDecimal.ZERO;
+        String voucherDiscountStr = voucherDiscount.compareTo(BigDecimal.ZERO) > 0
+                ? "-" + String.format("%,d", voucherDiscount.intValue()) + " đ"
+                : null;
+        String finalTotalStr = finalAmount != null
+                ? String.format("%,d", finalAmount.intValue())
+                : "";
         model.addAttribute("cart", cart);
         model.addAttribute("total", total);
         model.addAttribute("shippingFee", shippingFee);
         model.addAttribute("totalWithFee", total.add(shippingFee));
+        model.addAttribute("voucherCode", voucherCode);
+        model.addAttribute("voucherDiscount", voucherDiscount);
+        model.addAttribute("voucherDiscountStr", voucherDiscountStr);
+        model.addAttribute("finalTotalStr", finalTotalStr);
         model.addAttribute("customerName", customerName);
         model.addAttribute("phone", phone);
         model.addAttribute("email", email);
@@ -218,6 +283,40 @@ public class CartController {
             } else {
                 total = BigDecimal.ZERO;
             }
+            // Lấy voucherDiscount từ session
+            Object voucherDiscountObj = session.getAttribute("voucherDiscount");
+            BigDecimal voucherDiscount = BigDecimal.ZERO;
+            if (voucherDiscountObj instanceof BigDecimal) {
+                voucherDiscount = (BigDecimal) voucherDiscountObj;
+            } else if (voucherDiscountObj instanceof Number) {
+                voucherDiscount = BigDecimal.valueOf(((Number) voucherDiscountObj).doubleValue());
+            } else {
+                voucherDiscount = BigDecimal.ZERO;
+            }
+            // Ensure no null values
+            if (total == null)
+                total = BigDecimal.ZERO;
+            if (shippingFee == null)
+                shippingFee = BigDecimal.ZERO;
+            if (voucherDiscount == null)
+                voucherDiscount = BigDecimal.ZERO;
+            BigDecimal finalAmount = total.add(shippingFee).subtract(voucherDiscount);
+            if (finalAmount.compareTo(BigDecimal.ZERO) < 0)
+                finalAmount = BigDecimal.ZERO;
+            // Add finalTotal to model for Thymeleaf
+            model.addAttribute("finalTotal", finalAmount);
+            // Add formatted strings for Thymeleaf to avoid parse errors
+            String voucherDiscountStr = voucherDiscount.compareTo(BigDecimal.ZERO) > 0
+                    ? "-" + String.format("%,d", voucherDiscount.intValue()) + " đ"
+                    : null;
+            String finalTotalStr = finalAmount != null
+                    ? String.format("%,d", finalAmount.intValue())
+                    : "";
+            model.addAttribute("voucherDiscountStr", voucherDiscountStr);
+            model.addAttribute("finalTotalStr", finalTotalStr);
+            logger.info(
+                    "DEBUG: total={}, shippingFee={}, voucherDiscount={}, finalAmount={}, voucherDiscountStr={}, finalTotalStr={}",
+                    total, shippingFee, voucherDiscount, finalAmount, voucherDiscountStr, finalTotalStr);
             Order order = new Order();
             order.setCustomerName(customerName);
             order.setPhone(phone);
@@ -225,7 +324,7 @@ public class CartController {
             order.setAddress(address);
             order.setShippingMethod(shippingMethod);
             order.setShippingFee(shippingFee);
-            order.setTotalAmount(total.add(shippingFee));
+            order.setTotalAmount(finalAmount);
             order.setStatus(OrderStatus.PENDING);
             // Set userId nếu đã đăng nhập
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -267,9 +366,43 @@ public class CartController {
             }
             order.setItems(orderItems);
             orderService.saveOrder(order);
+            // Gửi email xác nhận đơn hàng
+            if (order.getEmail() != null && !order.getEmail().isEmpty()) {
+                String subject = "Xác nhận đơn hàng #" + order.getId();
+                StringBuilder body = new StringBuilder();
+                body.append("<h2 style='color:#0071e3;'>Cảm ơn bạn đã đặt hàng tại <b>TechShop</b>!</h2>");
+                body.append("<p>Mã đơn hàng: <b>").append(order.getId()).append("</b></p>");
+                body.append("<h4>Thông tin sản phẩm:</h4>");
+                body.append("<table style='border-collapse:collapse;width:100%;'>");
+                body.append(
+                        "<tr><th style='border:1px solid #ccc;padding:6px;'>Sản phẩm</th><th style='border:1px solid #ccc;padding:6px;'>Số lượng</th><th style='border:1px solid #ccc;padding:6px;'>Giá</th></tr>");
+                for (OrderItem item : order.getItems()) {
+                    body.append("<tr>");
+                    body.append("<td style='border:1px solid #ccc;padding:6px;'>").append(item.getProduct().getName())
+                            .append("</td>");
+                    body.append("<td style='border:1px solid #ccc;padding:6px;text-align:center;'>")
+                            .append(item.getQuantity()).append("</td>");
+                    body.append("<td style='border:1px solid #ccc;padding:6px;'>").append(item.getPrice())
+                            .append("đ</td>");
+                    body.append("</tr>");
+                }
+                body.append("</table>");
+                body.append("<p><b>Tổng cộng: <span style='color:#0071e3;'>").append(order.getTotalAmount())
+                        .append("đ</span></b></p>");
+                body.append("<p>Chúng tôi sẽ liên hệ với bạn để xác nhận và giao hàng trong thời gian sớm nhất.</p>");
+                body.append(
+                        "<hr><p style='font-size:12px;color:#888;'>Đây là email tự động, vui lòng không trả lời email này.</p>");
+                try {
+                    emailService.sendOrderConfirmationHtml(order.getEmail(), subject, body.toString());
+                } catch (Exception e) {
+                    logger.error("Lỗi gửi email xác nhận đơn hàng", e);
+                }
+            }
             // Chỉ xóa session sau khi lưu thành công
             session.removeAttribute("cart");
             session.removeAttribute("orderConfirmInfo");
+            session.removeAttribute("voucherCode");
+            session.removeAttribute("voucherDiscount");
             model.addAttribute("order", order);
             session.setAttribute("customerPhone", phone); // Lưu số điện thoại vào session
             logger.info("Đặt hàng thành công cho khách: {}", customerName);
@@ -290,6 +423,37 @@ public class CartController {
                 model.addAttribute("shippingMethod", info.get("shippingMethod"));
             }
             return "order_confirm";
+        }
+    }
+
+    @PostMapping("/cart/apply-voucher")
+    @ResponseBody
+    public Map<String, Object> applyVoucher(@RequestParam String code, @RequestParam double total,
+            HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            Voucher voucher = voucherService.findByCode(code);
+            if (!voucherService.isValid(voucher)) {
+                result.put("valid", false);
+                result.put("message", "Mã giảm giá không hợp lệ hoặc đã hết hạn/lượt sử dụng.");
+                session.removeAttribute("voucherCode");
+                session.removeAttribute("voucherDiscount");
+                return result;
+            }
+            double discount = voucher.getDiscount();
+            double discountAmount = discount < 1 ? total * discount : discount;
+            double newTotal = Math.max(0, total - discountAmount);
+            result.put("valid", true);
+            result.put("discountAmount", discountAmount);
+            result.put("newTotal", newTotal);
+            result.put("message", "Áp dụng mã thành công!");
+            session.setAttribute("voucherCode", code);
+            session.setAttribute("voucherDiscount", discountAmount);
+            return result;
+        } catch (Exception e) {
+            result.put("valid", false);
+            result.put("message", "Đã xảy ra lỗi khi áp dụng mã giảm giá. Vui lòng thử lại!");
+            return result;
         }
     }
 }

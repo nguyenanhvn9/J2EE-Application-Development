@@ -83,6 +83,13 @@
                     </div>
                 </div>
                 <div class="col-12">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <input type="text" id="voucherCode" class="form-control" placeholder="Nhập mã giảm giá..." />
+                        <button type="button" id="applyVoucherBtn" class="btn btn-warning">Áp dụng</button>
+                    </div>
+                    <div id="voucherMessage" class="mt-2"></div>
+                </div>
+                <div class="col-12">
                     <h4>Tóm tắt đơn hàng</h4>
                     <table class="table table-bordered">
                         <thead class="table-light">
@@ -100,7 +107,15 @@
                             </tr>
                         </tbody>
                     </table>
-                    <p><b>Tạm tính:</b> <span th:text="${#numbers.formatInteger(total, 0, 'COMMA')}"></span> đ</p>
+                    <p><b>Tạm tính:</b> <span id="cartTotal"
+                            th:text="${#numbers.formatInteger(total, 0, 'COMMA')}"></span> đ</p>
+                    <p id="voucherDiscountRow" style="display:none;">
+                        <b>Giảm giá:</b> <span id="voucherDiscount"></span>
+                    </p>
+                    <p>
+                        <b>Tổng cộng:</b>
+                        <span id="cartTotalFinal" th:text="${#numbers.formatInteger(total, 0, 'COMMA')}"></span> đ
+                    </p>
                 </div>
                 <div class="col-12 d-flex justify-content-between">
                     <a th:href="@{'/cart'}" class="btn btn-outline-secondary">Quay lại giỏ hàng</a>
@@ -109,6 +124,36 @@
             </form>
         </div>
     </div>
+    <script>
+        document.getElementById('applyVoucherBtn').onclick = async function () {
+            const code = document.getElementById('voucherCode').value.trim();
+            const total = parseFloat(document.getElementById('cartTotal').innerText.replace(/\D/g, ''));
+            if (!code) return;
+            const res = await fetch('/cart/apply-voucher', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `code=${encodeURIComponent(code)}&total=${total}`
+            });
+            const msg = document.getElementById('voucherMessage');
+            const contentType = res.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const data = await res.json();
+                if (data.valid) {
+                    document.getElementById('voucherDiscountRow').style.display = '';
+                    document.getElementById('voucherDiscount').innerText = '-' + data.discountAmount.toLocaleString() + ' đ';
+                    document.getElementById('cartTotalFinal').innerText = data.newTotal.toLocaleString();
+                    msg.innerHTML = `<span class='text-success'>${data.message}</span>`;
+                } else {
+                    document.getElementById('voucherDiscountRow').style.display = 'none';
+                    document.getElementById('voucherDiscount').innerText = '';
+                    document.getElementById('cartTotalFinal').innerText = total.toLocaleString();
+                    msg.innerHTML = `<span class='text-danger'>${data.message}</span>`;
+                }
+            } else {
+                msg.innerHTML = `<span class='text-danger'>Có lỗi xảy ra khi áp dụng mã giảm giá.</span>`;
+            }
+        };
+    </script>
 </body>
 
 </html>

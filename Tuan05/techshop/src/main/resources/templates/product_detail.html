@@ -63,6 +63,13 @@
             background: #005bb5;
             color: #fff;
         }
+
+        #review-list li {
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            padding: 10px 12px;
+        }
     </style>
 </head>
 
@@ -73,7 +80,7 @@
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="/cart">Giỏ hàng</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/products">Quản trị</a></li>
+                    <!-- <li class="nav-item"><a class="nav-link" href="/admin/products">Quản trị</a></li> -->
                 </ul>
             </div>
         </div>
@@ -86,52 +93,6 @@
             </div>
             <p><b>Số lượng còn lại:</b> <span th:text="${product.stockQuantity}"></span></p>
             <p><b>Mô tả:</b> <span th:text="${product.description}"></span></p>
-            <div class="mt-4">
-                <div th:if="${error != null}" class="alert alert-danger text-center" th:text="${error}"></div>
-                <div th:if="${success != null}" class="alert alert-success text-center">Đánh giá của bạn đã được ghi
-                    nhận!</div>
-                <div class="mb-3">
-                    <b>Đánh giá trung bình:</b>
-                    <span th:text="${averageRating}"></span> / 5
-                    <span th:if="${averageRating > 0}">
-                        <span th:each="i : ${#numbers.sequence(1, T(java.lang.Math).round(averageRating))}">★</span>
-                        <span th:each="i : ${#numbers.sequence(T(java.lang.Math).round(averageRating)+1, 5)}"
-                            style="color:#ccc">★</span>
-                    </span>
-                    <span th:if="${averageRating == 0}">(Chưa có đánh giá)</span>
-                </div>
-                <div class="mb-3">
-                    <h5 class="mb-2">Đánh giá sản phẩm</h5>
-                    <div th:if="${#lists.isEmpty(reviews)}" class="text-muted">Chưa có đánh giá nào.</div>
-                    <div th:each="review : ${reviews}" class="border-bottom pb-2 mb-2">
-                        <b th:text="${review.rating} + '★'"></b>
-                        <span th:text="${review.comment}"></span>
-                        <span class="text-secondary small ms-2" th:text="'bởi ' + review.username"></span>
-                        <div class="small text-secondary">Lúc: <span
-                                th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm')}"></span></div>
-                    </div>
-                </div>
-                <!-- Form đánh giá chỉ hiển thị nếu đủ điều kiện -->
-                <div class="mb-3" th:if="${canReview}">
-                    <form th:action="@{'/product/' + ${product.id} + '/review'}" method="post">
-                        <div class="mb-2">
-                            <label>Chọn số sao:</label>
-                            <select name="rating" class="form-select w-auto d-inline-block ms-2">
-                                <option th:each="i : ${#numbers.sequence(1,5)}" th:value="${i}" th:text="${i}"></option>
-                            </select>
-                        </div>
-                        <div class="mb-2">
-                            <textarea name="comment" class="form-control" placeholder="Nhận xét..." required></textarea>
-                        </div>
-                        <button type="submit" class="apple-btn">Gửi đánh giá</button>
-                    </form>
-                </div>
-                <div class="mb-3 text-muted" th:if="${!canReview}">
-                    <span th:if="${username == null}">Bạn cần đăng nhập và mua sản phẩm để đánh giá.</span>
-                    <span th:if="${username != null}">Bạn chỉ có thể đánh giá sản phẩm đã mua và mỗi sản phẩm chỉ được
-                        đánh giá một lần.</span>
-                </div>
-            </div>
             <form th:action="@{'/cart/add'}" method="post"
                 class="row g-2 align-items-center mt-3 w-100 justify-content-center">
                 <input type="hidden" name="productId" th:value="${product.id}" />
@@ -151,6 +112,71 @@
                 <a th:href="@{'/cart'}" class="btn btn-primary">Giỏ hàng</a>
             </div>
         </div>
+        <!-- Đánh giá sản phẩm: Viết lại hoàn toàn, đơn giản, an toàn -->
+        <div class="mb-4">
+            <h5 class="mb-2">Đánh giá sản phẩm</h5>
+            <input type="hidden" id="product-id" th:value="${product.id}" />
+            <div class="card p-3 shadow-sm" style="max-width: 600px;">
+                <div class="mb-2 d-flex align-items-center gap-2">
+                    <span>Lọc theo sao:</span>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(0)">Tất cả</button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(5)">5★</button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(4)">4★</button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(3)">3★</button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(2)">2★</button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(1)">1★</button>
+                </div>
+                <ul id="review-list" class="list-unstyled mb-0"></ul>
+            </div>
+        </div>
+        <script>
+            let allReviews = [];
+            const productId = document.getElementById('product-id') ? document.getElementById('product-id').value : null;
+            const ul = document.getElementById('review-list');
+
+            function renderReviews(reviews) {
+                if (!ul) return;
+                if (!Array.isArray(reviews) || reviews.length === 0) {
+                    ul.innerHTML = '<li>Chưa có đánh giá nào cho sản phẩm này.</li>';
+                } else {
+                    ul.innerHTML = reviews.map(r =>
+                        `<li class="border-bottom pb-2 mb-2">
+                            <b>${r.username ? r.username : 'Ẩn danh'}</b>
+                            <span style="color:gold;">${'★'.repeat(r.rating || 0)}</span>
+                            <span style="color:#ccc;">${'★'.repeat(5 - (r.rating || 0))}</span>
+                            <span class="text-secondary small ms-2">${r.createdAt ? r.createdAt.replace('T', ' ').slice(0, 16) : ''}</span>
+                            <div class="mt-1">${r.comment ? r.comment : '[Không có nội dung]'}</div>
+                        </li>`
+                    ).join('');
+                }
+            }
+
+            function filterReviews(star) {
+                if (star === 0) {
+                    renderReviews(allReviews);
+                } else {
+                    renderReviews(allReviews.filter(r => r.rating === star));
+                }
+            }
+
+            if (productId && !isNaN(productId)) {
+                fetch(`/product/${productId}/reviews`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('Không lấy được đánh giá');
+                        return res.json();
+                    })
+                    .then(reviews => {
+                        allReviews = reviews;
+                        renderReviews(allReviews);
+                    })
+                    .catch(err => {
+                        if (ul) ul.innerHTML = '<li>Lỗi khi lấy đánh giá.</li>';
+                        console.error(err);
+                    });
+            } else {
+                if (ul) ul.innerHTML = '<li>Không xác định được sản phẩm.</li>';
+            }
+        </script>
     </div>
 </body>
 

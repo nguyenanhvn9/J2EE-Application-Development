@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import com.techshop.model.OrderItem;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class OrderService {
@@ -56,5 +60,29 @@ public class OrderService {
 
     public List<Order> findByUserId(Long userId) {
         return orderRepository.findByUserId(userId);
+    }
+
+    public List<Map<String, Object>> getRevenueLast7Days() {
+        List<Map<String, Object>> result = new java.util.ArrayList<>();
+        LocalDate today = LocalDate.now();
+        for (int i = 6; i >= 0; i--) {
+            LocalDate day = today.minusDays(i);
+            double revenue = orderRepository.findAll().stream()
+                    .filter(o -> o.getCreatedAt().toLocalDate().equals(day))
+                    .mapToDouble(o -> o.getTotalAmount().doubleValue())
+                    .sum();
+            Map<String, Object> map = new HashMap<>();
+            map.put("date", day.toString());
+            map.put("revenue", revenue);
+            result.add(map);
+        }
+        return result;
+    }
+
+    public int countOrdersLast24h() {
+        LocalDateTime since = LocalDateTime.now().minusHours(24);
+        return (int) orderRepository.findAll().stream()
+                .filter(o -> o.getCreatedAt().isAfter(since))
+                .count();
     }
 }

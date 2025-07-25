@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Dashboard Thống kê</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: #f5f5f7;
+        }
+
+        .dashboard-card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+            padding: 32px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">TechShop Admin</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/products">Sản phẩm</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/categories">Danh mục</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/orders">Đơn hàng</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/users">Người dùng</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/vouchers">Mã giảm giá</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="dashboard-card">
+        <h2 class="mb-4">Dashboard Thống kê</h2>
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card p-3 text-center">
+                    <div class="fw-bold">Đơn hàng mới 24h</div>
+                    <div id="orders24h" class="display-5 text-primary">...</div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card p-3">
+                    <div class="fw-bold mb-2">Doanh thu 7 ngày gần nhất</div>
+                    <canvas id="revenueChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card p-3">
+                    <div class="fw-bold mb-2">Top 5 sản phẩm bán chạy tháng này</div>
+                    <canvas id="topProductsChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Đơn hàng mới 24h
+        fetch('/admin/dashboard/orders-24h').then(r => r.json()).then(data => {
+            document.getElementById('orders24h').innerText = data;
+        });
+        // Doanh thu 7 ngày
+        fetch('/admin/dashboard/revenue-7days').then(r => r.json()).then(data => {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.date),
+                    datasets: [{
+                        label: 'Doanh thu',
+                        data: data.map(d => d.revenue),
+                        borderColor: '#0071e3',
+                        backgroundColor: 'rgba(0,113,227,0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+        });
+        // Top 5 sản phẩm bán chạy
+        fetch('/admin/dashboard/top-products').then(r => r.json()).then(data => {
+            const ctx = document.getElementById('topProductsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.productName),
+                    datasets: [{
+                        label: 'Số lượng bán',
+                        data: data.map(d => d.quantity),
+                        backgroundColor: '#ff9800'
+                    }]
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+        });
+    </script>
+</body>
+
+</html>

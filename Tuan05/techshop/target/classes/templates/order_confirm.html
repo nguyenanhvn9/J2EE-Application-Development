@@ -81,16 +81,26 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="d-flex justify-content-between">
+                <span>Mã giảm giá:</span>
+                <span th:text="${voucherCode != null ? voucherCode : '-'}"></span>
+            </div>
+            <div class="d-flex justify-content-between" th:if="${voucherDiscountStr != null}">
+                <span>Giảm giá:</span>
+                <span th:text="${voucherDiscountStr}"></span>
+            </div>
             <div class="d-flex justify-content-end">
                 <div>
                     <p><b>Tạm tính:</b> <span
                             th:text="${total != null ? #numbers.formatInteger(total, 0, 'COMMA') : ''}"></span> đ</p>
+                    <p th:if="${voucherDiscountStr != null && voucherDiscountStr != ''}"><b>Giảm giá:</b> <span
+                            th:text="${voucherDiscountStr}"></span></p>
                     <p><b>Phí vận chuyển:</b> <span
                             th:text="${shippingFee != null ? #numbers.formatInteger(shippingFee, 0, 'COMMA') : ''}"></span>
                         đ</p>
-                    <p class="fs-5"><b>Tổng cộng:</b> <span
-                            th:text="${totalWithFee != null ? #numbers.formatInteger(totalWithFee, 0, 'COMMA') : ''}"></span>
-                        đ</p>
+                    <p class="fs-5"><b>Tổng cộng:</b>
+                        <span th:text="${finalTotalStr != null && finalTotalStr != '' ? finalTotalStr : '0'}"></span> đ
+                    </p>
                 </div>
             </div>
             <form th:action="@{'/checkout/confirm'}" method="post">

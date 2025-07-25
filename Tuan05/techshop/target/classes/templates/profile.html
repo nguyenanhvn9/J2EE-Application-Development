@@ -153,7 +153,10 @@
                             <td th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
                             <td th:text="${order.status}"></td>
                             <td th:text="${#numbers.formatInteger(order.totalAmount, 0, 'COMMA') + ' đ'}"></td>
-                            <td><a th:href="@{'/orders/' + ${order.id}}" class="btn btn-sm btn-info">Xem</a></td>
+                            <td><a th:href="@{'/orders/' + ${order.id}}" class="btn btn-sm btn-info">Xem</a>
+                                <a th:href="@{'/products/review-form?productId=' + ${order.items[0].product.id}}"
+                                    class="btn btn-sm btn-warning ms-2">Đánh giá</a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
