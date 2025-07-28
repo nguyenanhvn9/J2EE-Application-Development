@@ -1,6 +1,7 @@
 package com.techshop.controller;
 
 import com.techshop.model.User;
+import com.techshop.model.Role;
 import com.techshop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,9 +33,9 @@ public class AuthController {
             model.addAttribute("error", "Tên đăng nhập đã tồn tại!");
             return "register";
         }
-        // Đảm bảo role chỉ là USER hoặc ADMIN, mặc định là USER
-        if (user.getRole() == null || (!user.getRole().equals("USER") && !user.getRole().equals("ADMIN"))) {
-            user.setRole("USER");
+        // Đảm bảo role chỉ là USER, mặc định là USER
+        if (user.getRole() == null) {
+            user.setRole(Role.USER);
         }
         userService.register(user);
         return "redirect:/login?registerSuccess";

@@ -51,7 +51,7 @@ public class CustomerController {
             if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
                 com.techshop.model.User user = userService.findByUsername(auth.getName());
                 if (user != null) {
-                    userRole = user.getRole();
+                    userRole = user.getRole().getValue();
                 }
             }
             model.addAttribute("userRole", userRole);

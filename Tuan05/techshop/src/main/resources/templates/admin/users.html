@@ -48,20 +48,52 @@
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="/">TechShop Admin</a>
             <div class="collapse navbar-collapse">
+                <!-- Hiển thị role hiện tại -->
+                <div class="navbar-text me-3" th:if="${hasAnyAdminRole}">
+                    <span class="badge" th:text="${currentUserRole}" th:class="${currentUserRole == 'ADMIN' ? 'bg-danger' : 
+                                   currentUserRole == 'MANAGER' ? 'bg-warning text-dark' : 
+                                   currentUserRole == 'LEADER' ? 'bg-info' : 'bg-secondary'}"></span>
+                </div>
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/products">Sản phẩm</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/categories">Danh mục</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/orders">Đơn hàng</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/users">Người dùng</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/vouchers">Mã giảm giá</a></li>
+                    <!-- Dashboard - Tất cả admin roles -->
+                    <li class="nav-item" th:if="${hasAnyAdminRole}">
+                        <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+                    </li>
+                    <!-- Sản phẩm - ADMIN, MANAGER -->
+                    <li class="nav-item" th:if="${hasAnyManagerRole}">
+                        <a class="nav-link" href="/admin/products">Sản phẩm</a>
+                    </li>
+                    <!-- Danh mục - chỉ ADMIN -->
+                    <li class="nav-item" th:if="${isAdmin}">
+                        <a class="nav-link" href="/admin/categories">Danh mục</a>
+                    </li>
+                    <!-- Đơn hàng - ADMIN, MANAGER, LEADER -->
+                    <li class="nav-item" th:if="${hasAnyAdminRole}">
+                        <a class="nav-link" href="/admin/orders">Đơn hàng</a>
+                    </li>
+                    <!-- Người dùng - chỉ ADMIN -->
+                    <li class="nav-item" th:if="${isAdmin}">
+                        <a class="nav-link" href="/admin/users">Người dùng</a>
+                    </li>
+                    <!-- Mã giảm giá - ADMIN, MANAGER, LEADER -->
+                    <li class="nav-item" th:if="${hasAnyAdminRole}">
+                        <a class="nav-link" href="/admin/vouchers">Mã giảm giá</a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
     <div class="container">
         <div class="apple-card">
-            <h2 class="mb-4">Quản lý Người dùng</h2>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Quản lý Người dùng</h2>
+                <div>
+                    <span class="text-muted">Vai trò hiện tại: </span>
+                    <span class="badge" th:text="${currentUserRole}" th:class="${currentUserRole == 'ADMIN' ? 'bg-danger' : 
+                                   currentUserRole == 'MANAGER' ? 'bg-warning text-dark' : 
+                                   currentUserRole == 'LEADER' ? 'bg-info' : 'bg-secondary'}"></span>
+                </div>
+            </div>
             <table class="table table-bordered align-middle">
                 <thead class="table-light">
                     <tr>
@@ -83,27 +115,51 @@
                         <td th:text="${user.email}"></td>
                         <td th:text="${user.phone}"></td>
                         <td>
-                            <form th:action="@{'/admin/users/change-role'}" method="post"
-                                style="display:inline-flex;gap:4px;">
-                                <input type="hidden" name="userId" th:value="${user.id}" />
-                                <select name="newRole" class="form-select form-select-sm" th:value="${user.role}">
-                                    <option value="USER" th:selected="${user.role == 'USER'}">USER</option>
-                                    <option value="ADMIN" th:selected="${user.role == 'ADMIN'}">ADMIN</option>
-                                </select>
-                                <button type="submit" class="btn btn-sm btn-outline-primary">Đổi</button>
-                            </form>
+                            <!-- Chỉ ADMIN mới có thể thay đổi role -->
+                            <div th:if="${isAdmin}">
+                                <form th:action="@{'/admin/users/change-role'}" method="post"
+                                    style="display:inline-flex;gap:4px;">
+                                    <input type="hidden" name="userId" th:value="${user.id}" />
+                                    <select name="newRole" class="form-select form-select-sm">
+                                        <option value="USER" th:selected="${user.role.value == 'USER'}">Người dùng
+                                        </option>
+                                        <option value="MANAGER" th:selected="${user.role.value == 'MANAGER'}">Quản lý
+                                        </option>
+                                        <option value="LEADER" th:selected="${user.role.value == 'LEADER'}">Trưởng nhóm
+                                        </option>
+                                        <option value="ADMIN" th:selected="${user.role.value == 'ADMIN'}">Quản trị viên
+                                        </option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Đổi</button>
+                                </form>
+                            </div>
+                            <!-- Hiển thị role hiện tại cho các role khác -->
+                            <div th:unless="${isAdmin}">
+                                <span th:text="${user.role.value}"
+                                    th:class="${user.role.value == 'ADMIN' ? 'badge bg-danger' : 
+                                                user.role.value == 'MANAGER' ? 'badge bg-warning text-dark' : 
+                                                user.role.value == 'LEADER' ? 'badge bg-info' : 'badge bg-secondary'}"></span>
+                            </div>
                         </td>
                         <td>
                             <span th:text="${user.active} ? 'Kích hoạt' : 'Vô hiệu hóa'"
-                                th:classappend="${user.active} ? 'text-success' : 'text-danger'"></span>
+                                th:classappend="${user.active} ? 'badge bg-success' : 'badge bg-danger'"></span>
                         </td>
                         <td>
-                            <form th:action="@{'/admin/users/toggle-active'}" method="post" style="display:inline;">
-                                <input type="hidden" name="userId" th:value="${user.id}" />
-                                <button type="submit" class="btn btn-sm"
-                                    th:classappend="${user.active} ? 'btn-outline-danger' : 'btn-outline-success'"
-                                    th:text="${user.active} ? 'Vô hiệu hóa' : 'Kích hoạt'"></button>
-                            </form>
+                            <!-- Chỉ ADMIN mới có thể toggle active -->
+                            <div th:if="${isAdmin}">
+                                <form th:action="@{'/admin/users/toggle-active'}" method="post" style="display:inline;">
+                                    <input type="hidden" name="userId" th:value="${user.id}" />
+                                    <button type="submit" class="btn btn-sm"
+                                        th:classappend="${user.active} ? 'btn-outline-danger' : 'btn-outline-success'"
+                                        th:text="${user.active} ? 'Vô hiệu hóa' : 'Kích hoạt'"></button>
+                                </form>
+                            </div>
+                            <!-- Hiển thị trạng thái cho các role khác -->
+                            <div th:unless="${isAdmin}">
+                                <span th:text="${user.active} ? 'Kích hoạt' : 'Vô hiệu hóa'"
+                                    th:classappend="${user.active} ? 'badge bg-success' : 'badge bg-danger'"></span>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

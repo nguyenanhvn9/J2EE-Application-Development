@@ -28,13 +28,37 @@
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="/">TechShop Admin</a>
             <div class="collapse navbar-collapse">
+                <!-- Hiển thị role hiện tại -->
+                <div class="navbar-text me-3" th:if="${hasAnyAdminRole}">
+                    <span class="badge" th:text="${currentUserRole}" th:class="${currentUserRole == 'ADMIN' ? 'bg-danger' : 
+                                   currentUserRole == 'MANAGER' ? 'bg-warning text-dark' : 
+                                   currentUserRole == 'LEADER' ? 'bg-info' : 'bg-secondary'}"></span>
+                </div>
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/products">Sản phẩm</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/categories">Danh mục</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/orders">Đơn hàng</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/users">Người dùng</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/vouchers">Mã giảm giá</a></li>
+                    <!-- Dashboard - Tất cả admin roles -->
+                    <li class="nav-item" th:if="${hasAnyAdminRole}">
+                        <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+                    </li>
+                    <!-- Sản phẩm - ADMIN, MANAGER -->
+                    <li class="nav-item" th:if="${hasAnyManagerRole}">
+                        <a class="nav-link" href="/admin/products">Sản phẩm</a>
+                    </li>
+                    <!-- Danh mục - chỉ ADMIN -->
+                    <li class="nav-item" th:if="${isAdmin}">
+                        <a class="nav-link" href="/admin/categories">Danh mục</a>
+                    </li>
+                    <!-- Đơn hàng - ADMIN, MANAGER, LEADER -->
+                    <li class="nav-item" th:if="${hasAnyAdminRole}">
+                        <a class="nav-link" href="/admin/orders">Đơn hàng</a>
+                    </li>
+                    <!-- Người dùng - chỉ ADMIN -->
+                    <li class="nav-item" th:if="${isAdmin}">
+                        <a class="nav-link" href="/admin/users">Người dùng</a>
+                    </li>
+                    <!-- Mã giảm giá - ADMIN, MANAGER, LEADER -->
+                    <li class="nav-item" th:if="${hasAnyAdminRole}">
+                        <a class="nav-link" href="/admin/vouchers">Mã giảm giá</a>
+                    </li>
                 </ul>
             </div>
         </div>

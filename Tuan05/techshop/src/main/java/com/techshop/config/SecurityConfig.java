@@ -25,12 +25,30 @@ public class SecurityConfig {
                                 .userDetailsService(userDetailsService)
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/cart/apply-voucher").permitAll()
+                                                .requestMatchers("/test/**").permitAll()
+                                                // Quản lý Người dùng - chỉ ADMIN
                                                 .requestMatchers("/admin/users/**").hasRole("ADMIN")
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                // Quản lý Danh mục - chỉ ADMIN
+                                                .requestMatchers("/admin/categories/**").hasRole("ADMIN")
+                                                // Xem, Thêm, Sửa Sản phẩm - ADMIN và MANAGER
+                                                .requestMatchers("/admin/products", "/admin/products/add",
+                                                                "/admin/products/edit/**")
+                                                .hasAnyRole("ADMIN", "MANAGER")
+                                                // Xóa Sản phẩm - chỉ ADMIN
+                                                .requestMatchers("/admin/products/delete/**").hasRole("ADMIN")
+                                                // Xem, Sửa Đơn hàng - ADMIN, MANAGER, LEADER
+                                                .requestMatchers("/admin/orders", "/admin/orders/edit/**")
+                                                .hasAnyRole("ADMIN", "MANAGER", "LEADER")
+                                                // Các chức năng khác của admin - ADMIN, MANAGER, LEADER
+                                                .requestMatchers("/admin/dashboard", "/admin/vouchers/**")
+                                                .hasAnyRole("ADMIN", "MANAGER", "LEADER")
+                                                // Chức năng user thông thường
                                                 .requestMatchers("/profile/**", "/order-history", "/orders/**",
                                                                 "/cart/**")
-                                                .hasRole("USER")
+                                                .hasAnyRole("USER", "MANAGER", "LEADER", "ADMIN")
                                                 .anyRequest().permitAll())
+                                .exceptionHandling(ex -> ex
+                                                .accessDeniedPage("/error/403"))
                                 .csrf(csrf -> csrf.ignoringRequestMatchers("/cart/apply-voucher"))
                                 .formLogin(form -> form
                                                 .loginPage("/login")
@@ -39,9 +57,7 @@ public class SecurityConfig {
                                 .logout(logout -> logout
                                                 .logoutUrl("/logout")
                                                 .logoutSuccessUrl("/")
-                                                .permitAll())
-                                .exceptionHandling(eh -> eh
-                                                .accessDeniedPage("/login?error=forbidden"));
+                                                .permitAll());
                 return http.build();
         }
 }

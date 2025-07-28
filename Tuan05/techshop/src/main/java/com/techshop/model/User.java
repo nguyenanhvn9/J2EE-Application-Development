@@ -17,7 +17,8 @@ public class User {
     private String phone;
     private String email;
     @Column(nullable = false)
-    private String role = "USER";
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
     private boolean isActive = true;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -72,16 +73,20 @@ public class User {
         this.email = email;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
-        if (role == null || (!role.equals("USER") && !role.equals("ADMIN"))) {
-            this.role = "USER";
+    public void setRole(Role role) {
+        if (role == null) {
+            this.role = Role.USER;
         } else {
             this.role = role;
         }
+    }
+
+    public void setRole(String roleString) {
+        this.role = Role.fromString(roleString);
     }
 
     public boolean isActive() {
