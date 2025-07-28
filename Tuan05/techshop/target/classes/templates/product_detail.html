@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Chi tiết sản phẩm</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f5f5f7;
+        }
+
+        .apple-card {
+            border: none;
+            border-radius: 24px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+            background: #fff;
+            padding: 32px 24px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .apple-img {
+            width: 160px;
+            height: 320px;
+            object-fit: contain;
+            background: #fff;
+            border-radius: 16px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .apple-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 0.5em;
+            text-align: center;
+        }
+
+        .apple-price {
+            color: #86868b;
+            font-size: 1.1rem;
+            margin-bottom: 1.2em;
+        }
+
+        .apple-btn {
+            border-radius: 20px;
+            font-size: 1em;
+            padding: 8px 28px;
+            background: #0071e3;
+            color: #fff;
+            border: none;
+            transition: background 0.2s;
+            margin-top: 1.2em;
+        }
+
+        .apple-btn:hover {
+            background: #005bb5;
+            color: #fff;
+        }
+
+        #review-list li {
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            padding: 10px 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">TechShop</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/cart">Giỏ hàng</a></li>
+                    <!-- <li class="nav-item"><a class="nav-link" href="/admin/products">Quản trị</a></li> -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container py-4">
+        <div class="apple-card">
+            <img th:src="${product.imageUrl}" class="apple-img" alt="Hình sản phẩm">
+            <div class="apple-title" th:text="${product.name}"></div>
+            <div class="apple-price">Giá: <span th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')}"></span> đ
+            </div>
+            <p><b>Số lượng còn lại:</b> <span th:text="${product.stockQuantity}"></span></p>
+            <p><b>Mô tả:</b> <span th:text="${product.description}"></span></p>
+            <form th:action="@{'/cart/add'}" method="post"
+                class="row g-2 align-items-center mt-3 w-100 justify-content-center">
+                <input type="hidden" name="productId" th:value="${product.id}" />
+                <div class="col-auto">
+                    <label class="form-label">Số lượng:</label>
+                </div>
+                <div class="col-auto">
+                    <input type="number" name="quantity" value="1" min="1" th:attr="max=${product.stockQuantity}"
+                        class="form-control" style="width:100px;" />
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="apple-btn">Thêm vào giỏ hàng</button>
+                </div>
+            </form>
+            <div class="mt-4 w-100 d-flex justify-content-between">
+                <a th:href="@{'/'}" class="btn btn-outline-secondary">Trang chủ</a>
+                <a th:href="@{'/cart'}" class="btn btn-primary">Giỏ hàng</a>
+            </div>
+        </div>
+        <!-- Đánh giá sản phẩm: Viết lại hoàn toàn, đơn giản, an toàn -->
+        <div class="mb-4">
+            <h5 class="mb-2">Đánh giá sản phẩm</h5>
+            <input type="hidden" id="product-id" th:value="${product.id}" />
+            <div class="card p-3 shadow-sm" style="max-width: 600px;">
+                <div class="mb-2 d-flex align-items-center gap-2">
+                    <span>Lọc theo sao:</span>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(0)">Tất cả</button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(5)">5★</button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(4)">4★</button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(3)">3★</button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(2)">2★</button>
+                    <button class="btn btn-outline-warning btn-sm" onclick="filterReviews(1)">1★</button>
+                </div>
+                <ul id="review-list" class="list-unstyled mb-0"></ul>
+            </div>
+        </div>
+        <script>
+            let allReviews = [];
+            const productId = document.getElementById('product-id') ? document.getElementById('product-id').value : null;
+            const ul = document.getElementById('review-list');
+
+            function renderReviews(reviews) {
+                if (!ul) return;
+                if (!Array.isArray(reviews) || reviews.length === 0) {
+                    ul.innerHTML = '<li>Chưa có đánh giá nào cho sản phẩm này.</li>';
+                } else {
+                    ul.innerHTML = reviews.map(r =>
+                        `<li class="border-bottom pb-2 mb-2">
+                            <b>${r.username ? r.username : 'Ẩn danh'}</b>
+                            <span style="color:gold;">${'★'.repeat(r.rating || 0)}</span>
+                            <span style="color:#ccc;">${'★'.repeat(5 - (r.rating || 0))}</span>
+                            <span class="text-secondary small ms-2">${r.createdAt ? r.createdAt.replace('T', ' ').slice(0, 16) : ''}</span>
+                            <div class="mt-1">${r.comment ? r.comment : '[Không có nội dung]'}</div>
+                        </li>`
+                    ).join('');
+                }
+            }
+
+            function filterReviews(star) {
+                if (star === 0) {
+                    renderReviews(allReviews);
+                } else {
+                    renderReviews(allReviews.filter(r => r.rating === star));
+                }
+            }
+
+            if (productId && !isNaN(productId)) {
+                fetch(`/product/${productId}/reviews`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('Không lấy được đánh giá');
+                        return res.json();
+                    })
+                    .then(reviews => {
+                        allReviews = reviews;
+                        renderReviews(allReviews);
+                    })
+                    .catch(err => {
+                        if (ul) ul.innerHTML = '<li>Lỗi khi lấy đánh giá.</li>';
+                        console.error(err);
+                    });
+            } else {
+                if (ul) ul.innerHTML = '<li>Không xác định được sản phẩm.</li>';
+            }
+        </script>
+    </div>
+</body>
+
+</html>
