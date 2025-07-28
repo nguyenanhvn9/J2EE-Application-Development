@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <title>TechShop - Chi tiết Đơn hàng</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .container { margin-top: 20px; }
+    .product-item img { max-width: 80px; height: auto; margin-right: 15px; border-radius: .25rem; }
+    .product-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #eee;
+      border-radius: .25rem;
+    }
+    .order-summary {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: .25rem;
+    }
+    .status-badge {
+      padding: .35em .65em;
+      font-size: .9em; /* Larger for detail page */
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: baseline;
+      border-radius: .375rem;
+      color: #fff;
+    }
+    .status-badge.PENDING { background-color: #ffc107; color: #000; }
+    .status-badge.PROCESSING { background-color: #0d6efd; }
+    .status-badge.SHIPPED { background-color: #17a2b8; }
+    .status-badge.DELIVERED { background-color: #28a745; }
+    .status-badge.CANCELLED { background-color: #dc3545; }
+  </style>
+</head>
+<body>
+
+
+
+<div class="container">
+  <h1 class="my-4">Chi tiết Đơn hàng #<span th:text="${order.id}"></span></h1>
+
+  <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <span th:text="${successMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${errorMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <div class="row">
+    <div class="col-md-7">
+      <h3>Thông tin Đơn hàng</h3>
+      <div class="order-summary mb-4">
+        <p><strong>Mã đơn hàng:</strong> <span th:text="${order.id}"></span></p>
+        <p><strong>Khách hàng:</strong> <span th:text="${order.customerName}"></span></p>
+        <p><strong>Số điện thoại:</strong> <span th:text="${order.customerPhone}"></span></p>
+        <p><strong>Địa chỉ giao hàng:</strong> <span th:text="${order.shippingAddress}"></span></p>
+        <p><strong>Tổng tiền:</strong> <span th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span></p>
+        <p><strong>Ngày đặt hàng:</strong> <span th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy HH:mm')}"></span></p>
+        <p><strong>Trạng thái:</strong>
+          <span class="status-badge" th:classappend="${order.status.name()}" th:text="${order.status.description}"></span>
+        </p>
+        <p th:if="${order.updatedAt}"><strong>Cập nhật cuối:</strong> <span th:text="${#temporals.format(order.updatedAt, 'dd-MM-yyyy HH:mm')}"></span> bởi <span th:text="${order.updatedBy}"></span></p>
+        <p th:unless="${order.updatedAt}">Chưa có thông tin cập nhật.</p>
+      </div>
+
+      <h3 class="mb-3">Sản phẩm trong Đơn hàng</h3>
+      <div th:if="${order.orderItems.empty}">
+        <p class="text-muted">Không có sản phẩm nào trong đơn hàng này.</p>
+      </div>
+      <div th:each="item : ${order.orderItems}" class="product-item">
+        <img th:src="${item.product.imageUrl} ?: 'https://via.placeholder.com/80x80?text=No+Image'" alt="Product Image" class="img-fluid">
+        <div>
+          <h5><a th:href="@{/product/{id}(id=${item.product.id})}" th:text="${item.product.name}"></a></h5>
+          <p class="mb-1">Số lượng: <span th:text="${item.quantity}"></span></p>
+          <p class="mb-0">Giá mỗi sản phẩm: <span th:text="${#numbers.formatDecimal(item.pricePerUnit, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span></p>
+          <p class="mb-0">Tổng phụ: <span th:text="${#numbers.formatDecimal(item.pricePerUnit * item.quantity, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-5">
+      <h3>Cập nhật Trạng thái</h3>
+      <div class="card p-3">
+        <form th:action="@{/admin/orders/{id}/update-status(id=${order.id})}" method="post">
+          <div class="mb-3">
+            <label for="newStatus" class="form-label">Chọn trạng thái mới:</label>
+            <select id="newStatus" name="newStatus" class="form-select">
+              <option th:each="status : ${T(com.example.demo.entity.OrderStatus).values()}"
+                      th:value="${status}"
+                      th:text="${status.description}"></option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Cập nhật trạng thái</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <a th:href="@{/admin/orders}" class="btn btn-secondary mt-4">Quay lại danh sách đơn hàng</a>
+
+</div>
+
+<footer class="bg-light text-center py-3 mt-4">
+  <p>© 2025 TechShop. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

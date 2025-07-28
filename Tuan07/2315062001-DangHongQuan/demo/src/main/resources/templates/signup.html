@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechShop - Đăng ký</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --gray-color: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+
+        .signup-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            min-height: 700px;
+        }
+
+        .signup-image {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signup-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="0,100 1000,0 1000,100"/></svg>');
+            background-size: cover;
+        }
+
+        .signup-image-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .signup-image h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .signup-image p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .signup-image-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .signup-form {
+            flex: 1;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .signup-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .signup-header p {
+            color: var(--gray-color);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--light-color);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: white;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group .form-control {
+            padding-right: 3rem;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-color);
+            z-index: 10;
+        }
+
+        .btn-signup {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-signup:active {
+            transform: translateY(0);
+        }
+
+        .signup-links {
+            text-align: center;
+        }
+
+        .signup-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .signup-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .back-home {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-home:hover {
+            color: var(--accent-color);
+            transform: translateX(-5px);
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border-color);
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .strength-weak { background: var(--danger-color); width: 25%; }
+        .strength-fair { background: var(--accent-color); width: 50%; }
+        .strength-good { background: #3b82f6; width: 75%; }
+        .strength-strong { background: var(--success-color); width: 100%; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .signup-container {
+                flex-direction: column;
+                margin: 1rem;
+                min-height: auto;
+            }
+
+            .signup-image {
+                padding: 2rem;
+                min-height: 200px;
+            }
+
+            .signup-image h2 {
+                font-size: 2rem;
+            }
+
+            .signup-form {
+                padding: 2rem;
+            }
+
+            .back-home {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 1rem;
+                color: var(--primary-color);
+            }
+        }
+
+        /* Loading Animation */
+        .btn-loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Form validation styles */
+        .form-control.is-valid {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--danger-color);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .invalid-feedback {
+            display: block;
+            color: var(--danger-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-home">
+        <i class="fas fa-arrow-left me-2"></i>Về trang chủ
+    </a>
+
+    <div class="signup-container">
+        <div class="signup-image">
+            <div class="signup-image-content">
+                <div class="signup-image-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2>Tham gia TechShop!</h2>
+                <p>Tạo tài khoản để trải nghiệm mua sắm tuyệt vời với những sản phẩm công nghệ chất lượng cao</p>
+            </div>
+        </div>
+        
+        <div class="signup-form">
+            <div class="signup-header">
+                <h1>Đăng ký tài khoản</h1>
+                <p>Điền thông tin để tạo tài khoản mới</p>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <form th:action="@{/signup}" method="post" id="signupForm">
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user me-2"></i>Tên đăng nhập
+                    </label>
+                    <div class="input-group">
+                        <input type="text" id="username" name="username" class="form-control" 
+                               placeholder="Nhập tên đăng nhập" required>
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                    <div class="invalid-feedback" id="username-feedback"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Mật khẩu
+                    </label>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-control" 
+                               placeholder="Nhập mật khẩu" required>
+                        <i class="fas fa-lock input-icon"></i>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strength-fill"></div>
+                        </div>
+                        <small id="strength-text">Độ mạnh mật khẩu</small>
+                    </div>
+                    <div class="invalid-feedback" id="password-feedback"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope me-2"></i>Email
+                    </label>
+                    <div class="input-group">
+                        <input type="email" id="email" name="email" class="form-control" 
+                               placeholder="Nhập địa chỉ email" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                    <div class="invalid-feedback" id="email-feedback"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fullName" class="form-label">
+                        <i class="fas fa-id-card me-2"></i>Họ và tên
+                    </label>
+                    <div class="input-group">
+                        <input type="text" id="fullName" name="fullName" class="form-control" 
+                               placeholder="Nhập họ và tên đầy đủ" required>
+                        <i class="fas fa-id-card input-icon"></i>
+                    </div>
+                    <div class="invalid-feedback" id="fullName-feedback"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" class="form-label">
+                        <i class="fas fa-phone me-2"></i>Số điện thoại
+                    </label>
+                    <div class="input-group">
+                        <input type="tel" id="phone" name="phone" class="form-control" 
+                               placeholder="Nhập số điện thoại (tùy chọn)">
+                        <i class="fas fa-phone input-icon"></i>
+                    </div>
+                    <div class="invalid-feedback" id="phone-feedback"></div>
+                </div>
+
+                <button type="submit" class="btn btn-signup" id="signupBtn">
+                    <i class="fas fa-user-plus me-2"></i>Đăng ký
+                </button>
+            </form>
+
+            <div class="signup-links">
+                <p>Đã có tài khoản? 
+                    <a href="/login">
+                        <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập ngay
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthFill = document.getElementById('strength-fill');
+            const strengthText = document.getElementById('strength-text');
+            
+            let strength = 0;
+            let feedback = '';
+
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/)) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+            strengthFill.className = 'strength-fill';
+            
+            if (strength <= 2) {
+                strengthFill.classList.add('strength-weak');
+                feedback = 'Mật khẩu yếu';
+            } else if (strength <= 3) {
+                strengthFill.classList.add('strength-fair');
+                feedback = 'Mật khẩu trung bình';
+            } else if (strength <= 4) {
+                strengthFill.classList.add('strength-good');
+                feedback = 'Mật khẩu tốt';
+            } else {
+                strengthFill.classList.add('strength-strong');
+                feedback = 'Mật khẩu mạnh';
+            }
+            
+            strengthText.textContent = feedback;
+        });
+
+        // Form validation
+        function validateField(field, validationFn, feedbackId) {
+            const isValid = validationFn(field.value);
+            const feedback = document.getElementById(feedbackId);
+            
+            if (isValid) {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+                feedback.style.display = 'none';
+            } else {
+                field.classList.remove('is-valid');
+                field.classList.add('is-invalid');
+                feedback.style.display = 'block';
+            }
+            
+            return isValid;
+        }
+
+        // Username validation
+        document.getElementById('username').addEventListener('blur', function() {
+            validateField(this, 
+                value => value.length >= 3 && /^[a-zA-Z0-9_]+$/.test(value),
+                'username-feedback'
+            );
+        });
+
+        // Email validation
+        document.getElementById('email').addEventListener('blur', function() {
+            validateField(this, 
+                value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+                'email-feedback'
+            );
+        });
+
+        // Full name validation
+        document.getElementById('fullName').addEventListener('blur', function() {
+            validateField(this, 
+                value => value.length >= 2 && /^[a-zA-ZÀ-ỹ\s]+$/.test(value),
+                'fullName-feedback'
+            );
+        });
+
+        // Phone validation
+        document.getElementById('phone').addEventListener('blur', function() {
+            if (this.value) {
+                validateField(this, 
+                    value => /^[0-9+\-\s()]+$/.test(value) && value.length >= 10,
+                    'phone-feedback'
+                );
+            }
+        });
+
+        // Form submission
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('signupBtn');
+            btn.classList.add('btn-loading');
+            btn.disabled = true;
+        });
+
+        // Add some interactive effects
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

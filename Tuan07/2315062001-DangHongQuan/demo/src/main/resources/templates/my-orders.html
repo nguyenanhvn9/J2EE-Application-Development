@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechShop - Đơn hàng của tôi</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #1e40af;
+      --accent-color: #f59e0b;
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+      --warning-color: #f59e0b;
+      --info-color: #3b82f6;
+      --dark-color: #1f2937;
+      --light-color: #f8fafc;
+      --gray-color: #6b7280;
+      --border-color: #e5e7eb;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      color: var(--dark-color);
+      background-color: var(--light-color);
+    }
+
+    /* Header Styles */
+    .navbar {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      padding: 1rem 0;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: white !important;
+    }
+
+    .navbar-nav .nav-link {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      margin: 0 0.5rem;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: white !important;
+      transform: translateY(-2px);
+    }
+
+    .navbar-toggler {
+      border: none;
+      color: white;
+    }
+
+    .dropdown-menu {
+      border: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+    }
+
+    .dropdown-item {
+      padding: 0.75rem 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .dropdown-item:hover {
+      background-color: var(--light-color);
+      color: var(--primary-color);
+    }
+
+    /* Page Header */
+    .page-header {
+      background: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--dark-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .breadcrumb {
+      background: transparent;
+      padding: 0;
+      margin: 0;
+    }
+
+    .breadcrumb-item a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .breadcrumb-item.active {
+      color: var(--gray-color);
+    }
+
+    /* Order Cards */
+    .order-card {
+      background: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .order-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .order-id {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+
+    .order-date {
+      color: var(--gray-color);
+      font-size: 0.9rem;
+    }
+
+    /* Status Badges */
+    .order-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-PENDING {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #92400e;
+      border: 1px solid #f59e0b;
+    }
+
+    .status-PROCESSING {
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+      color: #1e40af;
+      border: 1px solid #3b82f6;
+    }
+
+    .status-SHIPPED {
+      background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+      color: #6b46c1;
+      border: 1px solid #8b5cf6;
+    }
+
+    .status-DELIVERED {
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+
+    .status-CANCELLED {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
+
+    .order-amount {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .order-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-icon {
+      color: var(--primary-color);
+      width: 20px;
+    }
+
+    .btn-detail {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border: none;
+      color: white;
+      padding: 0.6rem 1.5rem;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-detail:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+      color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      color: var(--gray-color);
+      margin-bottom: 1rem;
+    }
+
+    .empty-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--dark-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-text {
+      color: var(--gray-color);
+      margin-bottom: 2rem;
+    }
+
+    .btn-shop {
+      background: linear-gradient(135deg, var(--accent-color), #d97706);
+      border: none;
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-shop:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+      color: white;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--dark-color);
+      color: white;
+      padding: 2rem 0;
+      margin-top: 4rem;
+    }
+
+    .footer-content {
+      text-align: center;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 1.5rem;
+      }
+
+      .order-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .order-info {
+        grid-template-columns: 1fr;
+      }
+
+      .empty-state {
+        padding: 2rem 1rem;
+      }
+
+      .empty-icon {
+        font-size: 3rem;
+      }
+    }
+
+    /* Alerts */
+    .alert {
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .alert-danger {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      color: #991b1b;
+    }
+
+    /* Loading State */
+    .loading-skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body>
+<!-- Header -->
+<header>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <i class="fas fa-laptop me-2"></i>TechShop
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+        <ul class="navbar-nav align-items-center">
+          <li class="nav-item" sec:authorize="isAuthenticated()">
+            <a class="nav-link" href="/my-orders">
+              <i class="fas fa-box me-1"></i>Đơn hàng
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/cart">
+              <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
+            </a>
+          </li>
+          <li class="nav-item" sec:authorize="!isAuthenticated()">
+            <a class="nav-link" href="/login">
+              <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
+            </a>
+          </li>
+          <li class="nav-item" sec:authorize="!isAuthenticated()">
+            <a class="nav-link" href="/signup">
+              <i class="fas fa-user-plus me-1"></i>Đăng ký
+            </a>
+          </li>
+          <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user me-1"></i>
+              <span sec:authentication="principal.fullName"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/profile">
+                <i class="fas fa-user-cog me-2"></i>Tài khoản
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                  <button type="submit" class="dropdown-item">
+                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-cog me-1"></i>Quản lý
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/admin/products">
+                <i class="fas fa-boxes me-2"></i>Sản phẩm
+              </a></li>
+              <li><a class="dropdown-item" href="/admin/orders">
+                <i class="fas fa-list me-2"></i>Đơn hàng
+              </a></li>
+              <li><a class="dropdown-item" href="/admin/add-product">
+                <i class="fas fa-plus me-2"></i>Thêm sản phẩm
+              </a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Trang chủ</a></li>
+        <li class="breadcrumb-item active">Đơn hàng của tôi</li>
+      </ol>
+    </nav>
+    <h1 class="page-title">
+      <i class="fas fa-box-open me-2"></i>Đơn hàng của tôi
+    </h1>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+  <!-- Error Alert -->
+  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <span th:text="${error}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <!-- Empty State -->
+  <div th:if="${orders.isEmpty()}" class="empty-state">
+    <div class="empty-icon">
+      <i class="fas fa-inbox"></i>
+    </div>
+    <h3 class="empty-title">Chưa có đơn hàng nào</h3>
+    <p class="empty-text">Bạn chưa thực hiện đơn hàng nào. Hãy khám phá các sản phẩm tuyệt vời của chúng tôi!</p>
+    <a href="/" class="btn btn-shop">
+      <i class="fas fa-shopping-bag me-2"></i>Tiếp tục mua sắm
+    </a>
+  </div>
+
+  <!-- Orders List -->
+  <div th:unless="${orders.isEmpty()}">
+    <div class="row">
+      <div class="col-12">
+        <div th:each="order : ${orders}" class="order-card">
+          <div class="order-header">
+            <div class="flex-grow-1">
+              <div class="order-id">
+                <i class="fas fa-receipt me-2"></i>Đơn hàng #<span th:text="${order.id}"></span>
+              </div>
+              <div class="order-date">
+                <i class="fas fa-calendar-alt me-1"></i>
+                <span th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></span>
+              </div>
+            </div>
+            <div class="order-status" th:classappend="'status-' + ${order.status}">
+              <i class="fas fa-circle" th:if="${order.status.name() == 'PENDING'}"></i>
+              <i class="fas fa-clock" th:if="${order.status.name() == 'PROCESSING'}"></i>
+              <i class="fas fa-truck" th:if="${order.status.name() == 'SHIPPED'}"></i>
+              <i class="fas fa-check-circle" th:if="${order.status.name() == 'DELIVERED'}"></i>
+              <i class="fas fa-times-circle" th:if="${order.status.name() == 'CANCELLED'}"></i>
+              <span th:text="${order.status.description}"></span>
+            </div>
+          </div>
+
+          <div class="order-info">
+            <div class="info-item">
+              <i class="fas fa-dollar-sign info-icon"></i>
+              <div>
+                <strong>Tổng tiền:</strong>
+                <div class="order-amount" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <a th:href="@{/my-orders/{id}(id=${order.id})}" class="btn btn-detail">
+              <i class="fas fa-eye me-2"></i>Xem chi tiết
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <p><i class="fas fa-laptop me-2"></i>&copy; 2025 TechShop. Tất cả quyền được bảo lưu.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Add smooth animations
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animate order cards on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all order cards
+    document.querySelectorAll('.order-card').forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(30px)';
+      card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      observer.observe(card);
+    });
+
+    // Add loading state for detail buttons
+    document.querySelectorAll('.btn-detail').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        const text = this.querySelector('span') || this;
+
+        icon.className = 'fas fa-spinner fa-spin me-2';
+
+        setTimeout(() => {
+          icon.className = 'fas fa-eye me-2';
+        }, 2000);
+      });
+    });
+  });
+</script>
+</body>
+</html>

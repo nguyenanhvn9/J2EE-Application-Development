@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechShop - Chi tiết sản phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --gray-color: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+        }
+
+        /* Header Styles */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .navbar-toggler {
+            border: none;
+            color: white;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb-section {
+            background: white;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+        }
+
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb-item.active {
+            color: var(--gray-color);
+        }
+
+        /* Product Section */
+        .product-section {
+            padding: 3rem 0;
+        }
+
+        .product-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        /* Product Images */
+        .product-images {
+            padding: 2rem;
+            background: var(--light-color);
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .main-image:hover {
+            transform: scale(1.02);
+        }
+
+        .thumbnail-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .thumbnail:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+        }
+
+        .thumbnail.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Product Info */
+        .product-info {
+            padding: 2rem;
+        }
+
+        .product-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .product-category {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .product-description {
+            color: var(--gray-color);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .product-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .product-stock {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--light-color);
+            border-radius: 10px;
+        }
+
+        .stock-icon {
+            font-size: 1.2rem;
+            color: var(--success-color);
+        }
+
+        .stock-text {
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        /* Product Actions */
+        .product-actions {
+            margin-bottom: 2rem;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quantity-btn {
+            background: var(--light-color);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .quantity-input {
+            width: 80px;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.5rem;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-add-cart {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .btn-add-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-buy-now {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .btn-buy-now:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-back {
+            background: var(--gray-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: var(--dark-color);
+            transform: translateY(-2px);
+        }
+
+        /* Product Details */
+        .product-details {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .details-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .detail-value {
+            color: var(--gray-color);
+        }
+
+        /* Alert Styles */
+        .alert {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h5 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p, .footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent-color);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .product-title {
+                font-size: 2rem;
+            }
+
+            .product-price {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-add-cart, .btn-buy-now {
+                min-width: auto;
+            }
+
+            .main-image {
+                height: 300px;
+            }
+        }
+
+        /* Loading Animation */
+        .btn-loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header>
+        <nav class="navbar navbar-expand-lg">
+        <div class="container">
+                <a class="navbar-brand" href="/">
+                    <i class="fas fa-laptop me-2"></i>TechShop
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+                <ul class="navbar-nav align-items-center">
+                        <li class="nav-item" sec:authorize="isAuthenticated()">
+                            <a class="nav-link" href="/my-orders">
+                                <i class="fas fa-box me-1"></i>Đơn hàng
+                            </a>
+                        </li>
+                    <li class="nav-item">
+                            <a class="nav-link" href="/cart">
+                                <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
+                            </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                            <a class="nav-link" href="/login">
+                                <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
+                            </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                            <a class="nav-link" href="/signup">
+                                <i class="fas fa-user-plus me-1"></i>Đăng ký
+                            </a>
+                    </li>
+                        <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i>
+                                <span sec:authentication="principal.fullName"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/profile">
+                                    <i class="fas fa-user-cog me-2"></i>Tài khoản
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                        <form th:action="@{/logout}" method="post" style="margin: 0;">
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                            </button>
+                        </form>
+                    </li>
+                            </ul>
+                    </li>
+                        <li class="nav-item dropdown" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-cog me-1"></i>Quản lý
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/admin/products">
+                                    <i class="fas fa-boxes me-2"></i>Sản phẩm
+                                </a></li>
+                                <li><a class="dropdown-item" href="/admin/orders">
+                                    <i class="fas fa-list me-2"></i>Đơn hàng
+                                </a></li>
+                                <li><a class="dropdown-item" href="/admin/add-product">
+                                    <i class="fas fa-plus me-2"></i>Thêm sản phẩm
+                                </a></li>
+                            </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+    <!-- Breadcrumb -->
+    <section class="breadcrumb-section">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/category/{id}(id=${product.category.id})}" th:text="${product.category.name}">Danh mục</a>
+                    </li>
+                    <li class="breadcrumb-item active" th:text="${product.name}">Sản phẩm</li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+
+<!-- Main Content -->
+    <section class="product-section">
+        <div class="container">
+    <!-- Error/Success Message -->
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+        <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Product Container -->
+            <div class="product-container">
+                <div class="row">
+                    <!-- Product Images -->
+                    <div class="col-lg-6">
+                        <div class="product-images">
+                            <img th:src="${product.imageUrl} ?: 'https://via.placeholder.com/500x400?text=No+Image'" 
+                                 class="main-image" id="mainImage" alt="Product Image">
+                            <div class="thumbnail-container">
+                                <img th:src="${product.imageUrl} ?: 'https://via.placeholder.com/80x80?text=No+Image'" 
+                                     class="thumbnail active" alt="Thumbnail" onclick="changeMainImage(this.src, this)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Information -->
+                    <div class="col-lg-6">
+                        <div class="product-info">
+                            <h1 class="product-title" th:text="${product.name}">Tên sản phẩm</h1>
+                            <span class="product-category" th:text="${product.category.name}">Danh mục</span>
+                            
+                            <p class="product-description" th:text="${product.description} ?: 'Không có mô tả chi tiết cho sản phẩm này.'">
+                                Mô tả sản phẩm
+                            </p>
+
+                            <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
+                                Giá sản phẩm
+                            </div>
+
+                            <div class="product-stock">
+                                <i class="fas fa-check-circle stock-icon"></i>
+                                <span class="stock-text" th:text="'Còn ' + ${product.stockQuantity} + ' sản phẩm trong kho'">
+                                    Tình trạng kho
+                                </span>
+    </div>
+
+                            <!-- Product Actions -->
+                            <div class="product-actions">
+                                <form th:action="@{/customer/cart/add}" method="post" id="addToCartForm">
+                                    <input type="hidden" name="productId" th:value="${product.id}">
+                                    
+                                    <div class="quantity-control">
+                                        <label for="quantity" class="form-label">Số lượng:</label>
+                                        <button type="button" class="quantity-btn" onclick="changeQuantity(-1)">-</button>
+                                        <input type="number" id="quantity" name="quantity" class="quantity-input" 
+                                               value="1" min="1" th:max="${product.stockQuantity}">
+                                        <button type="button" class="quantity-btn" onclick="changeQuantity(1)">+</button>
+                                    </div>
+
+                                    <div class="action-buttons">
+                                        <button type="submit" class="btn btn-add-cart" id="addToCartBtn">
+                                            <i class="fas fa-shopping-cart me-2"></i>Thêm vào giỏ hàng
+                                        </button>
+                                        <button type="submit" name="buyNow" value="true" class="btn btn-buy-now" id="buyNowBtn">
+                                            <i class="fas fa-bolt me-2"></i>Mua ngay
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <div class="mt-3">
+                                    <a href="javascript:history.back()" class="btn btn-back">
+                                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <!-- Product Details -->
+            <div class="product-details">
+                <h3 class="details-title">
+                    <i class="fas fa-info-circle me-2"></i>Thông tin chi tiết
+                </h3>
+                <div class="detail-item">
+                    <span class="detail-label">Tên sản phẩm:</span>
+                    <span class="detail-value" th:text="${product.name}">Tên sản phẩm</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Danh mục:</span>
+                    <span class="detail-value" th:text="${product.category.name}">Danh mục</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Giá:</span>
+                    <span class="detail-value" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">Giá</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Số lượng tồn kho:</span>
+                    <span class="detail-value" th:text="${product.stockQuantity}">Số lượng</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Mô tả:</span>
+                    <span class="detail-value" th:text="${product.description} ?: 'Không có mô tả'">Mô tả</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h5><i class="fas fa-laptop me-2"></i>TechShop</h5>
+                    <p>Cửa hàng công nghệ hàng đầu Việt Nam, chuyên cung cấp các sản phẩm công nghệ chất lượng cao với giá cả hợp lý.</p>
+                </div>
+                <div class="footer-section">
+                    <h5>Liên kết nhanh</h5>
+                    <p><a href="/">Trang chủ</a></p>
+                    <p><a href="#products">Sản phẩm</a></p>
+                    <p><a href="/cart">Giỏ hàng</a></p>
+                    <p><a href="/my-orders">Đơn hàng</a></p>
+                </div>
+                <div class="footer-section">
+                    <h5>Hỗ trợ khách hàng</h5>
+                    <p><a href="#">Hướng dẫn mua hàng</a></p>
+                    <p><a href="#">Chính sách bảo hành</a></p>
+                    <p><a href="#">Chính sách đổi trả</a></p>
+                    <p><a href="#">Liên hệ</a></p>
+                </div>
+                <div class="footer-section">
+                    <h5>Liên hệ</h5>
+                    <p><i class="fas fa-phone me-2"></i>1900-1234</p>
+                    <p><i class="fas fa-envelope me-2"></i>info@techshop.vn</p>
+                    <p><i class="fas fa-map-marker-alt me-2"></i>123 Đường ABC, Quận 1, TP.HCM</p>
+        </div>
+    </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TechShop. Tất cả quyền được bảo lưu.</p>
+            </div>
+</div>
+</footer>
+
+    <!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+        function changeMainImage(src, element) {
+            document.getElementById('mainImage').src = src;
+            
+            // Remove active class from all thumbnails
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            
+            // Add active class to clicked thumbnail
+            element.classList.add('active');
+        }
+
+        function changeQuantity(delta) {
+            const input = document.getElementById('quantity');
+            const currentValue = parseInt(input.value);
+            const newValue = currentValue + delta;
+            
+            if (newValue >= 1 && newValue <= parseInt(input.max)) {
+                input.value = newValue;
+            }
+        }
+
+        // Form submission handling
+        document.getElementById('addToCartForm').addEventListener('submit', function(e) {
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            const buyNowBtn = document.getElementById('buyNowBtn');
+            
+            if (e.submitter === buyNowBtn) {
+                buyNowBtn.classList.add('btn-loading');
+                buyNowBtn.disabled = true;
+            } else {
+                addToCartBtn.classList.add('btn-loading');
+                addToCartBtn.disabled = true;
+            }
+        });
+
+        // Quantity input validation
+        document.getElementById('quantity').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            const max = parseInt(this.max);
+            const min = parseInt(this.min);
+            
+            if (value < min) this.value = min;
+            if (value > max) this.value = max;
+        });
+</script>
+</body>
+</html>
