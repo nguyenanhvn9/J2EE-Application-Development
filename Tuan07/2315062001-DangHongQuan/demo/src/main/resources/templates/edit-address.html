@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <title>TechShop - Chỉnh sửa Địa chỉ</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+<div class="container mt-4">
+  <h2 class="mb-4">Chỉnh sửa Địa chỉ</h2>
+
+  <div th:if="${successMessage != null and not #strings.isEmpty(successMessage)}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <span th:text="${successMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  <div th:if="${errorMessage != null and not #strings.isEmpty(errorMessage)}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${errorMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <form th:action="@{/profile/addresses/edit}" method="post" th:object="${addressToEdit}">
+    <input type="hidden" th:field="*{id}">
+
+    <div class="mb-3">
+      <label for="editAlias" class="form-label">Tên gợi nhớ:</label>
+      <input type="text" class="form-control"
+             th:classappend="${#fields.hasErrors('alias')} ? 'is-invalid' : ''"
+             id="editAlias" th:field="*{alias}" placeholder="Ví dụ: Nhà riêng, Công ty">
+      <div class="invalid-feedback" th:errors="*{alias}"></div>
+    </div>
+    <div class="mb-3">
+      <label for="editRecipientName" class="form-label">Tên người nhận:</label>
+      <input type="text" class="form-control"
+             th:classappend="${#fields.hasErrors('recipientName')} ? 'is-invalid' : ''"
+             id="editRecipientName" th:field="*{recipientName}" placeholder="Nguyễn Văn A">
+      <div class="invalid-feedback" th:errors="*{recipientName}"></div>
+    </div>
+    <div class="mb-3">
+      <label for="editPhoneNumber" class="form-label">Số điện thoại:</label>
+      <input type="text" class="form-control"
+             th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid' : ''"
+             id="editPhoneNumber" th:field="*{phoneNumber}" placeholder="0987xxxxxx">
+      <div class="invalid-feedback" th:errors="*{phoneNumber}"></div>
+    </div>
+    <div class="mb-3">
+      <label for="editStreetAddress" class="form-label">Địa chỉ đường/Số nhà:</label>
+      <input type="text" class="form-control"
+             th:classappend="${#fields.hasErrors('streetAddress')} ? 'is-invalid' : ''"
+             id="editStreetAddress" th:field="*{streetAddress}" placeholder="Số nhà, tên đường">
+      <div class="invalid-feedback" th:errors="*{streetAddress}"></div>
+    </div>
+    <div class="mb-3">
+      <label for="editWard" class="form-label">Phường/Xã:</label>
+      <input type="text" class="form-control"
+             th:classappend="${#fields.hasErrors('ward')} ? 'is-invalid' : ''"
+             id="editWard" th:field="*{ward}" placeholder="Phường/Xã">
+      <div class="invalid-feedback" th:errors="*{ward}"></div>
+    </div>
+    <div class="mb-3">
+      <label for="editDistrict" class="form-label">Quận/Huyện:</label>
+      <input type="text" class="form-control"
+             th:classappend="${#fields.hasErrors('district')} ? 'is-invalid' : ''"
+             id="editDistrict" th:field="*{district}" placeholder="Quận/Huyện">
+      <div class="invalid-feedback" th:errors="*{district}"></div>
+    </div>
+    <div class="mb-3">
+      <label for="editCity" class="form-label">Tỉnh/Thành phố:</label>
+      <input type="text" class="form-control"
+             th:classappend="${#fields.hasErrors('city')} ? 'is-invalid' : ''"
+             id="editCity" th:field="*{city}" placeholder="Tỉnh/Thành phố">
+      <div class="invalid-feedback" th:errors="*{city}"></div>
+    </div>
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="editIsDefault"
+             name="isDefault" th:checked="${addressToEdit.isDefault()}"> <label class="form-check-label" for="editIsDefault">Đặt làm địa chỉ mặc định</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+    <a th:href="@{/profile}" class="btn btn-secondary ms-2">Hủy</a>
+  </form>
+</div>
+
+<footer class="bg-light text-center py-3 mt-4">
+  <p>© 2025 TechShop. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

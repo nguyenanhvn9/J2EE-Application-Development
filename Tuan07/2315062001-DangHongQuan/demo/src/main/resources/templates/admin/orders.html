@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <title>TechShop - Quản lý Đơn hàng</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .container { margin-top: 20px; }
+    .table img { max-width: 50px; height: auto; }
+    .filter-form { margin-bottom: 20px; }
+    .status-badge {
+      padding: .35em .65em;
+      font-size: .75em;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: baseline;
+      border-radius: .375rem;
+      color: #fff;
+    }
+    .status-badge.PENDING { background-color: #ffc107; color: #000; } /* Yellow */
+    .status-badge.PROCESSING { background-color: #0d6efd; } /* Blue */
+    .status-badge.SHIPPED { background-color: #17a2b8; } /* Teal */
+    .status-badge.DELIVERED { background-color: #28a745; } /* Green */
+    .status-badge.CANCELLED { background-color: #dc3545; } /* Red */
+  </style>
+</head>
+<body>
+
+
+<div class="container">
+  <h1 class="my-4">Quản lý Đơn hàng</h1>
+
+  <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <span th:text="${successMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${errorMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <form th:action="@{/admin/orders}" method="get" class="filter-form row g-3 align-items-center">
+    <div class="col-md-4">
+      <label for="statusFilter" class="form-label visually-hidden">Lọc theo trạng thái:</label>
+      <select id="statusFilter" name="status" class="form-select">
+        <option value="">-- Tất cả trạng thái --</option>
+        <option th:each="s : ${T(com.example.demo.entity.OrderStatus).values()}"
+                th:value="${s}"
+                th:text="${s.name()}"
+                th:selected="${s.name() == selectedStatus}">
+        </option>
+      </select>
+    </div>
+    <div class="col-md-5">
+      <label for="keyword" class="form-label visually-hidden">Tìm kiếm:</label>
+      <input type="text" id="keyword" name="keyword" class="form-control" th:value="${keyword}" placeholder="Tìm theo tên/SĐT khách hàng">
+    </div>
+    <div class="col-md-3">
+      <button type="submit" class="btn btn-primary">Áp dụng</button>
+      <a th:href="@{/admin/orders}" class="btn btn-secondary ms-2">Đặt lại</a>
+    </div>
+  </form>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Khách hàng</th>
+        <th>SĐT</th>
+        <th>Địa chỉ</th>
+        <th>Tổng tiền</th>
+        <th>Ngày đặt</th>
+        <th>Trạng thái</th>
+        <th>Thao tác</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="order : ${orders}">
+        <td th:text="${order.id}"></td>
+        <td th:text="${order.customerName}"></td>
+        <td th:text="${order.customerPhone}"></td>
+        <td th:text="${order.shippingAddress}"></td>
+        <td th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+        <td th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy HH:mm')}"></td>
+        <td>
+          <span class="status-badge" th:classappend="${order.status.name()}" th:text="${order.status.description}"></span>
+        </td>
+        <td>
+          <a th:href="@{/admin/orders/{id}(id=${order.id})}" class="btn btn-info btn-sm">Xem chi tiết</a>
+        </td>
+      </tr>
+      <tr th:if="${orders.empty}">
+        <td colspan="8" class="text-center text-muted">Không tìm thấy đơn hàng nào.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer class="bg-light text-center py-3 mt-4">
+  <p>© 2025 TechShop. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

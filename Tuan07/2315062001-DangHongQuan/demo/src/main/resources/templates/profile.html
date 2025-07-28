@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechShop - Tài khoản cá nhân</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --gray-color: #6b7280;
+            --border-color: #e5e7eb;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-color);
+            color: var(--dark-color);
+        }
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+        }
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        .navbar-toggler {
+            border: none;
+            color: white;
+        }
+        .profile-header {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            padding: 2rem 2rem 1rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            box-shadow: 0 4px 16px rgba(37,99,235,0.08);
+        }
+        .profile-info h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .profile-info p {
+            color: var(--gray-color);
+            margin-bottom: 0.2rem;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .profile-card, .address-card, .order-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .address-card.default-address {
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 8px rgba(37,99,235,0.08);
+            position: relative;
+        }
+        .address-card.default-address::after {
+            content: "Mặc định";
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-bottom-left-radius: 16px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        .btn-action {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            margin-right: 0.5rem;
+        }
+        .btn-action:last-child { margin-right: 0; }
+        .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .footer-section h5 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+        .footer-section p, .footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+        .footer-section a:hover {
+            color: var(--accent-color);
+        }
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-laptop me-2"></i>TechShop
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/my-orders">
+                            <i class="fas fa-box me-1"></i>Đơn hàng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cart">
+                            <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/login">
+                            <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/signup">
+                            <i class="fas fa-user-plus me-1"></i>Đăng ký
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>
+                            <span sec:authentication="principal.fullName"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/profile">
+                                <i class="fas fa-user-cog me-2"></i>Tài khoản
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown" sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cog me-1"></i>Quản lý
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/admin/products">
+                                <i class="fas fa-boxes me-2"></i>Sản phẩm
+                            </a></li>
+                            <li><a class="dropdown-item" href="/admin/orders">
+                                <i class="fas fa-list me-2"></i>Đơn hàng
+                            </a></li>
+                            <li><a class="dropdown-item" href="/admin/add-product">
+                                <i class="fas fa-plus me-2"></i>Thêm sản phẩm
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="container py-4">
+    <div class="profile-header mb-4">
+        <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="profile-info">
+            <h2 th:text="${userProfileDto.fullName}">Họ và tên</h2>
+            <p><i class="fas fa-envelope me-2"></i><span th:text="${user.email}">Email</span></p>
+            <p><i class="fas fa-phone me-2"></i><span th:text="${userProfileDto.phone}">Số điện thoại</span></p>
+            <p><i class="fas fa-user me-2"></i><span th:text="${user.username}">Tên đăng nhập</span></p>
+        </div>
+    </div>
+
+    <div th:if="${successMessage != null and not #strings.isEmpty(successMessage)}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${errorMessage != null and not #strings.isEmpty(errorMessage)}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="profile-card mb-4">
+        <div class="section-title"><i class="fas fa-user-edit me-2"></i>Cập nhật thông tin cá nhân</div>
+        <form th:action="@{/profile/update-info}" method="post" th:object="${userProfileDto}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="fullName" class="form-label">Họ và tên</label>
+                    <input type="text" class="form-control" id="fullName" th:field="*{fullName}"
+                           th:classappend="${#fields.hasErrors('fullName') ? 'is-invalid' : ''}">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="phone" class="form-label">Số điện thoại</label>
+                    <input type="text" class="form-control" id="phone" th:field="*{phone}"
+                           th:classappend="${#fields.hasErrors('phone') ? 'is-invalid' : ''}">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                </div>
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" th:value="${user.email}" readonly>
+                    <small class="form-text text-muted">Email không thể thay đổi.</small>
+                </div>
+                <div class="col-md-6">
+                    <label for="username" class="form-label">Tên đăng nhập</label>
+                    <input type="text" class="form-control" id="username" th:value="${user.username}" readonly>
+                    <small class="form-text text-muted">Tên đăng nhập không thể thay đổi.</small>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-action mt-4"><i class="fas fa-save me-2"></i>Lưu thay đổi</button>
+        </form>
+    </div>
+
+    <div class="profile-card mb-4">
+        <div class="section-title"><i class="fas fa-map-marker-alt me-2"></i>Sổ địa chỉ của bạn</div>
+        <div th:if="${addresses.isEmpty()}" class="alert alert-info">Bạn chưa có địa chỉ nào.</div>
+        <div class="row">
+            <div class="col-md-6 mb-3" th:each="address : ${addresses}">
+                <div class="address-card h-100" th:classappend="${address.default ? 'default-address' : ''}">
+                    <h5 class="mb-2" th:text="${address.alias}"></h5>
+                    <p class="mb-0"><strong th:text="${address.recipientName}"></strong></p>
+                    <p class="mb-0" th:text="${address.phoneNumber}"></p>
+                    <p class="mb-0" th:text="${address.streetAddress}"></p>
+                    <p class="mb-0" th:text="${address.ward} + ', ' + ${address.district}"></p>
+                    <p class="mb-0" th:text="${address.city}"></p>
+                    <div class="mt-3">
+                        <a th:href="@{/profile/addresses/edit/{id}(id=${address.id})}" class="btn btn-warning btn-action"><i class="fas fa-edit me-1"></i>Sửa</a>
+                        <form th:action="@{/profile/addresses/delete/{id}(id=${address.id})}" method="post" style="display:inline;"
+                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa địa chỉ này?');">
+                            <button type="submit" class="btn btn-danger btn-action"><i class="fas fa-trash me-1"></i>Xóa</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-4">
+            <a th:href="@{/profile/addresses/add}" class="btn btn-success btn-action">
+                <i class="fas fa-plus-circle me-2"></i>Thêm Địa Chỉ Mới
+            </a>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a th:href="@{/my-orders}" class="btn btn-primary btn-action"><i class="fas fa-history me-2"></i>Xem lịch sử đơn hàng</a>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h5><i class="fas fa-laptop me-2"></i>TechShop</h5>
+                <p>Cửa hàng công nghệ hàng đầu Việt Nam, chuyên cung cấp các sản phẩm công nghệ chất lượng cao với giá cả hợp lý.</p>
+            </div>
+            <div class="footer-section">
+                <h5>Liên kết nhanh</h5>
+                <p><a href="/">Trang chủ</a></p>
+                <p><a href="#products">Sản phẩm</a></p>
+                <p><a href="/cart">Giỏ hàng</a></p>
+                <p><a href="/my-orders">Đơn hàng</a></p>
+            </div>
+            <div class="footer-section">
+                <h5>Hỗ trợ khách hàng</h5>
+                <p><a href="#">Hướng dẫn mua hàng</a></p>
+                <p><a href="#">Chính sách bảo hành</a></p>
+                <p><a href="#">Chính sách đổi trả</a></p>
+                <p><a href="#">Liên hệ</a></p>
+            </div>
+            <div class="footer-section">
+                <h5>Liên hệ</h5>
+                <p><i class="fas fa-phone me-2"></i>1900-1234</p>
+                <p><i class="fas fa-envelope me-2"></i>info@techshop.vn</p>
+                <p><i class="fas fa-map-marker-alt me-2"></i>123 Đường ABC, Quận 1, TP.HCM</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 TechShop. Tất cả quyền được bảo lưu.</p>
+        </div>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

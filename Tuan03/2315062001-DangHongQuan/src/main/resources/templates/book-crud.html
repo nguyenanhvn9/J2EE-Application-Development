@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Book CRUD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+
+<div class="container">
+    <h2 class="mb-4">Book CRUD</h2>
+
+    <form th:action="@{/book-crud/view/add}" method="post" class="row g-2 mb-4">
+        <div class="col-md-5">
+            <input type="text" class="form-control" name="title" placeholder="Title" required>
+        </div>
+        <div class="col-md-5">
+            <input type="text" class="form-control" name="author" placeholder="Author" required>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Add</button>
+        </div>
+    </form>
+
+    <div class="mb-3">
+        <a th:href="@{/book-crud/view/fetch}" class="btn btn-outline-success">Fetch 5 books from Gutendex</a>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th style="width: 180px">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="book : ${books}">
+            <form th:action="@{/book-crud/view/update}" method="post">
+                <td><input type="hidden" name="id" th:value="${book.id}" /> <span th:text="${book.id}"></span></td>
+                <td><input type="text" name="title" class="form-control" th:value="${book.title}" /></td>
+                <td><input type="text" name="author" class="form-control" th:value="${book.author}" /></td>
+                <td>
+                    <button class="btn btn-sm btn-warning" type="submit">Update</button>
+                    <a th:href="@{'/book-crud/view/delete/' + ${book.id}}" class="btn btn-sm btn-danger ms-1">Delete</a>
+                </td>
+            </form>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

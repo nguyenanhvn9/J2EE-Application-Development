@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>TechShop - Thanh toán</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .cart-img { width: 100px; height: 100px; object-fit: cover; }
+        .total-price { font-size: 1.2rem; font-weight: bold; }
+        .address-option-card, .store-option-card {
+            border: 1px solid #e9ecef;
+            border-radius: .25rem;
+            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+            cursor: pointer;
+        }
+        .address-option-card.selected, .store-option-card.selected {
+            border-color: #0d6efd;
+            box-shadow: 0 0 5px rgba(13, 110, 253, 0.2);
+            background-color: #eaf3ff;
+        }
+        .voucher-section {
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .text-line-through {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">TechShop</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/my-orders">📦 Đơn hàng của tôi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cart">🛒 Giỏ hàng</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/login">Đăng nhập</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/signup">Đăng ký</a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center" sec:authorize="isAuthenticated()">
+                        <span class="nav-link">
+                            👋 Chào mừng, <strong><span sec:authentication="principal.fullName"></span></strong>
+                        </span>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" th:href="@{/profile}">👤 Tài khoản của tôi</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <form th:action="@{/logout}" method="post" style="margin: 0;">
+                            <button type="submit" class="nav-link btn btn-link" style="padding: 0; border: none; background: none;">
+                                🚪 Đăng xuất
+                            </button>
+                        </form>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" href="/admin/products">🛠 Bảng điều khiển Admin</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" href="/admin/add-product">➕ Thêm Sản Phẩm</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" href="/admin/products">📝 Quản lý Sản Phẩm</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" href="/admin/orders">📦 Quản lý Đơn hàng</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="container mt-4">
+    <h2>Thanh toán</h2>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${selectedItems == null or selectedItems.isEmpty()}">
+        <p>Không có sản phẩm nào được chọn để thanh toán.</p>
+        <a href="/cart" class="btn btn-primary">Quay lại giỏ hàng</a>
+    </div>
+    <div th:if="${selectedItems != null and !selectedItems.isEmpty()}">
+        <div class="row">
+            <div class="col-md-7">
+                <h4>Sản phẩm đã chọn</h4>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Hình ảnh</th>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Giá</th>
+                        <th>Tổng</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${selectedItems}" th:with="total=${item.totalPrice}">
+                        <td><img th:src="${item.product.imageUrl} ?: 'https://via.placeholder.com/100x100?text=No+Image'" class="cart-img" alt="Product Image"></td>
+                        <td th:text="${item.product.name}"></td>
+                        <td th:text="${item.quantity}"></td>
+                        <td th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+                        <td th:text="${#numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="total-price">
+                    <p>Tổng tiền sản phẩm: <span id="productsTotalPriceDisplay" th:text="${#numbers.formatDecimal(productsTotalPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</span></p>
+                    <p>Phí vận chuyển: <span id="shippingFeeDisplay">0 VND</span></p>
+                    <p id="discountAmountRow" style="display: none;">Giảm giá Voucher: - <span id="discountAmountDisplay">0 VND</span></p>
+                    <p class="fs-4">Tổng thanh toán cuối cùng: <span id="finalTotalDisplay" class="text-danger">0 VND</span></p>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h4>Thông tin đặt hàng</h4>
+                <form id="checkoutForm" th:action="@{/checkout}" method="post">
+                    <input th:each="item : ${selectedItems}" type="hidden" name="selectedItemIds" th:value="${item.id}"/>
+
+                    <input type="hidden" id="hiddenShippingFee" name="shippingFee" value="0"/>
+                    <input type="hidden" id="hiddenDiscountAmount" name="discountAmount" value="0"/>
+                    <input type="hidden" id="hiddenVoucherCode" name="voucherCode" value=""/>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phương thức nhận hàng:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="deliveryMethod" id="deliveryMethod_delivery" value="DELIVERY" checked>
+                            <label class="form-check-label" for="deliveryMethod_delivery">Giao hàng tận nơi</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="deliveryMethod" id="deliveryMethod_pickup" value="PICKUP">
+                            <label class="form-check-label" for="deliveryMethod_pickup">Nhận tại cửa hàng</label>
+                        </div>
+                    </div>
+
+                    <div id="deliveryDetails" style="display: block;">
+                        <div sec:authorize="isAuthenticated()" class="mb-3">
+                            <label class="form-label">Chọn địa chỉ từ Sổ địa chỉ:</label>
+                            <div th:if="${addresses.isEmpty()}" class="alert alert-info py-2">Bạn chưa có địa chỉ nào trong sổ địa chỉ.</div>
+                            <div th:unless="${addresses.isEmpty()}">
+                                <div class="address-option-card" th:each="address : ${addresses}" th:data-address-id="${address.id}">
+                                    <input type="radio" name="selectedAddressId" th:id="'address_' + ${address.id}" th:value="${address.id}" class="form-check-input me-2">
+                                    <label th:for="'address_' + ${address.id}">
+                                        <strong th:text="${address.alias}"></strong> - <span th:text="${address.recipientName}"></span> - <span th:text="${address.phoneNumber}"></span><br>
+                                        <small th:text="${address.streetAddress} + ', ' + ${address.ward} + ', ' + ${address.district} + ', ' + ${address.city}"></small>
+                                        <span th:if="${address.isDefault}" class="badge bg-primary ms-2">Mặc định</span>
+                                    </label>
+                                </div>
+                                <div class="mt-2">
+                                    <a th:href="@{/profile}" target="_blank" class="btn btn-outline-secondary btn-sm">Quản lý Sổ địa chỉ</a>
+                                </div>
+                                <hr>
+                            </div>
+                        </div>
+
+                        <h5>Hoặc nhập địa chỉ thủ công:</h5>
+                        <div class="mb-3">
+                            <label for="customerName" class="form-label">Họ và tên</label>
+                            <input type="text" id="customerName" name="customerName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="shippingAddress" class="form-label">Địa chỉ giao hàng</label>
+                            <input type="text" id="shippingAddress" name="shippingAddress" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="customerPhone" class="form-label">Số điện thoại</label>
+                            <input type="text" id="customerPhone" name="customerPhone" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="shippingMethod" class="form-label">Phương thức giao hàng (Phí)</label>
+                            <select id="shippingMethod" name="shippingMethod" class="form-select" required>
+                                <option value="STANDARD" data-fee="30000">Giao hàng tiêu chuẩn (30,000 VND)</option>
+                                <option value="EXPRESS" data-fee="50000">Giao hàng nhanh (50,000 VND)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="pickupDetails" style="display: none;">
+                        <div class="mb-3">
+                            <label for="pickupStoreId" class="form-label">Chọn cửa hàng:</label>
+                            <div th:if="${stores.isEmpty()}" class="alert alert-warning py-2">Chưa có cửa hàng nào được cấu hình.</div>
+                            <div th:unless="${stores.isEmpty()}">
+                                <div class="store-option-card" th:each="store : ${stores}" th:data-store-id="${store.id}">
+                                    <input type="radio" name="pickupStoreId" th:id="'store_' + ${store.id}" th:value="${store.id}" class="form-check-input me-2" required>
+                                    <label th:for="'store_' + ${store.id}">
+                                        <strong th:text="${store.name}"></strong><br>
+                                        <small th:text="${store.address}"></small><br>
+                                        <small th:text="${store.phoneNumber}"></small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="voucher-section mt-4">
+                        <h5>Mã giảm giá</h5>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="voucherCodeInput" placeholder="Nhập mã giảm giá">
+                            <button class="btn btn-outline-primary" type="button" id="applyVoucherBtn">Áp dụng</button>
+                            <button class="btn btn-outline-danger" type="button" id="removeVoucherBtn" style="display: none;">Xóa</button>
+                        </div>
+                        <div id="voucherMessage" class="mt-2"></div>
+                        <div id="appliedVoucherInfo" class="mt-2" style="display: none;">
+                            <p>Mã đã áp dụng: <strong id="appliedVoucherCode"></strong></p>
+                            <p>Giảm giá: <strong class="text-success">- <span id="appliedVoucherDiscount">0 VND</span></strong></p>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Đặt hàng</button>
+                    <a href="/cart" class="btn btn-secondary ms-2 mt-3">Quay lại giỏ hàng</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-light text-center py-3 mt-4">
+    <p>© 2025 TechShop. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const addresses = /*[[${addresses}]]*/ [];
+    let productsTotalPrice = /*[[${#aggregates.sum(selectedItems.![totalPrice])}]]*/ 0.0;
+    console.log("Giá trị ban đầu của productsTotalPrice:", productsTotalPrice); // <--- THÊM DÒNG NÀY
+    console.log("Kiểu dữ liệu của productsTotalPrice:", typeof productsTotalPrice); // <--- THÊM DÒNG NÀY
+    let currentShippingFee = 0;
+    let currentDiscountAmount = 0;
+    let appliedVoucherCode = '';
+
+    const formatCurrency = (amount) => {
+        return parseFloat(amount).toLocaleString('vi-VN') + ' VND';
+    };
+
+    // Function to update all total amount displays
+    function updateFinalTotal() {
+        const initialTotalBeforeDiscount = productsTotalPrice + currentShippingFee;
+        const finalTotal = initialTotalBeforeDiscount - currentDiscountAmount;
+
+        $('#shippingFeeDisplay').text(formatCurrency(currentShippingFee));
+        $('#discountAmountDisplay').text(formatCurrency(currentDiscountAmount));
+        $('#finalTotalDisplay').text(formatCurrency(finalTotal));
+
+        // Update hidden fields for form submission
+        $('#hiddenShippingFee').val(currentShippingFee);
+        $('#hiddenDiscountAmount').val(currentDiscountAmount);
+        $('#hiddenVoucherCode').val(appliedVoucherCode);
+
+        // Show/hide discount row
+        if (currentDiscountAmount > 0) {
+            $('#discountAmountRow').show();
+        } else {
+            $('#discountAmountRow').hide();
+        }
+    }
+
+    // Toggle Delivery Details visibility and required attributes
+    function toggleDeliveryDetails() {
+        const deliveryDetailsDiv = $('#deliveryDetails');
+        const pickupDetailsDiv = $('#pickupDetails');
+        const shippingMethodSelect = $('#shippingMethod');
+        const customerNameInput = $('#customerName');
+        const shippingAddressInput = $('#shippingAddress');
+        const customerPhoneInput = $('#customerPhone');
+        const storeRadios = $('input[name="pickupStoreId"]');
+
+        if ($('#deliveryMethod_delivery').is(':checked')) {
+            deliveryDetailsDiv.show();
+            pickupDetailsDiv.hide();
+            shippingMethodSelect.prop('required', true);
+            customerNameInput.prop('required', true);
+            shippingAddressInput.prop('required', true);
+            customerPhoneInput.prop('required', true);
+            storeRadios.prop('required', false);
+            // Reset pickup store selection if any
+            storeRadios.prop('checked', false);
+            $('.store-option-card').removeClass('selected');
+
+            currentShippingFee = parseFloat(shippingMethodSelect.find('option:selected').data('fee') || 0);
+        } else { // PICKUP is checked
+            deliveryDetailsDiv.hide();
+            pickupDetailsDiv.show();
+            shippingMethodSelect.prop('required', false);
+            customerNameInput.prop('required', false);
+            shippingAddressInput.prop('required', false);
+            customerPhoneInput.prop('required', false);
+            // Reset address selection if any
+            $('input[name="selectedAddressId"]').prop('checked', false);
+            $('.address-option-card').removeClass('selected');
+            customerNameInput.val('');
+            shippingAddressInput.val('');
+            customerPhoneInput.val('');
+
+            storeRadios.prop('required', true);
+            currentShippingFee = 0; // No shipping fee for pickup
+        }
+        updateFinalTotal(); // Recalculate total after delivery method change
+        applyVoucher(); // Re-apply voucher as total might change
+    }
+
+    // Function to apply voucher via AJAX
+    function applyVoucher() {
+        const voucherCode = $('#voucherCodeInput').val().trim();
+        if (voucherCode === '') {
+            $('#voucherMessage').html('<div class="alert alert-info py-2">Vui lòng nhập mã giảm giá.</div>');
+            currentDiscountAmount = 0;
+            appliedVoucherCode = '';
+            $('#appliedVoucherInfo').hide();
+            $('#removeVoucherBtn').hide();
+            updateFinalTotal();
+            return;
+        }
+
+        // Calculate current total for voucher validation (products total + shipping fee)
+        const totalForVoucher = productsTotalPrice + currentShippingFee;
+
+        // Perform AJAX call
+        $.ajax({
+            url: '/api/voucher/validate', // Make sure this endpoint exists in your backend
+            type: 'GET',
+            data: {
+                code: voucherCode,
+                orderTotal: totalForVoucher
+            },
+            success: function(response) {
+                if (response.discountAmount !== undefined) {
+                    currentDiscountAmount = parseFloat(response.discountAmount);
+                    appliedVoucherCode = voucherCode;
+                    $('#voucherMessage').html('<div class="alert alert-success py-2">Mã giảm giá hợp lệ!</div>');
+                    $('#appliedVoucherCode').text(voucherCode);
+                    $('#appliedVoucherDiscount').text(formatCurrency(currentDiscountAmount));
+                    $('#appliedVoucherInfo').show();
+                    $('#removeVoucherBtn').show();
+                } else {
+                    // Fallback for unexpected response, though not ideal
+                    $('#voucherMessage').html('<div class="alert alert-warning py-2">Mã giảm giá không hợp lệ.</div>');
+                    currentDiscountAmount = 0;
+                    appliedVoucherCode = '';
+                    $('#appliedVoucherInfo').hide();
+                    $('#removeVoucherBtn').hide();
+                }
+                updateFinalTotal();
+            },
+            error: function(xhr, status, error) {
+                let errorMessage = 'Đã xảy ra lỗi khi kiểm tra mã giảm giá.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                } else if (xhr.responseText) {
+                    // Try to parse plain text error if not JSON
+                    try {
+                        const errorObj = JSON.parse(xhr.responseText);
+                        if (errorObj.message) {
+                            errorMessage = errorObj.message;
+                        }
+                    } catch (e) {
+                        errorMessage = xhr.responseText; // Use raw text if not JSON
+                    }
+                }
+                $('#voucherMessage').html('<div class="alert alert-danger py-2">' + errorMessage + '</div>');
+                currentDiscountAmount = 0;
+                appliedVoucherCode = '';
+                $('#appliedVoucherInfo').hide();
+                $('#removeVoucherBtn').hide();
+                updateFinalTotal();
+            }
+        });
+    }
+
+    // Function to remove applied voucher
+    function removeVoucher() {
+        currentDiscountAmount = 0;
+        appliedVoucherCode = '';
+        $('#voucherCodeInput').val(''); // Clear the input field
+        $('#voucherMessage').empty(); // Clear any messages
+        $('#appliedVoucherInfo').hide();
+        $('#removeVoucherBtn').hide();
+        updateFinalTotal();
+    }
+
+
+    $(document).ready(function() {
+        const deliveryMethodRadios = $('input[name="deliveryMethod"]');
+        const shippingMethodSelect = $('#shippingMethod');
+        const selectedAddressRadios = $('input[name="selectedAddressId"]');
+        const applyVoucherBtn = $('#applyVoucherBtn');
+        const removeVoucherBtn = $('#removeVoucherBtn');
+
+        // Initial setup based on checked radio button
+        toggleDeliveryDetails();
+
+        // Event listener for delivery method change
+        deliveryMethodRadios.on('change', toggleDeliveryDetails);
+
+        // Event listener for shipping method change (only relevant for delivery)
+        shippingMethodSelect.on('change', function() {
+            currentShippingFee = parseFloat($(this).find('option:selected').data('fee') || 0);
+            updateFinalTotal();
+            applyVoucher(); // Re-apply voucher as total might change
+        });
+
+        // Handle address selection from Address Book
+        selectedAddressRadios.on('change', function() {
+            const selectedAddressId = $(this).val();
+            const selectedAddress = addresses.find(addr => addr.id == selectedAddressId);
+
+            if (selectedAddress) {
+                $('#customerName').val(selectedAddress.recipientName);
+                $('#shippingAddress').val(selectedAddress.streetAddress + ', ' + selectedAddress.ward + ', ' + selectedAddress.district + ', ' + selectedAddress.city);
+                $('#customerPhone').val(selectedAddress.phoneNumber);
+            }
+
+            $('.address-option-card').removeClass('selected');
+            $(this).closest('.address-option-card').addClass('selected');
+        });
+
+        // Add click listener to address cards to also check the radio button
+        $('.address-option-card').on('click', function() {
+            $(this).find('input[type="radio"]').prop('checked', true).trigger('change');
+        });
+
+        // Add click listener to store cards to also check the radio button
+        $('.store-option-card').on('click', function() {
+            $(this).find('input[type="radio"]').prop('checked', true);
+            $('.store-option-card').removeClass('selected');
+            $(this).addClass('selected');
+        });
+
+        // If there are addresses, pre-select the default one if it exists, or the first one
+        if (addresses && addresses.length > 0) {
+            let defaultAddress = addresses.find(addr => addr.isDefault);
+            if (!defaultAddress) {
+                defaultAddress = addresses[0];
+            }
+            if (defaultAddress) {
+                $('#address_' + defaultAddress.id).prop('checked', true).trigger('change');
+            }
+        }
+
+        // Voucher button event listeners
+        applyVoucherBtn.on('click', applyVoucher);
+        removeVoucherBtn.on('click', removeVoucher);
+
+        // Optional: Allow pressing Enter to apply voucher
+        $('#voucherCodeInput').on('keypress', function(e) {
+            if (e.which === 13) { // Enter key
+                e.preventDefault(); // Prevent form submission
+                applyVoucher();
+            }
+        });
+
+        // Initial update of total
+        updateFinalTotal();
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .checkout-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+        }
+
+        .checkout-steps {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            right: -50%;
+            height: 2px;
+            background: #dee2e6;
+            z-index: 1;
+        }
+
+        .step:last-child::before {
+            display: none;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            position: relative;
+            z-index: 2;
+            color: #6c757d;
+        }
+
+        .step.active .step-circle {
+            background: #28a745;
+            color: white;
+        }
+
+        .step.completed .step-circle {
+            background: #20c997;
+            color: white;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: #495057;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .order-summary {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            position: sticky;
+            top: 20px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-row {
+            border-top: 2px solid #dee2e6;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .security-badge {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .btn-place-order {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-place-order:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+
+        .shipping-option {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .shipping-option:hover {
+            border-color: #28a745;
+            background-color: #f8fff8;
+        }
+
+        .shipping-option.selected {
+            border-color: #28a745;
+            background-color: #e8f5e8;
+        }
+
+        .shipping-option input[type="radio"] {
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<!-- Header -->
+<div class="checkout-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-shield-alt me-2"></i>Secure Checkout
+                </h1>
+                <p class="mb-0 opacity-75">Complete your purchase safely and securely</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="d-flex align-items-center justify-content-md-end">
+                    <i class="fas fa-lock me-2"></i>
+                    <span>SSL Secured</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Checkout Steps -->
+<div class="container mt-4">
+    <div class="checkout-steps">
+        <div class="step completed">
+            <div class="step-circle">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="step-label">Cart</div>
+        </div>
+        <div class="step active">
+            <div class="step-circle">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="step-label">Checkout</div>
+        </div>
+        <div class="step">
+            <div class="step-circle">
+                <i class="fas fa-credit-card"></i>
+            </div>
+            <div class="step-label">Payment</div>
+        </div>
+        <div class="step">
+            <div class="step-circle">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="step-label">Complete</div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Error Message -->
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <span th:text="${errorMessage}">Error message</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <form th:action="@{/checkout/process}" th:object="${checkoutRequest}" method="post" id="checkoutForm">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+        <div class="row">
+            <!-- Checkout Form -->
+            <div class="col-lg-8">
+                <!-- Customer Information -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-user me-2 text-primary"></i>Customer Information
+                    </h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="customerName" class="form-label">Full Name *</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="customerName"
+                                   th:field="*{customerName}"
+                                   placeholder="Enter your full name"
+                                   required>
+                            <div class="invalid-feedback">Please provide your full name.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="customerEmail" class="form-label">Email Address *</label>
+                            <input type="email"
+                                   class="form-control"
+                                   id="customerEmail"
+                                   th:field="*{customerEmail}"
+                                   placeholder="Enter your email"
+                                   required>
+                            <div class="invalid-feedback">Please provide a valid email address.</div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="customerPhone" class="form-label">Phone Number *</label>
+                            <input type="tel"
+                                   class="form-control"
+                                   id="customerPhone"
+                                   th:field="*{customerPhone}"
+                                   placeholder="Enter your phone number"
+                                   required>
+                            <div class="invalid-feedback">Please provide your phone number.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Information -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-shipping-fast me-2 text-primary"></i>Shipping Information
+                    </h4>
+                    <div class="mb-3">
+                        <label for="shippingAddress" class="form-label">Shipping Address *</label>
+                        <textarea class="form-control"
+                                  id="shippingAddress"
+                                  th:field="*{shippingAddress}"
+                                  rows="3"
+                                  placeholder="Enter your complete shipping address"
+                                  required></textarea>
+                        <div class="invalid-feedback">Please provide your shipping address.</div>
+                    </div>
+
+                    <!-- Shipping Method -->
+                    <div class="mb-3">
+                        <label class="form-label">Shipping Method *</label>
+                        <div class="shipping-options">
+                            <div class="shipping-option" data-method="standard">
+                                <input type="radio"
+                                       name="shippingMethod"
+                                       value="standard"
+                                       id="standard"
+                                       th:field="*{shippingMethod}"
+                                       required>
+                                <label for="standard" class="d-flex justify-content-between align-items-center w-100">
+                                    <div>
+                                        <strong>Standard Shipping</strong>
+                                        <br>
+                                        <small class="text-muted">5-7 business days</small>
+                                    </div>
+                                    <div class="text-success fw-bold">30,000 đ</div>
+                                </label>
+                            </div>
+                            <div class="shipping-option" data-method="express">
+                                <input type="radio"
+                                       name="shippingMethod"
+                                       value="express"
+                                       id="express"
+                                       th:field="*{shippingMethod}"
+                                       required>
+                                <label for="express" class="d-flex justify-content-between align-items-center w-100">
+                                    <div>
+                                        <strong>Express Shipping</strong>
+                                        <br>
+                                        <small class="text-muted">2-3 business days</small>
+                                    </div>
+                                    <div class="text-warning fw-bold">50,000 đ</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Badge -->
+                <div class="security-badge">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <i class="fas fa-shield-alt text-success fa-2x"></i>
+                        </div>
+                        <div class="col">
+                            <strong>Your information is secure</strong>
+                            <br>
+                            <small class="text-muted">We use industry-standard encryption to protect your data</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h4 class="mb-3">
+                        <i class="fas fa-receipt me-2"></i>Order Summary
+                    </h4>
+
+                    <!-- Cart Items Preview -->
+                    <div th:if="${cart != null and cart.cartItems != null}" class="mb-3">
+                        <div th:each="item : ${cart.cartItems}" class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0" th:text="${item.product.name}">Product Name</h6>
+                                <small class="text-muted">Qty: <span th:text="${item.quantity}">1</span></small>
+                            </div>
+                            <div class="text-end">
+                                <span th:text="${#numbers.formatDecimal(item.quantity * item.product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">299,000 đ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price Breakdown -->
+                    <div class="price-row">
+                        <span>Subtotal:</span>
+                        <span th:text="${#numbers.formatDecimal(subtotal, 0, 'COMMA', 0, 'POINT')} + ' đ'">890,000 đ</span>
+                    </div>
+
+                    <div class="price-row">
+                        <span>Shipping:</span>
+                        <span id="shippingCost">Select method</span>
+                    </div>
+
+                    <div class="price-row">
+                        <span>Tax (8%):</span>
+                        <span th:text="${#numbers.formatDecimal(subtotal * 0.08, 0, 'COMMA', 0, 'POINT')} + ' đ'">71,200 đ</span>
+                    </div>
+
+                    <div class="price-row total-row">
+                        <span>Total:</span>
+                        <span id="totalAmount" th:text="${#numbers.formatDecimal(subtotal * 1.08, 0, 'COMMA', 0, 'POINT')} + ' đ'">961,200 đ</span>
+                    </div>
+
+                    <!-- Place Order Button -->
+                    <button type="submit" class="btn btn-success btn-place-order w-100 mt-4">
+                        <i class="fas fa-lock me-2"></i>
+                        Place Secure Order
+                    </button>
+
+                    <!-- Payment Methods -->
+                    <div class="text-center mt-3">
+                        <small class="text-muted">We accept:</small>
+                        <div class="mt-2">
+                            <i class="fab fa-cc-visa fa-2x text-primary me-2"></i>
+                            <i class="fab fa-cc-mastercard fa-2x text-warning me-2"></i>
+                            <i class="fab fa-cc-paypal fa-2x text-info"></i>
+                        </div>
+                    </div>
+
+                    <!-- Return Policy -->
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <small class="text-muted">
+                            <i class="fas fa-undo me-1"></i>
+                            30-day return policy
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // Shipping method selection
+    document.querySelectorAll('.shipping-option').forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove selected class from all options
+            document.querySelectorAll('.shipping-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            // Add selected class to clicked option
+            this.classList.add('selected');
+
+            // Check the radio button
+            const radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+
+            // Update shipping cost
+            updateShippingCost(radio.value);
+        });
+    });
+
+    function updateShippingCost(method) {
+        const shippingCostElement = document.getElementById('shippingCost');
+        const totalAmountElement = document.getElementById('totalAmount');
+
+        let shippingCost = 0;
+        if (method === 'standard') {
+            shippingCost = 30000;
+            shippingCostElement.textContent = '30,000 đ';
+        } else if (method === 'express') {
+            shippingCost = 50000;
+            shippingCostElement.textContent = '50,000 đ';
+        }
+
+        // Calculate new total (assuming subtotal and tax are available)
+        const subtotal = /*[[${subtotal}]]*/ 0;
+        const tax = subtotal * 0.08;
+        const total = subtotal + tax + shippingCost;
+
+        totalAmountElement.textContent = new Intl.NumberFormat('vi-VN').format(total) + ' đ';
+    }
+
+    // Initialize with default shipping method if selected
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectedShipping = document.querySelector('input[name="shippingMethod"]:checked');
+        if (selectedShipping) {
+            updateShippingCost(selectedShipping.value);
+            selectedShipping.closest('.shipping-option').classList.add('selected');
+        }
+    });
+
+    // Auto-dismiss alerts
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                if (alert.classList.contains('show')) {
+                    alert.classList.remove('show');
+                }
+            });
+        }, 5000);
+    });
+</script>
+</body>
+</html>

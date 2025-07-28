@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <title>TechShop - Chi tiết đơn hàng</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .order-status {
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 5px;
+      color: white;
+    }
+    .status-PENDING { background-color: #ffc107; color: #333; }
+    .status-PROCESSING { background-color: #0d6efd; }
+    .status-SHIPPED { background-color: #6f42c1; }
+    .status-DELIVERED { background-color: #28a745; }
+    .status-CANCELLED { background-color: #dc3545; }
+    .product-thumbnail { width: 60px; height: 60px; object-fit: cover; }
+
+    /* Styles for the progress bar */
+    .progress-tracker {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 30px 0;
+      position: relative;
+    }
+    .progress-tracker::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background-color: #e0e0e0;
+      z-index: 1;
+      border-radius: 2px;
+    }
+    .progress-tracker-line {
+      position: absolute;
+      height: 4px;
+      background-color: #0d6efd; /* Bootstrap primary color */
+      z-index: 2;
+      border-radius: 2px;
+      transition: width 0.5s ease-in-out;
+    }
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 3;
+    }
+    .progress-step-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      font-weight: bold;
+      margin-bottom: 5px;
+      transition: background-color 0.5s ease-in-out;
+    }
+    .progress-step-text {
+      font-size: 0.85em;
+      text-align: center;
+      color: #6c757d;
+      font-weight: 500;
+    }
+    .progress-step.active .progress-step-icon {
+      background-color: #0d6efd; /* Active color */
+    }
+    .progress-step.completed .progress-step-icon {
+      background-color: #28a745; /* Completed color */
+    }
+  </style>
+</head>
+<body>
+<header>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <a class="navbar-brand" href="/">TechShop</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+              aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+        <ul class="navbar-nav align-items-center">
+          <li class="nav-item">
+            <a class="nav-link" href="/cart">🛒 Cart</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/my-orders">📦 Đơn hàng của tôi</a>
+          </li>
+          <li class="nav-item" sec:authorize="!isAuthenticated()">
+            <a class="nav-link" href="/login">Đăng nhập</a>
+          </li>
+          <li class="nav-item" sec:authorize="!isAuthenticated()">
+            <a class="nav-link" href="/signup">Đăng ký</a>
+          </li>
+          <li class="nav-item d-flex align-items-center" sec:authorize="isAuthenticated()">
+                        <span class="nav-link">
+                            👋 Chào mừng, <strong><span sec:authentication="principal.fullName"></span></strong>
+                        </span>
+          </li>
+          <li class="nav-item" sec:authorize="isAuthenticated()">
+            <form th:action="@{/logout}" method="post" style="margin: 0;">
+              <button type="submit" class="nav-link btn btn-link" style="padding: 0; border: none; background: none;">
+                🚪 Đăng xuất
+              </button>
+            </form>
+          </li>
+          <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+            <a class="nav-link" href="/admin/products">🛠 Bảng điều khiển Admin</a>
+          </li>
+          <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+            <a class="nav-link" href="/admin/add-product">➕ Thêm sản phẩm</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="container mt-4">
+  <h2 class="mb-4">Chi tiết đơn hàng #<span th:text="${order.id}"></span></h2>
+
+  <div th:if="${order == null}" class="alert alert-warning">
+    <p>Không tìm thấy đơn hàng này hoặc bạn không có quyền truy cập.</p>
+    <a href="/my-orders" class="btn btn-primary">Quay lại danh sách đơn hàng</a>
+  </div>
+
+  <div th:if="${order != null}">
+    <div class="progress-tracker">
+      <div class="progress-tracker-line" id="progressBar"></div>
+      <div class="progress-step" id="step-PENDING">
+        <div class="progress-step-icon">1</div>
+        <div class="progress-step-text">Đang chờ xử lý</div>
+      </div>
+      <div class="progress-step" id="step-PROCESSING">
+        <div class="progress-step-icon">2</div>
+        <div class="progress-step-text">Đang xử lý</div>
+      </div>
+      <div class="progress-step" id="step-SHIPPED">
+        <div class="progress-step-icon">3</div>
+        <div class="progress-step-text">Đang giao hàng</div>
+      </div>
+      <div class="progress-step" id="step-DELIVERED">
+        <div class="progress-step-icon">4</div>
+        <div class="progress-step-text">Đã giao hàng</div>
+      </div>
+    </div>
+    <div class="row mt-5">
+      <div class="col-md-6">
+        <h4>Thông tin đơn hàng</h4>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><strong>Ngày đặt:</strong> <span th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy HH:mm')}"></span></li>
+          <li class="list-group-item">
+            <strong>Trạng thái:</strong>
+            <span class="order-status" th:classappend="'status-' + ${order.status}" th:text="${order.status.description ?: order.status}"></span>
+          </li>
+          <li class="list-group-item"><strong>Tổng cộng:</strong> <span class="total-price" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span></li>
+          <li class="list-group-item" th:if="${order.shippingFee != null and order.shippingFee.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
+            <strong>Phí vận chuyển:</strong> <span th:text="${#numbers.formatDecimal(order.shippingFee, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span>
+          </li>
+          <li class="list-group-item" th:if="${order.discountAmount != null and order.discountAmount.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
+            <strong>Giảm giá Voucher:</strong> - <span th:text="${#numbers.formatDecimal(order.discountAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span> (<span th:text="${order.voucherCode}"></span>)
+          </li>
+        </ul>
+
+        <h4 class="mt-4">Thông tin nhận hàng</h4>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <strong>Phương thức:</strong>
+            <span th:text="${order.deliveryMethod == T(com.example.demo.entity.Order.DeliveryMethod).DELIVERY ? 'Giao hàng tận nơi' : 'Nhận tại cửa hàng'}"></span>
+          </li>
+
+          <th:block th:if="${order.deliveryMethod == T(com.example.demo.entity.Order.DeliveryMethod).DELIVERY}">
+            <li class="list-group-item"><strong>Họ và tên:</strong> <span th:text="${order.customerName}"></span></li>
+            <li class="list-group-item"><strong>Địa chỉ:</strong> <span th:text="${order.shippingAddress}"></span></li>
+            <li class="list-group-item"><strong>Số điện thoại:</strong> <span th:text="${order.customerPhone}"></span></li>
+            <li class="list-group-item" th:if="${order.shippingMethod != null}"><strong>Phương thức vận chuyển:</strong> <span th:text="${order.shippingMethod.description}"></span></li>
+          </th:block>
+
+          <th:block th:if="${order.deliveryMethod == T(com.example.demo.entity.Order.DeliveryMethod).PICKUP}">
+            <li class="list-group-item"><strong>Cửa hàng nhận:</strong> <span th:text="${order.pickupStore.name}"></span></li>
+            <li class="list-group-item"><strong>Địa chỉ cửa hàng:</strong> <span th:text="${order.pickupStore.address}"></span></li>
+            <li class="list-group-item"><strong>Số điện thoại cửa hàng:</strong> <span th:text="${order.pickupStore.phoneNumber}"></span></li>
+          </th:block>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <h4>Sản phẩm trong đơn hàng</h4>
+        <table class="table table-striped table-bordered">
+          <thead>
+          <tr>
+            <th></th>
+            <th>Sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Giá/SP</th>
+            <th>Tổng</th>
+            <th th:if="${order.status == T(com.example.demo.entity.OrderStatus).DELIVERED}">Đánh giá</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="item : ${order.orderItems}">
+            <td><img th:src="${item.product.imageUrl} ?: 'https://via.placeholder.com/60x60?text=No+Image'" class="product-thumbnail" alt="Product Image"></td>
+            <td><a th:href="@{/product/{id}(id=${item.product.id})}" th:text="${item.product.name}"></a></td>
+            <td th:text="${item.quantity}"></td>
+            <td th:text="${#numbers.formatDecimal(item.pricePerUnit, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+            <td th:text="${#numbers.formatDecimal(item.pricePerUnit * item.quantity, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+            <td th:if="${order.status == T(com.example.demo.entity.OrderStatus).DELIVERED}">
+              <a th:href="${'/product/' + item.product.id + '#reviewsSection'}" class="btn btn-sm btn-outline-primary">Viết đánh giá</a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="mt-4">
+      <a href="/my-orders" class="btn btn-secondary">Quay lại danh sách đơn hàng</a>
+      <button th:if="${order.status == T(com.example.demo.entity.OrderStatus).PENDING}"
+              type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
+        Hủy đơn hàng
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancelOrderModalLabel">Xác nhận hủy đơn hàng</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Không</button>
+        <form th:action="@{/my-orders/cancel/{id}(id=${order.id})}" method="post">
+          <button type="submit" class="btn btn-danger">Đồng ý Hủy</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<footer class="bg-light text-center py-3 mt-4">
+  <p>© 2025 TechShop. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  document.addEventListener('DOMContentLoaded', function() {
+    const orderStatus = /*[[${order.status.name()}]]*/ 'PENDING'; // Get current status name (e.g., "PENDING")
+    const statuses = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED']; // Define order of statuses
+
+    let currentIndex = statuses.indexOf(orderStatus);
+    if (currentIndex === -1) { // If status is not in the normal flow (e.g., CANCELLED)
+      currentIndex = 0; // Default to first step or handle as needed
+    }
+
+    const progressBar = document.getElementById('progressBar');
+    const steps = document.querySelectorAll('.progress-step');
+
+    // Add 'completed' class to steps before the current status
+    for (let i = 0; i <= currentIndex; i++) {
+      const stepId = 'step-' + statuses[i];
+      const stepElement = document.getElementById(stepId);
+      if (stepElement) {
+        stepElement.classList.add('active'); // Mark current step as active
+        if (i < currentIndex) { // Mark previous steps as completed
+          stepElement.classList.add('completed');
+        }
+      }
+    }
+
+    // Calculate progress bar width
+    // For 4 steps, positions are 0%, 33.3%, 66.6%, 100% relative to the total width
+    const totalSteps = statuses.length - 1; // Number of "segments" for the line
+    const progressWidth = (currentIndex / totalSteps) * 100;
+    progressBar.style.width = progressWidth + '%';
+
+    // Handle CANCELLED status: show it as a distinct state, not on the progress bar flow
+    if (orderStatus === 'CANCELLED') {
+      const cancelledStatusElement = document.querySelector('.order-status.status-CANCELLED');
+      if (cancelledStatusElement) {
+        cancelledStatusElement.textContent = 'Đã hủy'; // Ensure text is correct
+      }
+      // Optionally, you might want to gray out the progress bar or hide it for cancelled orders
+      // For now, it will show progress up to the point of cancellation if it was one of the defined steps
+      // or just remain at PENDING if cancelled immediately.
+    }
+  });
+  /*]]>*/
+</script>
+</body>
+</html>
